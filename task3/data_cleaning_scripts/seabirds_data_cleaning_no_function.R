@@ -20,23 +20,37 @@ seabirds_joined_data <- bird_dirty_data %>%
 
 
 # clean species names to remove age, wanplum, plphase and sex
-species_split <- function(df, col_name) {
-  case_when(
-    !is.na(df$age) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
-    !is.na(df$wanplum) ~ str_remove(col_name, " PL[// [:alnum:]]*"),
-    !is.na(df$plphase) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
-    !is.na(df$sex) ~ str_remove(col_name, " [MF]$"),
-    TRUE ~ col_name
+seabirds_clean_data <- seabirds_joined_data %>%
+  mutate(
+    common_name = case_when(
+      !is.na(age) ~ str_remove(com_name, " [A-Z]{2}[// [:alnum:]]*"),
+      !is.na(wanplum) ~ str_remove(com_name, " PL[// [:alnum:]]*"),
+      !is.na(plphase) ~ str_remove(com_name, " [A-Z]{2}[// [:alnum:]]*"),
+      !is.na(sex) ~ str_remove(com_name, " [MF]$"),
+      TRUE ~ com_name
+      ),
+    .after = com_name
+    ) %>%
+  mutate(
+    scientific_name = case_when(
+      !is.na(age) ~ str_remove(sci_name, " [A-Z]{2}[// [:alnum:]]*"),
+      !is.na(wanplum) ~ str_remove(sci_name, " PL[// [:alnum:]]*"),
+      !is.na(plphase) ~ str_remove(sci_name, " [A-Z]{2}[// [:alnum:]]*"),
+      !is.na(sex) ~ str_remove(sci_name, " [MF]$"),
+      TRUE ~ sci_name
+    ),
+    .after = com_name
+  ) %>%
+  mutate(
+    abbreviation = case_when(
+      !is.na(age) ~ str_remove(abr_name, " [A-Z]{2}[// [:alnum:]]*"),
+      !is.na(wanplum) ~ str_remove(abr_name, " PL[// [:alnum:]]*"),
+      !is.na(plphase) ~ str_remove(abr_name, " [A-Z]{2}[// [:alnum:]]*"),
+      !is.na(sex) ~ str_remove(abr_name, " [MF]$"),
+      TRUE ~ abr_name
+    ),
+    .after = abr_name
   )
-}
-
-seabirds_clean_data <- seabirds_joined_data %>% 
-  mutate(across(.cols = c(com_name, sci_name, abr_name),
-                .fns = ~ species_split(seabirds_joined_data, .x),
-                .names = "{.col}_1"
-                ),
-         .after = abr_name
-         )
 
 
 # select required variables and export clean data

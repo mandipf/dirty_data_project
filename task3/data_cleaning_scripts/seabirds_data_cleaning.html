@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-04-08" />
+<meta name="date" content="2023-04-09" />
 
 <title>seabirds_data_cleaning.R</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">seabirds_data_cleaning.R</h1>
 <h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-08</h4>
+<h4 class="date">2023-04-09</h4>
 
 </div>
 
@@ -422,84 +422,6 @@ seabirds_clean_data %&gt;%
     longitude = long
     ) %&gt;%
   write_csv(here::here(&quot;clean_data/seabirds_clean.csv&quot;))</code></pre>
-<pre class="r"><code># FUNCTION USING IF_ELSE
-# my_function &lt;- function(age, wanplum, plphase, sex, com_name) {
-#   if_else(!is.na(age),
-#           str_remove(com_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#           if_else(!is.na(wanplum),
-#                   str_remove(com_name, &quot; PL[// [:alnum:]]*&quot;),
-#                   if_else(!is.na(plphase),
-#                           str_remove(com_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#                           if_else(!is.na(sex),
-#                                   str_remove(com_name, &quot; [MF]$&quot;),
-#                                   com_name
-#                           )
-#                   )
-#           )
-#   )
-# }
-# 
-# temp &lt;- seabirds_joined_data %&gt;%
-#   mutate(common_name = my_function(age, wanplum, plphase, sex, com_name),
-#          .after = com_name
-#          )  
-
-# FUNCTION USING CASE_WHEN  
-# my_function_2 &lt;- function(age, wanplum, plphase, sex, col_name) {
-#   case_when(
-#     !is.na(age) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#     !is.na(wanplum) ~ str_remove(col_name, &quot; PL[// [:alnum:]]*&quot;),
-#     !is.na(plphase) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#     !is.na(sex) ~ str_remove(col_name, &quot; [MF]&quot;),
-#     TRUE ~ col_name
-#   )
-# }  
-# 
-# temp_2 &lt;- seabirds_joined_data %&gt;%
-#   mutate(common_name = my_function_2(age, wanplum, plphase, sex, com_name),
-#          .after = com_name
-#   )     
-# 
-# temp_2 &lt;- seabirds_joined_data %&gt;%
-#   mutate(across(.cols = c(com_name, sci_name, abr_name),
-#                 .fns = ~ my_function_2(age, wanplum, plphase, sex, .x),
-#                 .names = &quot;{.col}_1&quot;
-#   ),
-#   .after = abr_name
-#   )  
-
-# LINE-BY-LINE WITHOUT FUNCTIONS 
-# temp &lt;- seabirds_joined_data %&gt;%
-#   mutate(
-#     common_name = case_when(
-#       !is.na(age) ~ str_remove(com_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#       !is.na(wanplum) ~ str_remove(com_name, &quot; PL[// [:alnum:]]*&quot;),
-#       !is.na(plphase) ~ str_remove(com_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#       !is.na(sex) ~ str_remove(com_name, &quot; [MF]$&quot;),
-#       TRUE ~ com_name
-#       ),
-#     .after = com_name
-#     ) %&gt;%
-#   mutate(
-#     scientific_name = case_when(
-#       !is.na(age) ~ str_remove(sci_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#       !is.na(wanplum) ~ str_remove(sci_name, &quot; PL[// [:alnum:]]*&quot;),
-#       !is.na(plphase) ~ str_remove(sci_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#       !is.na(sex) ~ str_remove(sci_name, &quot; [MF]$&quot;),
-#       TRUE ~ sci_name
-#     ),
-#     .after = com_name
-#   ) %&gt;%
-#   mutate(
-#     abbreviation = case_when(
-#       !is.na(age) ~ str_remove(abr_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#       !is.na(wanplum) ~ str_remove(abr_name, &quot; PL[// [:alnum:]]*&quot;),
-#       !is.na(plphase) ~ str_remove(abr_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-#       !is.na(sex) ~ str_remove(abr_name, &quot; [MF]$&quot;),
-#       TRUE ~ abr_name
-#     ),
-#     .after = abr_name
-#   )</code></pre>
 
 
 
