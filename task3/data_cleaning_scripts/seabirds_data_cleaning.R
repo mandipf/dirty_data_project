@@ -48,8 +48,6 @@ seabirds_clean_data %>%
     scientific_name = sci_name_1,
     abbreviation = abr_name_1,
     count,
-    acc_num = nacc,
-    acc_occ = ocacc,
     latitude = lat,
     longitude = long
     ) %>%
