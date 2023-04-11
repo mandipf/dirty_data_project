@@ -6,7 +6,7 @@ candy_names <- c(
   "airheads",
   "almond joy",
   "andes mints",
-  "any full sized candy bar",
+  # "any full sized candy bar",
   "atomic fireballs",
   "babe ruth",
   "bit o'honey",

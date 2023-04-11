@@ -1,0 +1,171 @@
+---
+title: "Task 4 - Halloween Candy Data"
+author: "Mandip"
+date: "2023-04-11"
+output: html_document
+---
+
+#Import libraries and data sets
+
+Import statements
+
+```{r}
+library(tidyverse)
+```
+
+Import data and have a quick review
+
+```{r}
+candy_data <- read_csv(here::here("clean_data/candy_clean.csv"),
+                           show_col_types = FALSE)
+
+candy_data_unique_rater <- candy_data %>% 
+  select(year, rater_id, age, gender, country, going_trick_or_treating) %>% 
+  unique()
+
+candy_data_with_rating_numbers <- candy_data %>% 
+  mutate(rating_number = case_when(rating == "despair" ~ -1,
+                                   rating == "joy" ~ 1,
+                                   TRUE ~ 0)
+         )
+
+summary(candy_data)
+```
+
+```{r}
+candy_data_unique_rater  %>% 
+  group_by(year) %>% 
+  count()
+
+candy_data_unique_rater  %>%
+  group_by(gender) %>% 
+  count()
+
+candy_data_unique_rater  %>%
+  group_by(country) %>% 
+  count()
+
+candy_data_unique_rater  %>%
+  group_by(going_trick_or_treating) %>% 
+  count()
+
+candy_data  %>% 
+  group_by(candy) %>% 
+  count()
+
+candy_data  %>% 
+  group_by(rating) %>% 
+  count()
+```
+
+# Analysis questions
+
+## Q1
+What is the total number of candy ratings given across the three years. (Number of candy ratings, not the number of raters. Don’t count missing values)
+
+```{r}
+candy_data  %>%
+  count()
+```
+
+## Q2
+What was the average age of people who are going out trick or treating?
+
+```{r}
+candy_data_unique_rater  %>%
+  filter(going_trick_or_treating == "Yes") %>% 
+  summarise(average_age = mean(age, na.rm = TRUE))
+```
+
+## Q3
+What was the average age of people who are not going trick or treating?
+
+```{r}
+candy_data_unique_rater  %>%
+  filter(going_trick_or_treating == "No") %>% 
+  summarise(average_age = mean(age, na.rm = TRUE))
+```
+
+## Q4
+For each of joy, despair and meh, which candy bar received the most of these ratings?
+
+```{r}
+# candy bars only
+candy_data %>%
+  filter(str_detect(candy, "bar")) %>% 
+  group_by(rating, candy) %>% 
+  summarise(number_of_ratings = n()) %>%
+  slice_max(number_of_ratings, n = 1)
+
+# all candy
+candy_data %>%
+  group_by(rating, candy) %>% 
+  summarise(number_of_ratings = n()) %>%
+  slice_max(number_of_ratings, n = 1)
+```
+
+## Q5
+How many people rated Starburst as despair?
+
+```{r}
+candy_data %>% 
+  filter(candy == "starburst" & rating == "despair") %>% 
+  summarise(number_of_people_rated_starburst_as_despair = n())
+```
+
+** For the next three questions, count despair as -1, joy as +1, and meh as 0**
+
+## Q6
+What was the most popular candy bar by this rating system for each gender in the dataset ?
+
+```{r}
+# candy bars only
+candy_data_with_rating_numbers %>%
+  filter(str_detect(candy, "bar")) %>% 
+  group_by(gender, candy) %>%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
+  slice_max(rating_value)
+
+# all candy
+candy_data_with_rating_numbers %>%
+  group_by(gender, candy) %>%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
+  slice_max(rating_value)
+```
+
+## Q7
+What was the most popular candy bar in each year?
+
+```{r}
+# candy bars only
+candy_data_with_rating_numbers %>%
+  filter(str_detect(candy, "bar")) %>% 
+  group_by(year, candy) %>%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
+  slice_max(rating_value)
+
+# all candy
+candy_data_with_rating_numbers %>%
+  group_by(year, candy) %>%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
+  slice_max(rating_value)
+```
+
+
+## Q8
+What was the most popular candy bar by this rating for people in US, Canada, UK, and all other countries?
+
+```{r}
+# candy bars only
+candy_data_with_rating_numbers %>%
+  filter(str_detect(candy, "bar")) %>% 
+  group_by(country, candy) %>%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
+  slice_max(rating_value)
+
+# all candy
+candy_data_with_rating_numbers %>%
+  group_by(country, candy) %>%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
+  slice_max(rating_value)
+```

@@ -10,6 +10,7 @@ import_xlsx_and_clean_names <- function(file_name) {
   df_clean <- df %>% 
     mutate(year = str_extract(file_name, "20[:digit:]{2}"),
            tibble::rowid_to_column(df, "rater_id"),
+           rater_id = str_c(year, "_", rater_id),
            .before = everything()
            ) %>% 
     janitor::clean_names()
