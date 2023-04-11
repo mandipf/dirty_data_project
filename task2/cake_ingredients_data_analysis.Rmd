@@ -1,0 +1,98 @@
+---
+title: "Task 2 - Cake ingredients"
+author: "Mandip"
+date: "2023-04-11"
+output: html_document
+---
+
+# Import libraries and data sets
+
+Import statements
+
+```{r}
+library(tidyverse)
+```
+
+Import data and have a quick review
+
+```{r}
+cake_data <- read_csv(here::here("clean_data/cake_ingredients_clean.csv"),
+                           show_col_types = FALSE)
+
+summary(cake_data)
+```
+
+```{r}
+cake_data %>% 
+  group_by(cake) %>% 
+  count()
+
+cake_data %>% 
+  group_by(ingredient) %>% 
+  count()
+
+cake_data %>% 
+  group_by(quantity) %>% 
+  count()
+
+cake_data %>% 
+  group_by(measure) %>% 
+  count()
+```
+
+
+# Analysis questions
+
+## Q1
+Which cake has the most cocoa in it?
+```{r}
+cake_data %>% 
+  filter(ingredient == "Cocoa") %>%
+  group_by(measure) %>% 
+  slice_max(quantity)
+```
+
+## Q2
+For sponge cake, how many cups of ingredients are used in total?
+
+```{r}
+cake_data %>% 
+  filter(cake == "Sponge" & measure == "cup") %>% 
+  summarise(quantity_of_cups_of_ingredients = sum(quantity, na.rm = TRUE))
+
+cake_data %>% 
+  filter(cake == "Sponge") %>% 
+  group_by(measure) %>% 
+  summarise(quantity_per_measure = sum(quantity, na.rm = TRUE))
+```
+
+## Q3
+How many ingredients are measured in teaspoons?
+
+```{r}
+cake_data %>% 
+  filter(measure == "teaspoon" & !is.na(quantity)) %>% 
+  distinct(ingredient) %>% 
+  arrange(ingredient)
+```
+
+## Q4
+Which cake has the most unique ingredients?
+
+```{r}
+cake_data %>% 
+  group_by(cake) %>%
+  filter(!is.na(quantity)) %>%
+  summarise(number_of_ingredients = n()) %>% 
+  slice_max(number_of_ingredients, n = 1)
+```
+
+## Q5
+Which ingredients are used only once?
+
+```{r}
+cake_data %>% 
+  filter(!is.na(quantity)) %>% 
+  count(ingredient) %>% 
+  filter(n == 1)
+```
