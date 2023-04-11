@@ -8,10 +8,11 @@ import_xlsx_and_clean_names <- function(file_name) {
                 col_types = "text")
   
   df_clean <- df %>% 
-    janitor::clean_names() %>% 
     mutate(year = str_extract(file_name, "20[:digit:]{2}"),
+           tibble::rowid_to_column(df, "rater_id"),
            .before = everything()
-           )
+           ) %>% 
+    janitor::clean_names()
 }
 
 # function to convert other candy bar column to usable candy and rating data
@@ -22,10 +23,7 @@ others_to_candy <- function(df, start_column, end_column) {
                  values_to = "candy"
                  ) %>%
     separate_longer_delim(cols = candy,
-                          delim = regex("[//.//,]")
-                          ) %>% 
-    separate_longer_delim(cols = candy,
-                          delim = regex(" and ")
+                          delim = regex("[//.//,//;]")
                           ) %>% 
     filter(!is.na(candy) & candy != "")
 }
@@ -44,11 +42,12 @@ candy_2015_col_clean <- candy_2015_import %>%
          going_trick_or_treating = are_you_going_actually_going_trick_or_treating_yourself,
          joy = please_list_any_items_not_included_above_that_give_you_joy,
          despair = please_list_any_items_not_included_above_that_give_you_despair
-         )
+         ) %>% 
+  select(year:despair)
 
 candy_2015_main_list <- candy_2015_col_clean %>%
   select(-joy, -despair) %>% 
-  pivot_longer(cols = butterfinger:please_estimate_the_degrees_of_separation_you_have_from_the_following_folks_beyonce_knowles,
+  pivot_longer(cols = butterfinger:last_col(),
                names_to = "candy",
                values_to = "rating"
                ) %>% 
@@ -56,7 +55,7 @@ candy_2015_main_list <- candy_2015_col_clean %>%
   filter(!is.na(rating))
 
 candy_2015_other_items <- candy_2015_col_clean %>% 
-  select(year, timestamp, age,
+  select(year, rater_id, age,
          going_trick_or_treating,
          joy, despair
          ) %>%
@@ -74,14 +73,14 @@ candy_2016_col_clean <- candy_2016_import %>%
          going_trick_or_treating = are_you_going_actually_going_trick_or_treating_yourself,
          gender = your_gender,
          country = which_country_do_you_live_in,
-         state_province_county_etc = which_state_province_county_do_you_live_in,
          joy = please_list_any_items_not_included_above_that_give_you_joy,
          despair = please_list_any_items_not_included_above_that_give_you_despair
-         )
+         ) %>% 
+  select(year:despair)
 
 candy_2016_main_list <- candy_2016_col_clean %>%
   select(-joy, -despair) %>%
-  pivot_longer(cols = x100_grand_bar:york_peppermint_patties_ignore,
+  pivot_longer(cols = x100_grand_bar:last_col(),
                names_to = "candy",
                values_to = "rating"
                ) %>% 
@@ -89,9 +88,9 @@ candy_2016_main_list <- candy_2016_col_clean %>%
   filter(!is.na(rating))
 
 candy_2016_other_items <- candy_2016_col_clean %>% 
-  select(year, timestamp, age, gender,
+  select(year, rater_id, age, gender,
          going_trick_or_treating,
-         country, state_province_county_etc,
+         country,
          joy, despair) %>% 
   others_to_candy("joy", "despair")
 
@@ -106,11 +105,12 @@ candy_2017_col_clean <- candy_2017_import %>%
   rename_with(~str_remove(., "^q[1-6]_")) %>% 
   rename(going_trick_or_treating = going_out,
          joy = q7_joy_other,
-         despair = q8_despair_other)
+         despair = q8_despair_other) %>% 
+  select(year:despair)
 
 candy_2017_main_list <- candy_2017_col_clean %>%
   select(-joy, -despair) %>% 
-  pivot_longer(cols = `100_grand_bar`:click_coordinates_x_y,
+  pivot_longer(cols = `100_grand_bar`:last_col(),
                names_to = "candy",
                values_to = "rating"
                ) %>% 
@@ -118,9 +118,9 @@ candy_2017_main_list <- candy_2017_col_clean %>%
   filter(!is.na(rating))
 
 candy_2017_other_items <- candy_2017_col_clean %>% 
-  select(year, internal_id, age, gender,
+  select(year, rater_id, age, gender,
          going_trick_or_treating,
-         country, state_province_county_etc,
+         country,
          joy, despair) %>%
   others_to_candy("joy", "despair")
 
@@ -134,157 +134,105 @@ all_candy_data_combined <- bind_rows(candy_2015_data,
                                       candy_2017_data)
 
 
+all_candy_data_combined <- all_candy_data_combined %>% 
+  select(year, rater_id, age, gender, country, 
+         going_trick_or_treating, candy, rating)
 
 
 
-# DEEP CLEAN
 
-# remove "candy" listings (individual spelling) with less than 5 votes based
-all_candy_data_ordered <- all_candy_data_unordered %>% 
-  select(year, timestamp, age, gender,
-         going_trick_or_treating,
-         country, state_province_county_etc,
-         everything()) %>%
+
+# DEEP CLEAN OF FULL DATA SET
+
+# combine similar sounding candy names and only keep joy/meh/despair entries
+
+source(here::here("data_cleaning_scripts/alt_entry_names_for_candy.R"))
+
+alternative_candy_names <- enframe(candy_list) %>%
+  unnest_longer(col = value, values_to = "replace_this")
+
+alt_candy_combined <- all_candy_data_combined %>%
   mutate(rating = str_to_lower(str_trim(rating)),
          candy = str_to_lower(str_trim(candy))
-         ) %>% 
+         ) %>%
   filter(rating %in% c("joy", "despair", "meh")) %>%
-  group_by(candy) %>% 
-  filter(n() > 4) %>% 
-  ungroup()
-
-# filter list further to group candy with different spelling
-
-# hundred_grand_bar <- c("100 grand bar", "x100 grand bar")
-# fifth_avenue <- c("5th avenue", "5th avenue bar")
-# aero <- c("aero, aero bars")
-# almond_joy <- c("almond_joy, almond_joys")
-# mary_jane <- c("anonymous brown globs that come in black and orange wrappers",
-#                "anonymous brown globs that come in black and orange wrappers a k a mary janes",
-#                "mary janes")
-# babe_ruth <- c("babe ruth", "baby ruth", "baby ruth bar", "baby ruths")
-# bit_o_honey <- c("bit o honey", "bit o' honey", "bit o'honey", "bit-o-honey")
-# bonkers <- c("bonkers", "bonkers the candy")
-# box_o_raisins <- c("box o raisins", "boxo raisins")
-# candy_apple <- c("candy apple", "candy apples")
-# caramel_apple <- c("caramel apple", "caramel apple pops", "caramel apples", "carmel apples")
-# charleston_chew <- c("charleston chew", "charleston chews")
-# clark_bar <- c("clark bar", "clark bars")
-# cow_tales <- c("cow tails", "cow tales")
-# dum_dums <- c("dum dums", "dum-dums")
-# gummi_worms <- c("gummi worms", "gummy worms")
-# jawbreakers <- c("jaw breakers", "jawbreakers")
-# jelly_belly <- c("jelly bellies", "jelly belly")
-# jolly_rancher <- c("jolly rancher bad flavor", "jolly ranchers good flavor")
-# licorice <- c("licorice", "licorice not black","licorice yes black")
-# mallo_cup <- c("mallo cups", "mallow cups")
-# mike_and_ike <- c("mike", "mike & ike", "mike & ikes", "mike and ike")
-# mounds_bar <- c("mounds", "mounds bar", "mounds bars")
-# mr_goodbar <- c("goodbar", "mr", "mr goodbar")
-# payday_bar <- c("pay day", "payday", "payday bar", "payday bars")
-# peanut_butter_m&m <- c("peanut butter m&m's","peanut butter m&ms")
-# raisinets <- c("raisinets", "raisinettes", "raisins")
-# reeses_pieces <- c("reece's pieces", "reese's pieces", "reeses pieces")
-# skor_bar <- c("skor", "skor bar", "skor bars")
-# sky_bar <- c("sky bar", "skybar")
-# sour_patch_kids <- c("sour patch kids", "sourpatch kids",
-#                      "sourpatch kids i e abominations of nature")
-# take_5_bar <- c("take 5", "take 5 bar", "take 5 bars", "take five", "take5")
-# tootsie_pop <- c("tootsie pop", "tootsie pops")
-# tootsie_roll <- c("tootsie roll", "tootsie roll pops", "tootsie rolls")
-# zagnut_bars <- c("zagnut", "zagnut bars")
-# zero_bar <- c("zero", "zero bar", "zero bars")
+  left_join(alternative_candy_names, by = join_by(candy == replace_this)) %>%
+  mutate(candy = if_else(!is.na(name), name, candy)) %>% 
+  select(-name)
 
 
+# check candy names exists and remove those with less than 10 entries 
 
-alternative_candy_names <- data.frame(
-  hundred_grand_bar = cbind("100 grand bar", "x100 grand bar"),
-  fifth_avenue = cbind("5th avenue", "5th avenue bar"),
-  aero = cbind("aero", "aero bars"),
-  almond_joy = cbind("almond_joy", "almond_joys"),
-  mary_jane = cbind("anonymous brown globs that come in black and orange wrappers",
-                 "anonymous brown globs that come in black and orange wrappers a k a mary janes",
-                 "mary janes"),
-  babe_ruth = cbind("babe ruth", "baby ruth", "baby ruth bar", "baby ruths"),
-  bit_o_honey = cbind("bit o honey", "bit o' honey", "bit o'honey", "bit-o-honey"),
-  bonkers = cbind("bonkers", "bonkers the candy"),
-  box_o_raisins = cbind("box o raisins", "boxo raisins"),
-  candy_apple = cbind("candy apple", "candy apples"),
-  caramel_apple = cbind("caramel apple", "caramel apple pops", "caramel apples", "carmel apples"),
-  charleston_chew = cbind("charleston chew", "charleston chews"),
-  clark_bar = cbind("clark bar", "clark bars"),
-  cow_tales = cbind("cow tails", "cow tales"),
-  dum_dums = cbind("dum dums", "dum-dums"),
-  gummi_worms = cbind("gummi worms", "gummy worms"),
-  jawbreakers = cbind("jaw breakers", "jawbreakers"),
-  jelly_belly = cbind("jelly bellies", "jelly belly"),
-  jolly_rancher = cbind("jolly rancher bad flavor", "jolly ranchers good flavor"),
-  licorice = cbind("licorice", "licorice not black","licorice yes black"),
-  mallo_cup = cbind("mallo cups", "mallow cups"),
-  mike_and_ike = cbind("mike", "mike & ike", "mike & ikes", "mike and ike"),
-  mounds_bar = cbind("mounds", "mounds bar", "mounds bars"),
-  mr_goodbar = cbind("goodbar", "mr", "mr goodbar"),
-  payday_bar = cbind("pay day", "payday", "payday bar", "payday bars"),
-  peanut_butter_m_m = cbind("peanut butter m&m's","peanut butter m&ms"),
-  raisinets = cbind("raisinets", "raisinettes", "raisins"),
-  reeses_pieces = cbind("reece's pieces", "reese's pieces", "reeses pieces"),
-  skor_bar = cbind("skor", "skor bar", "skor bars"),
-  sky_bar = cbind("sky bar", "skybar"),
-  sour_patch_kids = cbind("sour patch kids", "sourpatch kids",
-                       "sourpatch kids i e abominations of nature"),
-  take_5_bar = cbind("take 5", "take 5 bar", "take 5 bars", "take five", "take5"),
-  tootsie_pop = cbind("tootsie pop", "tootsie pops"),
-  tootsie_roll = cbind("tootsie roll", "tootsie roll pops", "tootsie rolls"),
-  zagnut_bar = cbind("zagnut", "zagnut bars"),
-  zero_bar = cbind("zero", "zero bar", "zero bars")
-)
+source(here::here("data_cleaning_scripts/candy_names.R"))
 
-alternative_candy_names_2 <- alternative_candy_names %>% 
-  pivot_longer(cols = everything(),
-               names_to = "replacement",
-               values_to = "to_replace") %>% 
-  mutate(replacement = str_remove(replacement, ".[0-9]$"))
+fixed_candy_data <- alt_candy_combined %>% 
+  mutate(is_candy = (candy %in% candy_names)) %>%
+  filter(is_candy) %>%
+  group_by(candy) %>%
+  filter(n() > 9) %>%
+  ungroup() %>% 
+  select(-is_candy)
 
-
-
-
-
-
-
-
-
-all_candy_data_ordered %>% 
-  group_by(candy) %>% 
-  count() %>% 
-  arrange() %>% 
-  write_csv(here::here("clean_data/all_candy_clean.csv"))
-
-
-all_candy_grouped <- all_candy_data_ordered %>% 
-  rename(going_trick_or_treating = going_out,
-         joy = q7_joy_other,
-         despair = q8_despair_other)
- 
-# remove non-candy bars from the list
-
-candy_only_data <- all_candy_grouped %>% 
-  filter(candy %in% candy_bar_list)
 
 # filter countries into Canada, UK, USA and others_unknown
 
-canada <- c()
-u_k <- c()
-u_s_a <- c()
+source(here::here("data_cleaning_scripts/alt_entry_names_for_countries.R"))
 
-candy_only_and_country_data <- candy_only_data %>% 
-  rename(going_trick_or_treating = going_out,
-         joy = q7_joy_other,
-         despair = q8_despair_other)
+alternative_country_names <- enframe(country_list) %>%
+  unnest_longer(col = value, values_to = "replace_this")
+
+candy_and_country_data <- fixed_candy_data %>% 
+  left_join(alternative_country_names, by = join_by(country == replace_this)) %>% 
+  mutate(name_2 = case_when(str_detect(country, "^(?i)canada")
+                                   ~ "Canada",
+                                   str_detect(country, "^(?i)unite[sd] st")
+                                   ~ "United States of America",
+                                   str_detect(country, "^(?i)U[// //.]*S")
+                                   ~ "United States of America",
+                                   str_detect(country, "mer")
+                                   ~ "United States of America",
+                                   str_detect(country, "^(?i)U[// ]*K$")
+                                   ~ "United Kingdom",
+                                   str_detect(country, "^United Ki[:alpha:]*om$")
+                                   ~ "United Kingdom",
+                                   TRUE ~ NA),
+         .after = name
+         ) %>%
+  mutate(country = case_when(!is.na(name_2) ~ name_2,
+                                   !is.na(name) ~ name,
+                                   TRUE ~ "Other or Unknown")
+         ) %>% 
+  select(-name, -name_2)
 
 
-## check age limits, gender and trick_treating status
+# check age limits, gender and trick_treating status
+#
+# age_list <- candy_and_country_data %>% 
+#   group_by(age) %>% 
+#   count()
+# 
+# gender_list <- candy_and_country_data %>% 
+#   group_by(gender) %>% 
+#   count()
+# 
+# trick_treating_list <- candy_and_country_data %>% 
+#   group_by(going_trick_or_treating) %>% 
+#   count()
+
+# update age list to be 1-100 years old, rest are NA
+
+age_candy_country_data <- candy_and_country_data %>% 
+  mutate(age_floor = floor(as.numeric(age)),
+         age = if_else(age_floor > 0 & age_floor <= 100,
+                       age_floor, NA)) %>% 
+  select(-age_floor)
 
 
-# export clean data
-all_candy_final %>%
+
+
+
+# EXPORT CLEAN DATA AS CSV
+age_candy_country_data %>%
+  select(year, rater_id, age, gender, country, 
+         going_trick_or_treating, candy, rating) %>% 
   write_csv(here::here("clean_data/candy_clean.csv"))
