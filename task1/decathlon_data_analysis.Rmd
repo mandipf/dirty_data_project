@@ -1,0 +1,95 @@
+---
+title: "Task 1 - Decathlon Data"
+author: "Mandip"
+date: "2023-04-11"
+output: html_document
+---
+
+# Import libraries and data sets
+
+Import statements
+
+```{r}
+library(tidyverse)
+```
+
+Import data and have a quick review
+
+```{r}
+decathlon_data <- read_csv(here::here("clean_data/decathlon_clean.csv"),
+                           show_col_types = FALSE)
+
+summary(decathlon_data)
+```
+
+```{r}
+decathlon_data %>% 
+  group_by(competition) %>% 
+  count()
+
+decathlon_data %>% 
+  group_by(event) %>% 
+  count()
+
+```
+
+# Analysis questions
+
+## Q1
+Who had the longest long jump seen in the data?
+
+```{r}
+decathlon_data %>% 
+  filter(event == "long jump") %>% 
+  slice_max(score)
+  
+```
+
+## Q2
+What was the average 100m time in each competition?
+
+```{r}
+decathlon_data %>% 
+  filter(event == "100m") %>% 
+  group_by(competition) %>% 
+  summarise("average 100m time (s)" = mean(score))
+```
+
+## Q3
+Who had the highest total points across both competitions?
+
+```{r}
+decathlon_data %>% 
+  group_by(competitor) %>% 
+  summarise(total_points = sum(points)) %>% 
+  slice_max(total_points)
+```
+
+## Q4
+What was the shot-put scores for the top three competitors in each competition?
+
+```{r}
+decathlon_data %>% 
+  filter(event == "shot put") %>% 
+  group_by(competition) %>%
+  slice_max(score, n = 3)
+```
+
+## Q5
+What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?
+
+```{r}
+# across both competitions
+decathlon_data %>% 
+  filter(event == "400m") %>% 
+  mutate(less_than_50s = score < 50) %>%
+  group_by(less_than_50s) %>% 
+  summarise(average_points = mean(points))
+
+# for each competition
+decathlon_data %>% 
+  filter(event == "400m") %>% 
+  mutate(less_than_50s = score < 50) %>%
+  group_by(competition,less_than_50s) %>% 
+  summarise(average_points = mean(points))
+```
