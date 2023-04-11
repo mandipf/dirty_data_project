@@ -10,13 +10,14 @@ ship_dirty_data <- readxl::read_xls(here::here("raw_data/seabirds.xls"),
                             col_types = "text")
 
 
-# join data sets and clean column names 
+# join data sets, clean column names and remove empty observations/records
 seabirds_joined_data <- bird_dirty_data %>% 
   left_join(ship_dirty_data, by = "RECORD ID") %>% 
   janitor::clean_names() %>% 
   rename(com_name = species_common_name_taxon_age_sex_plumage_phase,
          sci_name = species_scientific_name_taxon_age_sex_plumage_phase,
-         abr_name = species_abbreviation)
+         abr_name = species_abbreviation) %>% 
+  filter(com_name != "[NO BIRDS RECORDED]")
 
 
 # clean species names to remove age, wanplum, plphase and sex

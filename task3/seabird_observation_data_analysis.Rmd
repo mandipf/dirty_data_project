@@ -1,0 +1,120 @@
+---
+title: "Task 3 - Seabird observation data"
+author: "Mandip"
+date: "2023-04-11"
+output: html_document
+---
+
+# Import libraries and data sets
+
+Import statements
+
+```{r}
+library(tidyverse)
+```
+
+Import data and have a quick review
+
+```{r}
+seabirds_data <- read_csv(here::here("clean_data/seabirds_clean.csv"),
+                           show_col_types = FALSE)
+
+summary(seabirds_data)
+```
+
+```{r}
+seabirds_data %>% 
+  group_by(common_name) %>% 
+  count()
+
+seabirds_data %>% 
+  group_by(scientific_name) %>% 
+  count()
+
+seabirds_data %>% 
+  group_by(abbreviation) %>% 
+  count()
+```
+
+# Analysis questions
+
+## Q1
+Which bird had the most individual sightings?
+
+```{r}
+seabirds_data %>% 
+  select(common_name, scientific_name, abbreviation) %>% 
+  group_by(common_name) %>% 
+  mutate(number_of_sightings = n()) %>%
+  arrange(desc(number_of_sightings)) %>% 
+  head(1)
+
+# alt method which only gets common name
+seabirds_data %>%
+  group_by(common_name) %>% 
+  summarise(total_count = n()) %>% 
+  slice_max(total_count)
+```
+
+## Q2
+Which bird had the highest total count?
+
+```{r}
+seabirds_data %>% 
+  group_by(common_name) %>% 
+  mutate(total_count = sum(count, na.rm = TRUE)) %>%
+  select(common_name, scientific_name, abbreviation, total_count) %>%
+  arrange(desc(total_count)) %>% 
+  head(1)
+
+# alt method which only gets common name
+seabirds_data %>%
+  group_by(common_name) %>% 
+  summarise(total_count = sum(count, na.rm = TRUE)) %>% 
+  slice_max(total_count)
+```
+
+## Q3
+Which bird had the highest total count above a latitude of -30?
+
+```{r}
+seabirds_data %>% 
+  filter(latitude > -30) %>% 
+  group_by(common_name) %>% 
+  mutate(total_count = sum(count, na.rm = TRUE)) %>%
+  select(common_name, scientific_name, abbreviation, total_count) %>%
+  arrange(desc(total_count)) %>% 
+  head(1)
+
+# alt method which only gets common name
+seabirds_data %>%
+  filter(latitude > -30) %>% 
+  group_by(common_name) %>% 
+  summarise(total_count = sum(count, na.rm = TRUE)) %>% 
+  slice_max(total_count)
+```
+
+## Q4
+How many different types of birds were only ever seen in groups of 1?
+
+```{r}
+seabirds_data %>% 
+  filter(count == 1) %>%
+  distinct(common_name)
+
+seabirds_data %>% 
+  filter(count == 1) %>%
+  distinct(common_name) %>% 
+  count()
+```
+
+## Q5
+How many penguins were seen? (Hint: there are many types of penguin)
+
+```{r}
+seabirds_data %>% 
+  mutate(is_penguin = str_detect(common_name, "(?i)penguin")) %>%
+  filter(is_penguin) %>% 
+  summarise(number_penguin_sightings = n(),
+            number_of_penguins_seen = sum(count, na.rm = TRUE))
+```
