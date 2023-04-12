@@ -19,19 +19,6 @@ import_xlsx_and_clean_names <- function(file_name) {
     janitor::clean_names()
 }
 
-# function to convert other candy bar column to usable candy and rating data
-others_to_candy <- function(df, start_column, end_column) {
-  df %>% 
-    pivot_longer(cols = all_of(start_column):all_of(end_column),
-                 names_to = "rating",
-                 values_to = "candy"
-    ) %>%
-    separate_longer_delim(cols = candy,
-                          delim = regex("[//.//,//;]")
-    ) %>% 
-    filter(!is.na(candy) & candy != "")
-}
-
 
 
 ##### 
@@ -117,7 +104,7 @@ all_candy_data_combined <- all_candy_data_combined %>%
 # SECTION 3: DEEP CLEAN OF FULL DATA SET
 
 # combine similar sounding candy names and only keep joy/meh/despair entries
-source(here::here("data_cleaning_scripts/alt_entry_names_for_candy.R"))
+source(here::here("data_cleaning_scripts/lists/alt_entry_names_for_candy.R"))
 
 alternative_candy_names <- enframe(candy_list) %>%
   unnest_longer(col = value, values_to = "replace_this")
@@ -133,7 +120,7 @@ alt_candy_combined <- all_candy_data_combined %>%
 
 
 # check candy names exists and remove those with less than 10 entries 
-source(here::here("data_cleaning_scripts/candy_names.R"))
+source(here::here("data_cleaning_scripts/lists/candy_names.R"))
 
 fixed_candy_data <- alt_candy_combined %>% 
   mutate(is_candy = (candy %in% candy_names)) %>%
@@ -145,7 +132,7 @@ fixed_candy_data <- alt_candy_combined %>%
 
 
 # filter countries into Canada, UK, USA and others_unknown
-source(here::here("data_cleaning_scripts/alt_entry_names_for_countries.R"))
+source(here::here("data_cleaning_scripts/lists/alt_entry_names_for_countries.R"))
 
 alternative_country_names <- enframe(country_list) %>%
   unnest_longer(col = value, values_to = "replace_this")

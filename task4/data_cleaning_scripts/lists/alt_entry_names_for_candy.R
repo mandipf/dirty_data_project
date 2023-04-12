@@ -113,7 +113,7 @@ candy_list <- list(
                    "take 5 bars",
                    "take five",
                    "take5"),
-  "tolberone bar" = c("tolberone something or other"),
+  "toblerone bar" = c("tolberone something or other"),
   "tootsie pop" = c("tootsie pop",
                     "tootsie pops"),
   "tootsie roll" = c("tootsie roll",

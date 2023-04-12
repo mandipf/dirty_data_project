@@ -137,7 +137,7 @@ candy_names <- c(
   "those odd marshmallow circus peanut things",
   "three musketeers",
   "tic tacs",
-  "tolberone bar",
+  "toblerone bar",
   "tootsie pop",
   "tootsie roll",
   "trail mix",

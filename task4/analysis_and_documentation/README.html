@@ -9,11 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-04-12" />
 
-<title>candy_names.R</title>
+<title>README</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,169 +348,266 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">candy_names.R</h1>
-<h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-12</h4>
 
 </div>
 
 
-<pre class="r"><code>candy_names &lt;- c(
-  &quot;100 grand bar&quot;,
-  &quot;5th avenue bar&quot;,
-  &quot;abba zabba&quot;,
-  &quot;aero bar&quot;,
-  &quot;airheads&quot;,
-  &quot;almond joy bar&quot;,
-  &quot;andes mints&quot;,
-  # &quot;any full sized candy bar&quot;,
-  &quot;atomic fireballs&quot;,
-  &quot;babe ruth bar&quot;,
-  &quot;bit-o-honey&quot;,
-  &quot;black jacks&quot;,
-  &quot;blow pops&quot;,
-  &quot;bonkers&quot;,
-  &quot;bottle caps&quot;,
-  &quot;bounty&quot;,
-  &quot;bubble gum&quot;,
-  &quot;butterfinger&quot;,
-  &quot;cadbury creme eggs&quot;,
-  &quot;candy apple&quot;,
-  &quot;candy cigarettes&quot;,
-  &quot;candy corn&quot;,
-  &quot;caramel apple&quot;,
-  &quot;caramellos&quot;,
-  &quot;caramels&quot;,
-  &quot;charleston chew&quot;,
-  &quot;chick-o-sticks&quot;,
-  &quot;chiclets&quot;,
-  &quot;circus peanuts&quot;,
-  &quot;clark bar&quot;,
-  &quot;coffee crisp&quot;,
-  &quot;cow tales&quot;,
-  &quot;crispy crunch&quot;,
-  &quot;dark chocolate&quot;,
-  &quot;dark chocolate hershey&quot;,
-  &quot;dots&quot;,
-  &quot;dove bars&quot;,
-  &quot;dum-dums&quot;,
-  &quot;ferrero rocher&quot;,
-  &quot;free restaurant candy&quot;,
-  &quot;fun dip&quot;,
-  &quot;fuzzy peaches&quot;,
-  &quot;gobstoppers&quot;,
-  &quot;goo goo clusters&quot;,
-  &quot;good n plenty&quot;,
-  &quot;gum&quot;,
-  &quot;gum from baseball cards&quot;,
-  &quot;gummi worms&quot;,
-  &quot;gummy bears&quot;,
-  &quot;hard candy&quot;,
-  &quot;hershey s kissables&quot;,
-  &quot;hershey s milk chocolate&quot;,
-  &quot;hersheys dark chocolate&quot;,
-  &quot;hersheys kisses&quot;,
-  &quot;jawbreakers&quot;,
-  &quot;jelly beans&quot;,
-  &quot;jelly belly&quot;,
-  &quot;jolly rancher&quot;,
-  &quot;joy joy mit iodine&quot;,
-  &quot;junior mints&quot;,
-  &quot;kale smoothie&quot;,
-  &quot;kinder bueno&quot;,
-  &quot;kinder happy hippo&quot;,
-  &quot;kit kat&quot;,
-  &quot;kittens&quot;,
-  &quot;laffy taffy&quot;,
-  &quot;lemon heads&quot;,
-  &quot;licorice&quot;,
-  &quot;lindt truffle&quot;,
-  &quot;lollipops&quot;,
-  &quot;m&amp;ms&quot;,
-  &quot;mallo cup&quot;,
-  &quot;malted milk balls&quot;,
-  &quot;maltesers&quot;,
-  &quot;mars&quot;,
-  &quot;mary jane&quot;,
-  &quot;marzipan&quot;,
-  &quot;maynards&quot;,
-  &quot;mike and ike&quot;,
-  &quot;milk duds&quot;,
-  &quot;milky way&quot;,
-  &quot;milky way midnight&quot;,
-  &quot;minibags of chips&quot;,
-  &quot;mint juleps&quot;,
-  &quot;mint kisses&quot;,
-  &quot;mint leaves&quot;,
-  &quot;mounds bar&quot;,
-  &quot;mr goodbar&quot;,
-  &quot;necco wafers&quot;,
-  &quot;nerds&quot;,
-  &quot;nestle crunch&quot;,
-  &quot;nown laters&quot;,
-  &quot;nutrageous&quot;,
-  &quot;oh henry&quot;,
-  &quot;oreos&quot;,
-  &quot;payday bar&quot;,
-  &quot;peanut butter bars&quot;,
-  &quot;peeps&quot;,
-  &quot;pencils&quot;,
-  &quot;pennies&quot;,
-  &quot;pixy stix&quot;,
-  &quot;pop rocks&quot;,
-  &quot;popcorn&quot;,
-  &quot;popcorn ball&quot;,
-  &quot;pretzels&quot;,
-  &quot;puppies&quot;,
-  &quot;raisins&quot;,
-  &quot;raisinets&quot;,
-  &quot;reese s peanut butter cups&quot;,
-  &quot;reeses pieces&quot;,
-  &quot;reggie jackson bar&quot;,
-  &quot;ribbon candy&quot;,
-  &quot;ring pops&quot;,
-  &quot;rockets&quot;,
-  &quot;rocks&quot;,
-  &quot;rolos&quot;,
-  &quot;runts&quot;,
-  &quot;salt water taffy&quot;,
-  &quot;senior mints&quot;,
-  &quot;sixlets&quot;,
-  &quot;skittles&quot;,
-  &quot;skor bar&quot;,
-  &quot;sky bar&quot;,
-  &quot;smarties&quot;,
-  &quot;snickers&quot;,
-  &quot;soda&quot;,
-  &quot;sour patch kids&quot;,
-  &quot;starburst&quot;,
-  &quot;stickers&quot;,
-  &quot;sugar babies&quot;,
-  &quot;sugar daddy&quot;,
-  &quot;swedish fish&quot;,
-  &quot;sweetarts&quot;,
-  &quot;sweetums&quot;,
-  &quot;take 5 bar&quot;,
-  &quot;those odd marshmallow circus peanut things&quot;,
-  &quot;three musketeers&quot;,
-  &quot;tic tacs&quot;,
-  &quot;tolberone bar&quot;,
-  &quot;tootsie pop&quot;,
-  &quot;tootsie roll&quot;,
-  &quot;trail mix&quot;,
-  &quot;turkish delight&quot;,
-  &quot;twix&quot;,
-  &quot;twizzlers&quot;,
-  &quot;warheads&quot;,
-  &quot;wax lips&quot;,
-  &quot;whatchamacallit bar&quot;,
-  &quot;white chocolate&quot;,
-  &quot;whoppers&quot;,
-  &quot;wunderbar&quot;,
-  &quot;york peppermint patties&quot;,
-  &quot;zagnut bar&quot;,
-  &quot;zero bar&quot;
-)</code></pre>
+<div id="task-4---halloween-candy-data" class="section level1">
+<h1><strong>Task 4 - Halloween Candy Data</strong></h1>
+<hr />
+<div id="project-description" class="section level2">
+<h2>Project Description</h2>
+<p>This project cleans some Halloween Candy Data and performs some
+analysis on that cleaned data. The data itself, which is in the form of
+three Excel-based questionnaires (2015, 2016 and 2017), was provided as
+part of a CodeClan Dirty Data Project.</p>
+<p>Assumptions made about the data:</p>
+<ul>
+<li>There are no duplicates (raters) across the three year data
+set;</li>
+<li>Age range of people surveyed were 4 to 100. Anything outside this
+range was marked N/A;</li>
+<li>Candy names within the free text columns were separated using full
+stops, commas or semi-colons;</li>
+<li>Any candy which had less than 10 entries was removed from the data
+set to remove any pattern errors when searching free text columns.</li>
+</ul>
+<hr />
+</div>
+<div id="data-cleaning" class="section level2">
+<h2>Data cleaning</h2>
+<p>The data cleaning scripts are located in the
+<code>data_cleaning_scripts</code> folder. There are two scripts within
+this folder:</p>
+<ul>
+<li>The first uses the distinct column headers only for candy name
+(<code>candy_data_cleaning_without_text_field.R</code>);</li>
+<li>The other also extracts candy data from the free text field for
+other candies described as joy, meh or despair
+(<code>candy_data_cleaning.R</code>).</li>
+</ul>
+<p>There are also three scripts within the sub folder
+<code>lists</code>. These contain lists of:</p>
+<ul>
+<li>Recognised candy names (<code>candy_names.R</code>);</li>
+<li>Alternative entries for certain candy used within the questionnaires
+(<code>alt_entry_names_for_candy.R</code>);</li>
+<li>Alternative entries for certain countries used within the
+questionnaires (<code>alt_entry_names_for_countries.R</code>).</li>
+</ul>
+<p>The libraries required to run the data cleaning script are:</p>
+<pre><code>library(here)
+library(janitor)
+library(readxl)
+library(tidyverse)</code></pre>
+<div id="section-1-function-definitions" class="section level3">
+<h3>Section 1: Function definitions</h3>
+<p>This section defines the two functions used later in the data
+cleaning script.</p>
+<p><strong>Function 1</strong></p>
+<ul>
+<li>Imports the xlsx file;</li>
+<li>Adds columns for <code>year</code> and <code>rater_id</code>, which
+is made up of the row number and questionnaire year;</li>
+<li>Cleans the column names.</li>
+</ul>
+<p><strong>Function 2</strong> (only required for free text field
+search)</p>
+<ul>
+<li>Converts the data to long format (headers <code>candy</code> and
+<code>rating</code>);</li>
+<li>Searches through the free text columns for additional candy
+ratings;</li>
+<li>Remove any empty (N/A) ratings.</li>
+</ul>
+</div>
+<div id="section-2-import-and-clean-each-data-set-then-combine-them" class="section level3">
+<h3>Section 2: Import and clean each data set, then combine them</h3>
+<p>This section is used to import each data file and standardise it to
+combine all three data sets into one data set. For each data set (2015,
+2016, 2017), the following is carried out:</p>
+<ul>
+<li>Import file using Function 1;</li>
+<li>Rename columns relating the rater (age, country etc) to be
+consistent across all three files;</li>
+<li>Convert the data from the candy named columns into long format
+(<code>candy</code> and <code>rating</code>) and remove any empty (N/A)
+ratings;</li>
+<li>Use Function 2 to extract ratings for free text candy;</li>
+<li>Combine the data from the named columns and the extracted columns
+for a complete data set for that year.</li>
+</ul>
+<p>Each of the three data sets were then combined for further
+processing.</p>
+<p>Note: Function 2 is not used in
+<code>candy_data_cleaning_without_text_field.R</code>. Therefore only
+the data from the named columns is used in this reduced analysis.</p>
+</div>
+<div id="section-3-deep-clean-of-full-data-set" class="section level3">
+<h3>Section 3: Deep clean of full data set</h3>
+<p>This section is used to deep clean the combined data set as
+follows:</p>
+<ul>
+<li>Create a table of accepted alternative candy entries (spelling
+errors etc) using <code>alt_entry_names_for_candy.R</code>;</li>
+<li>Join this table to the combined data set;</li>
+<li>Create a table of recognised candy names using
+<code>candy_names.R</code>;</li>
+<li>Filter the combined data set against this candy name table;</li>
+<li>Remove any candies with less than 10 entries for pattern detection
+errors;</li>
+<li>Decode country entries using REGEX patterns;</li>
+<li>Create a table of accepted alternative country entries (spelling
+errors etc) using <code>alt_entry_names_for_countries.R</code>;</li>
+<li>Join this table to the combined data set;</li>
+<li>Convert age column to numeric and set all entries below 1 or above
+100 to N/A.</li>
+</ul>
+</div>
+<div id="section-4" class="section level3">
+<h3>Section 4:</h3>
+<p>This section selects the required variables (columns) for data
+analysis and exports the data to a CSV file.</p>
+<hr />
+</div>
+</div>
+<div id="data-analysis" class="section level2">
+<h2>Data analysis</h2>
+<p>The data analysis scripts are located in the
+<code>analysis_and_documentation</code> folder. There are two scripts
+within this folder:</p>
+<ul>
+<li>The first analyses data cleaned with
+<code>candy_data_cleaning_without_text_field.R</code>.</li>
+<li>The other analyses data cleaned with
+<code>candy_data_cleaning.R</code>.</li>
+</ul>
+<p>The libraries required to run the data analysis script are:</p>
+<pre><code>library(assertr)
+library(here)
+library(tidyverse)</code></pre>
+<p>The presence of all required fields within the imported file are
+verified before any analysis is conducted. This also includes a class
+verification for numeric fields.</p>
+<div id="analysis-questions" class="section level3">
+<h3>Analysis questions</h3>
+<p>With the exception of Q1, the answers provided by both data analysis
+scripts matched although the numbers were slightly higher in the
+complete data set.</p>
+<div id="q1" class="section level4">
+<h4>Q1</h4>
+<p>What is the total number of candy ratings given across the three
+years?</p>
+<pre><code>candy_data  %&gt;%
+  summarise(number_of_ratings = n())</code></pre>
+<p>This code chunk showed that there were 623513 candy ratings within
+the complete data set. Split by year, this was 384024 in 2015, 97340 in
+2016, and 142149 in 2017.</p>
+<p>When using the reduced data set (no free text field), this was
+reduced to 620373 candy ratings.Split by year, this was 381871 in 2015,
+96959 in 2016, and 141543 in 2017.</p>
+</div>
+<div id="q2" class="section level4">
+<h4>Q2</h4>
+<p>What was the average age of people who are going out trick or
+treating?</p>
+<pre><code>candy_data_unique_rater  %&gt;%
+  filter(going_trick_or_treating == &quot;Yes&quot;) %&gt;% 
+  summarise(average_age = mean(age, na.rm = TRUE))</code></pre>
+<p>The average age for trick or treaters was 35.1 years old.</p>
+</div>
+<div id="q3" class="section level4">
+<h4>Q3</h4>
+<p>What was the average age of people who are not going trick or
+treating?</p>
+<pre><code>candy_data_unique_rater  %&gt;%
+  filter(going_trick_or_treating == &quot;No&quot;) %&gt;% 
+  summarise(average_age = mean(age, na.rm = TRUE))</code></pre>
+<p>The average age for people not trick or treating was 39.0 years
+old.</p>
+</div>
+<div id="q4" class="section level4">
+<h4>Q4</h4>
+<p>For each of joy, despair and meh, which candy bar received the most
+of these ratings?</p>
+<pre><code>candy_data %&gt;%
+  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
+  group_by(rating, candy) %&gt;% 
+  summarise(number_of_ratings = n()) %&gt;%
+  slice_max(number_of_ratings, n = 1)</code></pre>
+<p>For candy bars:</p>
+<ul>
+<li>the highest rating for joy was Toblerone bar</li>
+<li>the highest rating for despair was Peanut Butter bars</li>
+<li>the highest rating for meh was 100 Grand bar</li>
+</ul>
+<p>For all candy:</p>
+<ul>
+<li>the highest rating for joy and meh was m&amp;ms</li>
+<li>the highest rating for despair was Mary Jane</li>
+</ul>
+</div>
+<div id="q5" class="section level4">
+<h4>Q5</h4>
+<p>How many people rated Starburst as despair?</p>
+<pre><code>candy_data %&gt;% 
+  filter(candy == &quot;starburst&quot; &amp; rating == &quot;despair&quot;) %&gt;% 
+  summarise(number_of_people_rated_starburst_as_despair = n())</code></pre>
+<p>1990 people rated Starburst as despair.</p>
+</div>
+<div id="q6" class="section level4">
+<h4>Q6</h4>
+<p>What was the most popular candy bar for each gender in the dataset?
+Count despair as -1, joy as +1, and meh as 0.</p>
+<pre><code>candy_data_with_rating_numbers %&gt;%
+  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
+  group_by(gender, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<p>For candy bars:</p>
+<ul>
+<li>the highest rating for female was Toblerone bar</li>
+<li>the highest rating for male was Toblerone bar</li>
+<li>the highest rating for other was Toblerone bar</li>
+<li>the highest rating for “I’d rather not say” was Dove bar</li>
+<li>the highest rating for unanswered (N/A) was Toblerone bar</li>
+</ul>
+<p>For all candy, the highest rated by everyone was m&amp;ms.</p>
+</div>
+<div id="q7" class="section level4">
+<h4>Q7</h4>
+<p>What was the most popular candy bar in each year? Count despair as
+-1, joy as +1, and meh as 0.</p>
+<pre><code>candy_data_with_rating_numbers %&gt;%
+  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
+  group_by(year, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<p>The highest rated candy bar every year was Toblerone bar.</p>
+<p>For all candy types, it was m&amp;ms every year.</p>
+</div>
+<div id="q8" class="section level4">
+<h4>Q8</h4>
+<p>What was the most popular candy bar by this rating for people in US,
+Canada, UK, and all other countries? Count despair as -1, joy as +1, and
+meh as 0.</p>
+<pre><code>candy_data_with_rating_numbers %&gt;%
+  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
+  group_by(country, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<p>The highest rated candy bar every region was Toblerone bar.</p>
+<p>For all candy types, it was m&amp;ms for every region.</p>
+<hr />
+</div>
+</div>
+</div>
+<div id="license" class="section level2">
+<h2>License</h2>
+<p>Distributed under the MIT License. See <code>LICENSE.txt</code> for
+more information.</p>
+</div>
+</div>
 
 
 
