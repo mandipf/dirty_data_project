@@ -9,11 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Mandip Farmahan" />
+<meta name="author" content="Mandip" />
 
 <meta name="date" content="2023-04-11" />
 
-<title>candy_names.R</title>
+<title>Task 4 - Halloween Candy Data (reduced data set)</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,169 +350,353 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">candy_names.R</h1>
-<h4 class="author">Mandip Farmahan</h4>
+<h1 class="title toc-ignore">Task 4 - Halloween Candy Data (reduced data
+set)</h1>
+<h4 class="author">Mandip</h4>
 <h4 class="date">2023-04-11</h4>
 
 </div>
 
 
-<pre class="r"><code>candy_names &lt;- c(
-  &quot;100 grand bar&quot;,
-  &quot;5th avenue bar&quot;,
-  &quot;abba zabba&quot;,
-  &quot;aero&quot;,
-  &quot;airheads&quot;,
-  &quot;almond joy&quot;,
-  &quot;andes mints&quot;,
-  &quot;any full sized candy bar&quot;,
-  &quot;atomic fireballs&quot;,
-  &quot;babe ruth&quot;,
-  &quot;bit o&#39;honey&quot;,
-  &quot;black jacks&quot;,
-  &quot;blow pops&quot;,
-  &quot;bonkers&quot;,
-  &quot;bottle caps&quot;,
-  &quot;bounty&quot;,
-  &quot;box o&#39;raisins&quot;,
-  &quot;bubble gum&quot;,
-  &quot;butterfinger&quot;,
-  &quot;cadbury creme eggs&quot;,
-  &quot;candy apple&quot;,
-  &quot;candy cigarettes&quot;,
-  &quot;candy corn&quot;,
-  &quot;caramel apple&quot;,
-  &quot;caramellos&quot;,
-  &quot;caramels&quot;,
-  &quot;charleston chew&quot;,
-  &quot;chick o&#39;sticks&quot;,
-  &quot;chiclets&quot;,
-  &quot;circus peanuts&quot;,
-  &quot;clark bar&quot;,
-  &quot;coffee crisp&quot;,
-  &quot;cow tales&quot;,
-  &quot;crispy crunch&quot;,
-  &quot;dark chocolate&quot;,
-  &quot;dark chocolate hershey&quot;,
-  &quot;dots&quot;,
-  &quot;dove bars&quot;,
-  &quot;dum-dums&quot;,
-  &quot;ferrero rocher&quot;,
-  &quot;free restaurant candy&quot;,
-  &quot;fun dip&quot;,
-  &quot;fuzzy peaches&quot;,
-  &quot;gobstoppers&quot;,
-  &quot;goo goo clusters&quot;,
-  &quot;good n plenty&quot;,
-  &quot;gum&quot;,
-  &quot;gum from baseball cards&quot;,
-  &quot;gummi worms&quot;,
-  &quot;gummy bears&quot;,
-  &quot;hard candy&quot;,
-  &quot;hershey s kissables&quot;,
-  &quot;hershey s milk chocolate&quot;,
-  &quot;hersheys dark chocolate&quot;,
-  &quot;hersheys kisses&quot;,
-  &quot;jawbreakers&quot;,
-  &quot;jelly beans&quot;,
-  &quot;jelly belly&quot;,
-  &quot;jolly rancher&quot;,
-  &quot;joy joy mit iodine&quot;,
-  &quot;junior mints&quot;,
-  &quot;kale smoothie&quot;,
-  &quot;kinder bueno&quot;,
-  &quot;kinder happy hippo&quot;,
-  &quot;kit kat&quot;,
-  &quot;kittens&quot;,
-  &quot;laffy taffy&quot;,
-  &quot;lemon heads&quot;,
-  &quot;licorice&quot;,
-  &quot;lindt truffle&quot;,
-  &quot;lollipops&quot;,
-  &quot;m&amp;m&quot;,
-  &quot;mallo cup&quot;,
-  &quot;malted milk balls&quot;,
-  &quot;maltesers&quot;,
-  &quot;mars&quot;,
-  &quot;mary jane&quot;,
-  &quot;marzipan&quot;,
-  &quot;maynards&quot;,
-  &quot;mike and ike&quot;,
-  &quot;milk duds&quot;,
-  &quot;milky way&quot;,
-  &quot;milky way midnight&quot;,
-  &quot;minibags of chips&quot;,
-  &quot;mint juleps&quot;,
-  &quot;mint kisses&quot;,
-  &quot;mint leaves&quot;,
-  &quot;mounds bar&quot;,
-  &quot;mr goodbar&quot;,
-  &quot;necco wafers&quot;,
-  &quot;nerds&quot;,
-  &quot;nestle crunch&quot;,
-  &quot;nown laters&quot;,
-  &quot;nutrageous&quot;,
-  &quot;oh henry&quot;,
-  &quot;oreos&quot;,
-  &quot;payday bar&quot;,
-  &quot;peanut butter bars&quot;,
-  &quot;peeps&quot;,
-  &quot;pencils&quot;,
-  &quot;pennies&quot;,
-  &quot;pixy stix&quot;,
-  &quot;pop rocks&quot;,
-  &quot;popcorn&quot;,
-  &quot;popcorn ball&quot;,
-  &quot;pretzels&quot;,
-  &quot;puppies&quot;,
-  &quot;raisinets&quot;,
-  &quot;reese s peanut butter cups&quot;,
-  &quot;reeses pieces&quot;,
-  &quot;reggie jackson bar&quot;,
-  &quot;ribbon candy&quot;,
-  &quot;ring pops&quot;,
-  &quot;rockets&quot;,
-  &quot;rocks&quot;,
-  &quot;rolos&quot;,
-  &quot;runts&quot;,
-  &quot;salt water taffy&quot;,
-  &quot;senior mints&quot;,
-  &quot;sixlets&quot;,
-  &quot;skittles&quot;,
-  &quot;skor bar&quot;,
-  &quot;sky bar&quot;,
-  &quot;smarties&quot;,
-  &quot;snickers&quot;,
-  &quot;soda&quot;,
-  &quot;sour patch kids&quot;,
-  &quot;starburst&quot;,
-  &quot;stickers&quot;,
-  &quot;sugar babies&quot;,
-  &quot;sugar daddy&quot;,
-  &quot;swedish fish&quot;,
-  &quot;sweetarts&quot;,
-  &quot;sweetums&quot;,
-  &quot;take 5 bar&quot;,
-  &quot;those odd marshmallow circus peanut things&quot;,
-  &quot;three musketeers&quot;,
-  &quot;tic tacs&quot;,
-  &quot;tolberone&quot;,
-  &quot;tootsie pop&quot;,
-  &quot;tootsie roll&quot;,
-  &quot;trail mix&quot;,
-  &quot;turkish delight&quot;,
-  &quot;twix&quot;,
-  &quot;twizzlers&quot;,
-  &quot;warheads&quot;,
-  &quot;wax lips&quot;,
-  &quot;whatchamacallit&quot;,
-  &quot;white chocolate&quot;,
-  &quot;whoppers&quot;,
-  &quot;wunderbar&quot;,
-  &quot;york peppermint patties&quot;,
-  &quot;zagnut bar&quot;,
-  &quot;zero bar&quot;
-)</code></pre>
+<div id="import-libraries-and-data-sets" class="section level1">
+<h1>Import libraries and data sets</h1>
+<div id="import-libraries" class="section level3">
+<h3>Import libraries</h3>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ dplyr     1.1.0     ✔ readr     2.1.4
+## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+## ✔ ggplot2   3.4.1     ✔ tibble    3.2.0
+## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+## ✔ purrr     1.0.1     
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
+<pre class="r"><code>library(assertr)
+
+# removes: `summarise()` has grouped output by x
+options(dplyr.summarise.inform = FALSE)</code></pre>
+</div>
+<div id="import-data" class="section level3">
+<h3>Import data</h3>
+<p>This data does not include additional free text field from the
+questionnaires.</p>
+<ul>
+<li>Check all fields required for analysis are present</li>
+<li>Check <code>age</code> is numeric
+<ul>
+<li><code>year</code> can be character or numeric class</li>
+</ul></li>
+</ul>
+<pre class="r"><code>candy_data &lt;- read_csv(here::here(&quot;clean_data/candy_clean_without_text_field.csv&quot;),
+                           show_col_types = FALSE)
+
+candy_data %&gt;% 
+  verify(has_all_names(&quot;year&quot;, &quot;rater_id&quot;, &quot;age&quot;, &quot;gender&quot;, &quot;country&quot;,
+                       &quot;going_trick_or_treating&quot;, &quot;candy&quot;, &quot;rating&quot;)) %&gt;% 
+  verify(is.numeric(age)) %&gt;%
+  summary()</code></pre>
+<pre><code>##       year        rater_id              age            gender         
+##  Min.   :2015   Length:620373      Min.   :  4.00   Length:620373     
+##  1st Qu.:2015   Class :character   1st Qu.: 31.00   Class :character  
+##  Median :2015   Mode  :character   Median : 38.00   Mode  :character  
+##  Mean   :2016                      Mean   : 38.85                     
+##  3rd Qu.:2016                      3rd Qu.: 46.00                     
+##  Max.   :2017                      Max.   :100.00                     
+##                                    NA&#39;s   :29048                      
+##    country          going_trick_or_treating    candy          
+##  Length:620373      Length:620373           Length:620373     
+##  Class :character   Class :character        Class :character  
+##  Mode  :character   Mode  :character        Mode  :character  
+##                                                               
+##                                                               
+##                                                               
+##                                                               
+##     rating         
+##  Length:620373     
+##  Class :character  
+##  Mode  :character  
+##                    
+##                    
+##                    
+## </code></pre>
+<pre class="r"><code>candy_data_unique_rater &lt;- candy_data %&gt;% 
+  select(year, rater_id, age, gender, country, going_trick_or_treating) %&gt;% 
+  unique()
+
+candy_data_with_rating_numbers &lt;- candy_data %&gt;% 
+  mutate(rating_number = case_when(rating == &quot;despair&quot; ~ -1,
+                                   rating == &quot;joy&quot; ~ 1,
+                                   TRUE ~ 0)
+         )</code></pre>
+<pre class="r"><code>candy_data_unique_rater  %&gt;% 
+  group_by(year) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 3 × 2
+## # Groups:   year [3]
+##    year     n
+##   &lt;dbl&gt; &lt;int&gt;
+## 1  2015  5533
+## 2  2016  1256
+## 3  2017  1803</code></pre>
+<pre class="r"><code>candy_data_unique_rater  %&gt;%
+  group_by(gender) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 5 × 2
+## # Groups:   gender [5]
+##   gender                 n
+##   &lt;chr&gt;              &lt;int&gt;
+## 1 Female              1027
+## 2 I&#39;d rather not say    89
+## 3 Male                1881
+## 4 Other                 43
+## 5 &lt;NA&gt;                5552</code></pre>
+<pre class="r"><code>candy_data_unique_rater  %&gt;%
+  group_by(country) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 4 × 2
+## # Groups:   country [4]
+##   country                      n
+##   &lt;chr&gt;                    &lt;int&gt;
+## 1 Canada                     277
+## 2 Other or Unknown          5698
+## 3 United Kingdom              44
+## 4 United States of America  2573</code></pre>
+<pre class="r"><code>candy_data_unique_rater  %&gt;%
+  group_by(going_trick_or_treating) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 3 × 2
+## # Groups:   going_trick_or_treating [3]
+##   going_trick_or_treating     n
+##   &lt;chr&gt;                   &lt;int&gt;
+## 1 No                       7637
+## 2 Yes                       891
+## 3 &lt;NA&gt;                       64</code></pre>
+<pre class="r"><code>candy_data  %&gt;% 
+  group_by(candy) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 81 × 2
+## # Groups:   candy [81]
+##    candy                  n
+##    &lt;chr&gt;              &lt;int&gt;
+##  1 100 grand bar       7868
+##  2 black jacks         7197
+##  3 bonkers             6954
+##  4 bottle caps         7909
+##  5 bubble gum          5171
+##  6 butterfinger        8261
+##  7 cadbury creme eggs  8267
+##  8 candy corn          8260
+##  9 caramellos          7921
+## 10 chick-o-sticks      7107
+## # … with 71 more rows</code></pre>
+<pre class="r"><code>candy_data  %&gt;% 
+  group_by(rating) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 3 × 2
+## # Groups:   rating [3]
+##   rating       n
+##   &lt;chr&gt;    &lt;int&gt;
+## 1 despair 276911
+## 2 joy     264896
+## 3 meh      78566</code></pre>
+</div>
+</div>
+<div id="analysis-questions" class="section level1">
+<h1>Analysis questions</h1>
+<div id="part-1" class="section level2">
+<h2>Part 1</h2>
+<div id="q1" class="section level3">
+<h3>Q1</h3>
+<p>What is the total number of candy ratings given across the three
+years. (Number of candy ratings, not the number of raters. Don’t count
+missing values)</p>
+<pre class="r"><code># across all three years
+candy_data  %&gt;%
+  summarise(number_of_ratings = n())</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   number_of_ratings
+##               &lt;int&gt;
+## 1            620373</code></pre>
+<pre class="r"><code># split by year
+candy_data  %&gt;%
+  summarise(number_of_ratings = n(),
+            .by = year)</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##    year number_of_ratings
+##   &lt;dbl&gt;             &lt;int&gt;
+## 1  2015            381871
+## 2  2016             96959
+## 3  2017            141543</code></pre>
+</div>
+<div id="q2" class="section level3">
+<h3>Q2</h3>
+<p>What was the average age of people who are going out trick or
+treating?</p>
+<pre class="r"><code>candy_data_unique_rater  %&gt;%
+  filter(going_trick_or_treating == &quot;Yes&quot;) %&gt;% 
+  summarise(average_age = mean(age, na.rm = TRUE))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   average_age
+##         &lt;dbl&gt;
+## 1        35.1</code></pre>
+</div>
+<div id="q3" class="section level3">
+<h3>Q3</h3>
+<p>What was the average age of people who are not going trick or
+treating?</p>
+<pre class="r"><code>candy_data_unique_rater  %&gt;%
+  filter(going_trick_or_treating == &quot;No&quot;) %&gt;% 
+  summarise(average_age = mean(age, na.rm = TRUE))</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   average_age
+##         &lt;dbl&gt;
+## 1        39.0</code></pre>
+</div>
+<div id="q4" class="section level3">
+<h3>Q4</h3>
+<p>For each of joy, despair and meh, which candy bar received the most
+of these ratings?</p>
+<pre class="r"><code># candy bars only
+candy_data %&gt;%
+  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
+  group_by(rating, candy) %&gt;% 
+  summarise(number_of_ratings = n()) %&gt;%
+  slice_max(number_of_ratings, n = 1)</code></pre>
+<pre><code>## # A tibble: 3 × 3
+## # Groups:   rating [3]
+##   rating  candy              number_of_ratings
+##   &lt;chr&gt;   &lt;chr&gt;                          &lt;int&gt;
+## 1 despair peanut butter bars              6006
+## 2 joy     tolberone bar                   6176
+## 3 meh     100 grand bar                   1307</code></pre>
+<pre class="r"><code># all candy
+candy_data %&gt;%
+  group_by(rating, candy) %&gt;% 
+  summarise(number_of_ratings = n()) %&gt;%
+  slice_max(number_of_ratings, n = 1)</code></pre>
+<pre><code>## # A tibble: 3 × 3
+## # Groups:   rating [3]
+##   rating  candy     number_of_ratings
+##   &lt;chr&gt;   &lt;chr&gt;                 &lt;int&gt;
+## 1 despair mary jane             10677
+## 2 joy     m&amp;ms                  20259
+## 3 meh     m&amp;ms                   5409</code></pre>
+</div>
+<div id="q5" class="section level3">
+<h3>Q5</h3>
+<p>How many people rated Starburst as despair?</p>
+<pre class="r"><code>candy_data %&gt;% 
+  filter(candy == &quot;starburst&quot; &amp; rating == &quot;despair&quot;) %&gt;% 
+  summarise(number_of_people_rated_starburst_as_despair = n())</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   number_of_people_rated_starburst_as_despair
+##                                         &lt;int&gt;
+## 1                                        1990</code></pre>
+</div>
+</div>
+<div id="part-2" class="section level2">
+<h2>Part 2</h2>
+<p>For the next three questions, count despair as -1, joy as +1, and meh
+as 0</p>
+<div id="q6" class="section level3">
+<h3>Q6</h3>
+<p>What was the most popular candy bar by this rating system for each
+gender in the dataset ?</p>
+<pre class="r"><code># candy bars only
+candy_data_with_rating_numbers %&gt;%
+  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
+  group_by(gender, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<pre><code>## # A tibble: 5 × 3
+## # Groups:   gender [5]
+##   gender             candy         rating_value
+##   &lt;chr&gt;              &lt;chr&gt;                &lt;dbl&gt;
+## 1 Female             tolberone bar          716
+## 2 I&#39;d rather not say dove bars               53
+## 3 Male               tolberone bar         1238
+## 4 Other              tolberone bar           23
+## 5 &lt;NA&gt;               tolberone bar         2807</code></pre>
+<pre class="r"><code># all candy
+candy_data_with_rating_numbers %&gt;%
+  group_by(gender, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<pre><code>## # A tibble: 5 × 3
+## # Groups:   gender [5]
+##   gender             candy rating_value
+##   &lt;chr&gt;              &lt;chr&gt;        &lt;dbl&gt;
+## 1 Female             m&amp;ms          2600
+## 2 I&#39;d rather not say m&amp;ms           217
+## 3 Male               m&amp;ms          4486
+## 4 Other              m&amp;ms           103
+## 5 &lt;NA&gt;               m&amp;ms          6546</code></pre>
+</div>
+<div id="q7" class="section level3">
+<h3>Q7</h3>
+<p>What was the most popular candy bar in each year?</p>
+<pre class="r"><code># candy bars only
+candy_data_with_rating_numbers %&gt;%
+  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
+  group_by(year, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<pre><code>## # A tibble: 3 × 3
+## # Groups:   year [3]
+##    year candy         rating_value
+##   &lt;dbl&gt; &lt;chr&gt;                &lt;dbl&gt;
+## 1  2015 tolberone bar         2797
+## 2  2016 tolberone bar          802
+## 3  2017 tolberone bar         1236</code></pre>
+<pre class="r"><code># all candy
+candy_data_with_rating_numbers %&gt;%
+  group_by(year, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<pre><code>## # A tibble: 3 × 3
+## # Groups:   year [3]
+##    year candy rating_value
+##   &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;
+## 1  2015 m&amp;ms          6495
+## 2  2016 m&amp;ms          2137
+## 3  2017 m&amp;ms          5320</code></pre>
+</div>
+<div id="q8" class="section level3">
+<h3>Q8</h3>
+<p>What was the most popular candy bar by this rating for people in US,
+Canada, UK, and all other countries?</p>
+<pre class="r"><code># candy bars only
+candy_data_with_rating_numbers %&gt;%
+  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
+  group_by(country, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<pre><code>## # A tibble: 4 × 3
+## # Groups:   country [4]
+##   country                  candy         rating_value
+##   &lt;chr&gt;                    &lt;chr&gt;                &lt;dbl&gt;
+## 1 Canada                   tolberone bar          220
+## 2 Other or Unknown         tolberone bar         2894
+## 3 United Kingdom           tolberone bar           33
+## 4 United States of America tolberone bar         1688</code></pre>
+<pre class="r"><code># all candy
+candy_data_with_rating_numbers %&gt;%
+  group_by(country, candy) %&gt;%
+  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
+  slice_max(rating_value)</code></pre>
+<pre><code>## # A tibble: 4 × 3
+## # Groups:   country [4]
+##   country                  candy rating_value
+##   &lt;chr&gt;                    &lt;chr&gt;        &lt;dbl&gt;
+## 1 Canada                   m&amp;ms           746
+## 2 Other or Unknown         m&amp;ms          6794
+## 3 United Kingdom           m&amp;ms           109
+## 4 United States of America m&amp;ms          6303</code></pre>
+</div>
+</div>
+</div>
 
 
 

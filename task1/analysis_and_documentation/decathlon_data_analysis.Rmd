@@ -7,19 +7,28 @@ output: html_document
 
 # Import libraries and data sets
 
-Import statements
+### Import libraries
 
 ```{r}
 library(tidyverse)
+library(assertr)
 ```
 
-Import data and have a quick review
+### Import data with verification
+
+- Check all fields required for analysis are present
+  - `rank` not required
+- Check `points` and `score` are numeric
 
 ```{r}
 decathlon_data <- read_csv(here::here("clean_data/decathlon_clean.csv"),
                            show_col_types = FALSE)
 
-summary(decathlon_data)
+decathlon_data %>% 
+  verify(has_all_names("competitor", "points", "competition",
+                       "event", "score")) %>% 
+  verify(is.numeric(c(points, score))) %>%
+  summary()
 ```
 
 ```{r}
@@ -30,42 +39,40 @@ decathlon_data %>%
 decathlon_data %>% 
   group_by(event) %>% 
   count()
-
 ```
 
 # Analysis questions
 
-## Q1
+### Q1
 Who had the longest long jump seen in the data?
 
 ```{r}
 decathlon_data %>% 
   filter(event == "long jump") %>% 
   slice_max(score)
-  
 ```
 
-## Q2
+### Q2
 What was the average 100m time in each competition?
 
 ```{r}
 decathlon_data %>% 
   filter(event == "100m") %>% 
-  group_by(competition) %>% 
-  summarise("average 100m time (s)" = mean(score))
+  summarise("average 100m time (s)" = mean(score),
+            .by =competition)
 ```
 
-## Q3
+### Q3
 Who had the highest total points across both competitions?
 
 ```{r}
 decathlon_data %>% 
-  group_by(competitor) %>% 
-  summarise(total_points = sum(points)) %>% 
+  summarise(total_points = sum(points),
+            .by = competitor) %>% 
   slice_max(total_points)
 ```
 
-## Q4
+### Q4
 What was the shot-put scores for the top three competitors in each competition?
 
 ```{r}
@@ -75,7 +82,7 @@ decathlon_data %>%
   slice_max(score, n = 3)
 ```
 
-## Q5
+### Q5
 What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?
 
 ```{r}
@@ -83,13 +90,13 @@ What was the average points for competitors who ran the 400m in less than 50 sec
 decathlon_data %>% 
   filter(event == "400m") %>% 
   mutate(less_than_50s = score < 50) %>%
-  group_by(less_than_50s) %>% 
-  summarise(average_points = mean(points))
+  summarise(average_points = mean(points),
+            .by = less_than_50s)
 
 # for each competition
 decathlon_data %>% 
   filter(event == "400m") %>% 
   mutate(less_than_50s = score < 50) %>%
-  group_by(competition,less_than_50s) %>% 
-  summarise(average_points = mean(points))
+  summarise(average_points = mean(points),
+            .by = c(competition, less_than_50s))
 ```

@@ -57,16 +57,6 @@ candy_2015_main_list <- candy_2015_col_clean %>%
   mutate(candy = str_replace_all(candy, "_", " ")) %>% 
   filter(!is.na(rating))
 
-candy_2015_other_items <- candy_2015_col_clean %>% 
-  select(year, rater_id, age,
-         going_trick_or_treating,
-         joy, despair
-  ) %>%
-  others_to_candy("joy", "despair")
-
-candy_2015_data <- bind_rows(candy_2015_main_list,
-                             candy_2015_other_items)
-
 
 # import and extract relevant data from 2016 data file (file specific)
 candy_2016_import <- import_xlsx_and_clean_names("boing-boing-candy-2016.xlsx")
@@ -90,16 +80,6 @@ candy_2016_main_list <- candy_2016_col_clean %>%
   mutate(candy = str_replace_all(candy, "_", " ")) %>% 
   filter(!is.na(rating))
 
-candy_2016_other_items <- candy_2016_col_clean %>% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %>% 
-  others_to_candy("joy", "despair")
-
-candy_2016_data <- bind_rows(candy_2016_main_list,
-                             candy_2016_other_items)
-
 
 # import and extract relevant data from 2017 data file (file specific)
 candy_2017_import <- import_xlsx_and_clean_names("boing-boing-candy-2017.xlsx")
@@ -120,21 +100,11 @@ candy_2017_main_list <- candy_2017_col_clean %>%
   mutate(candy = str_replace_all(candy, "_", " ")) %>% 
   filter(!is.na(rating))
 
-candy_2017_other_items <- candy_2017_col_clean %>% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %>%
-  others_to_candy("joy", "despair")
-
-candy_2017_data <- bind_rows(candy_2017_main_list,
-                             candy_2017_other_items)
-
 
 # combine all 3 data sets and remove redundant columns
-all_candy_data_combined <- bind_rows(candy_2015_data,
-                                     candy_2016_data,
-                                     candy_2017_data)
+all_candy_data_combined <- bind_rows(candy_2015_main_list,
+                                     candy_2016_main_list,
+                                     candy_2017_main_list)
 
 
 all_candy_data_combined <- all_candy_data_combined %>% 
@@ -213,4 +183,4 @@ age_candy_country_data <- candy_and_country_data %>%
 age_candy_country_data %>%
   select(year, rater_id, age, gender, country, 
          going_trick_or_treating, candy, rating) %>% 
-  write_csv(here::here("clean_data/candy_clean.csv"))
+  write_csv(here::here("clean_data/candy_clean_without_text_field.csv"))

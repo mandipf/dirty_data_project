@@ -13,7 +13,7 @@
 
 <meta name="date" content="2023-04-11" />
 
-<title>Task 4 - Halloween Candy Data</title>
+<title>Task 1 - Decathlon Data</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,15 +350,17 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Task 4 - Halloween Candy Data</h1>
+<h1 class="title toc-ignore">Task 1 - Decathlon Data</h1>
 <h4 class="author">Mandip</h4>
 <h4 class="date">2023-04-11</h4>
 
 </div>
 
 
-<p>#Import libraries and data sets</p>
-<p>Import statements</p>
+<div id="import-libraries-and-data-sets" class="section level1">
+<h1>Import libraries and data sets</h1>
+<div id="import-libraries" class="section level3">
+<h3>Import libraries</h3>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.0     ✔ readr     2.1.4
@@ -370,307 +372,152 @@ display: none;
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
 ## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
-<p>Import data and have a quick review</p>
-<pre class="r"><code>candy_data &lt;- read_csv(here::here(&quot;clean_data/candy_clean.csv&quot;),
+<pre class="r"><code>library(assertr)</code></pre>
+</div>
+<div id="import-data-with-verification" class="section level3">
+<h3>Import data with verification</h3>
+<ul>
+<li>Check all fields required for analysis are present
+<ul>
+<li><code>rank</code> not required</li>
+</ul></li>
+<li>Check <code>points</code> and <code>score</code> are numeric</li>
+</ul>
+<pre class="r"><code>decathlon_data &lt;- read_csv(here::here(&quot;clean_data/decathlon_clean.csv&quot;),
                            show_col_types = FALSE)
 
-candy_data_unique_rater &lt;- candy_data %&gt;% 
-  select(year, rater_id, age, gender, country, going_trick_or_treating) %&gt;% 
-  unique()
-
-candy_data_with_rating_numbers &lt;- candy_data %&gt;% 
-  mutate(rating_number = case_when(rating == &quot;despair&quot; ~ -1,
-                                   rating == &quot;joy&quot; ~ 1,
-                                   TRUE ~ 0)
-         )
-
-summary(candy_data)</code></pre>
-<pre><code>##       year        rater_id              age            gender         
-##  Min.   :2015   Length:615594      Min.   :  4.00   Length:615594     
-##  1st Qu.:2015   Class :character   1st Qu.: 31.00   Class :character  
-##  Median :2015   Mode  :character   Median : 38.00   Mode  :character  
-##  Mean   :2016                      Mean   : 38.85                     
-##  3rd Qu.:2016                      3rd Qu.: 46.00                     
-##  Max.   :2017                      Max.   :100.00                     
-##                                    NA&#39;s   :28794                      
-##    country          going_trick_or_treating    candy          
-##  Length:615594      Length:615594           Length:615594     
-##  Class :character   Class :character        Class :character  
-##  Mode  :character   Mode  :character        Mode  :character  
-##                                                               
-##                                                               
-##                                                               
-##                                                               
-##     rating         
-##  Length:615594     
-##  Class :character  
-##  Mode  :character  
-##                    
-##                    
-##                    
-## </code></pre>
-<pre class="r"><code>candy_data_unique_rater  %&gt;% 
-  group_by(year) %&gt;% 
+decathlon_data %&gt;% 
+  verify(has_all_names(&quot;competitor&quot;, &quot;points&quot;, &quot;competition&quot;,
+                       &quot;event&quot;, &quot;score&quot;)) %&gt;% 
+  verify(is.numeric(c(points, score))) %&gt;%
+  summary()</code></pre>
+<pre><code>##   competitor             rank           points     competition       
+##  Length:410         Min.   : 1.00   Min.   :7313   Length:410        
+##  Class :character   1st Qu.: 6.00   1st Qu.:7802   Class :character  
+##  Mode  :character   Median :11.00   Median :8021   Mode  :character  
+##                     Mean   :12.12   Mean   :8005                     
+##                     3rd Qu.:18.00   3rd Qu.:8122                     
+##                     Max.   :28.00   Max.   :8893                     
+##     event               score       
+##  Length:410         Min.   :  1.85  
+##  Class :character   1st Qu.:  7.30  
+##  Mode  :character   Median : 14.52  
+##                     Mean   : 48.54  
+##                     3rd Qu.: 49.54  
+##                     Max.   :317.00</code></pre>
+<pre class="r"><code>decathlon_data %&gt;% 
+  group_by(competition) %&gt;% 
   count()</code></pre>
-<pre><code>## # A tibble: 3 × 2
-## # Groups:   year [3]
-##    year     n
-##   &lt;dbl&gt; &lt;int&gt;
-## 1  2015  5533
-## 2  2016  1256
-## 3  2017  1803</code></pre>
-<pre class="r"><code>candy_data_unique_rater  %&gt;%
-  group_by(gender) %&gt;% 
+<pre><code>## # A tibble: 2 × 2
+## # Groups:   competition [2]
+##   competition     n
+##   &lt;chr&gt;       &lt;int&gt;
+## 1 Decastar      130
+## 2 OlympicG      280</code></pre>
+<pre class="r"><code>decathlon_data %&gt;% 
+  group_by(event) %&gt;% 
   count()</code></pre>
-<pre><code>## # A tibble: 5 × 2
-## # Groups:   gender [5]
-##   gender                 n
-##   &lt;chr&gt;              &lt;int&gt;
-## 1 Female              1027
-## 2 I&#39;d rather not say    89
-## 3 Male                1881
-## 4 Other                 43
-## 5 &lt;NA&gt;                5552</code></pre>
-<pre class="r"><code>candy_data_unique_rater  %&gt;%
-  group_by(country) %&gt;% 
-  count()</code></pre>
-<pre><code>## # A tibble: 4 × 2
-## # Groups:   country [4]
-##   country                      n
-##   &lt;chr&gt;                    &lt;int&gt;
-## 1 Canada                     277
-## 2 Other or Unknown          5698
-## 3 United Kingdom              44
-## 4 United States of America  2573</code></pre>
-<pre class="r"><code>candy_data_unique_rater  %&gt;%
-  group_by(going_trick_or_treating) %&gt;% 
-  count()</code></pre>
-<pre><code>## # A tibble: 3 × 2
-## # Groups:   going_trick_or_treating [3]
-##   going_trick_or_treating     n
-##   &lt;chr&gt;                   &lt;int&gt;
-## 1 No                       7637
-## 2 Yes                       891
-## 3 &lt;NA&gt;                       64</code></pre>
-<pre class="r"><code>candy_data  %&gt;% 
-  group_by(candy) %&gt;% 
-  count()</code></pre>
-<pre><code>## # A tibble: 151 × 2
-## # Groups:   candy [151]
-##    candy                n
-##    &lt;chr&gt;            &lt;int&gt;
-##  1 100 grand bar     7869
-##  2 5th avenue bar      12
-##  3 abba zabba          13
-##  4 aero                16
-##  5 airheads            17
-##  6 almond joy         353
-##  7 andes mints         11
-##  8 atomic fireballs    20
-##  9 babe ruth           82
-## 10 bit o&#39;honey         77
-## # … with 141 more rows</code></pre>
-<pre class="r"><code>candy_data  %&gt;% 
-  group_by(rating) %&gt;% 
-  count()</code></pre>
-<pre><code>## # A tibble: 3 × 2
-## # Groups:   rating [3]
-##   rating       n
-##   &lt;chr&gt;    &lt;int&gt;
-## 1 despair 273313
-## 2 joy     264805
-## 3 meh      77476</code></pre>
+<pre><code>## # A tibble: 10 × 2
+## # Groups:   event [10]
+##    event           n
+##    &lt;chr&gt;       &lt;int&gt;
+##  1 100m           41
+##  2 110m hurdle    41
+##  3 1500m          41
+##  4 400m           41
+##  5 discus         41
+##  6 high jump      41
+##  7 javeline       41
+##  8 long jump      41
+##  9 pole vault     41
+## 10 shot put       41</code></pre>
+</div>
+</div>
 <div id="analysis-questions" class="section level1">
 <h1>Analysis questions</h1>
-<div id="q1" class="section level2">
-<h2>Q1</h2>
-<p>What is the total number of candy ratings given across the three
-years. (Number of candy ratings, not the number of raters. Don’t count
-missing values)</p>
-<pre class="r"><code>candy_data  %&gt;%
-  count()</code></pre>
-<pre><code>## # A tibble: 1 × 1
-##        n
-##    &lt;int&gt;
-## 1 615594</code></pre>
+<div id="q1" class="section level3">
+<h3>Q1</h3>
+<p>Who had the longest long jump seen in the data?</p>
+<pre class="r"><code>decathlon_data %&gt;% 
+  filter(event == &quot;long jump&quot;) %&gt;% 
+  slice_max(score)</code></pre>
+<pre><code>## # A tibble: 1 × 6
+##   competitor  rank points competition event     score
+##   &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;
+## 1 Clay           2   8820 OlympicG    long jump  7.96</code></pre>
 </div>
-<div id="q2" class="section level2">
-<h2>Q2</h2>
-<p>What was the average age of people who are going out trick or
-treating?</p>
-<pre class="r"><code>candy_data_unique_rater  %&gt;%
-  filter(going_trick_or_treating == &quot;Yes&quot;) %&gt;% 
-  summarise(average_age = mean(age, na.rm = TRUE))</code></pre>
-<pre><code>## # A tibble: 1 × 1
-##   average_age
-##         &lt;dbl&gt;
-## 1        35.1</code></pre>
+<div id="q2" class="section level3">
+<h3>Q2</h3>
+<p>What was the average 100m time in each competition?</p>
+<pre class="r"><code>decathlon_data %&gt;% 
+  filter(event == &quot;100m&quot;) %&gt;% 
+  summarise(&quot;average 100m time (s)&quot; = mean(score),
+            .by =competition)</code></pre>
+<pre><code>## # A tibble: 2 × 2
+##   competition `average 100m time (s)`
+##   &lt;chr&gt;                         &lt;dbl&gt;
+## 1 Decastar                       11.2
+## 2 OlympicG                       10.9</code></pre>
 </div>
-<div id="q3" class="section level2">
-<h2>Q3</h2>
-<p>What was the average age of people who are not going trick or
-treating?</p>
-<pre class="r"><code>candy_data_unique_rater  %&gt;%
-  filter(going_trick_or_treating == &quot;No&quot;) %&gt;% 
-  summarise(average_age = mean(age, na.rm = TRUE))</code></pre>
-<pre><code>## # A tibble: 1 × 1
-##   average_age
-##         &lt;dbl&gt;
-## 1        39.0</code></pre>
+<div id="q3" class="section level3">
+<h3>Q3</h3>
+<p>Who had the highest total points across both competitions?</p>
+<pre class="r"><code>decathlon_data %&gt;% 
+  summarise(total_points = sum(points),
+            .by = competitor) %&gt;% 
+  slice_max(total_points)</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##   competitor total_points
+##   &lt;chr&gt;             &lt;dbl&gt;
+## 1 Sebrle           171100</code></pre>
 </div>
-<div id="q4" class="section level2">
-<h2>Q4</h2>
-<p>For each of joy, despair and meh, which candy bar received the most
-of these ratings?</p>
-<pre class="r"><code># candy bars only
-candy_data %&gt;%
-  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
-  group_by(rating, candy) %&gt;% 
-  summarise(number_of_ratings = n()) %&gt;%
-  slice_max(number_of_ratings, n = 1)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;rating&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre><code>## # A tibble: 3 × 3
-## # Groups:   rating [3]
-##   rating  candy              number_of_ratings
-##   &lt;chr&gt;   &lt;chr&gt;                          &lt;int&gt;
-## 1 despair peanut butter bars              6006
-## 2 joy     100 grand bar                   4853
-## 3 meh     100 grand bar                   1307</code></pre>
-<pre class="r"><code># all candy
-candy_data %&gt;%
-  group_by(rating, candy) %&gt;% 
-  summarise(number_of_ratings = n()) %&gt;%
-  slice_max(number_of_ratings, n = 1)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;rating&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre><code>## # A tibble: 3 × 3
-## # Groups:   rating [3]
-##   rating  candy     number_of_ratings
-##   &lt;chr&gt;   &lt;chr&gt;                 &lt;int&gt;
-## 1 despair mary jane             10677
-## 2 joy     m&amp;m                   20312
-## 3 meh     m&amp;m                    5409</code></pre>
+<div id="q4" class="section level3">
+<h3>Q4</h3>
+<p>What was the shot-put scores for the top three competitors in each
+competition?</p>
+<pre class="r"><code>decathlon_data %&gt;% 
+  filter(event == &quot;shot put&quot;) %&gt;% 
+  group_by(competition) %&gt;%
+  slice_max(score, n = 3)</code></pre>
+<pre><code>## # A tibble: 6 × 6
+## # Groups:   competition [2]
+##   competitor  rank points competition event    score
+##   &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt;
+## 1 Yurkov         5   8036 Decastar    shot put  15.2
+## 2 Sebrle         1   8217 Decastar    shot put  14.8
+## 3 Karpov         3   8099 Decastar    shot put  14.8
+## 4 Sebrle         1   8893 OlympicG    shot put  16.4
+## 5 Karpov         3   8725 OlympicG    shot put  15.9
+## 6 Macey          4   8414 OlympicG    shot put  15.7</code></pre>
 </div>
-<div id="q5" class="section level2">
-<h2>Q5</h2>
-<p>How many people rated Starburst as despair?</p>
-<pre class="r"><code>candy_data %&gt;% 
-  filter(candy == &quot;starburst&quot; &amp; rating == &quot;despair&quot;) %&gt;% 
-  summarise(number_of_people_rated_starburst_as_despair = n())</code></pre>
-<pre><code>## # A tibble: 1 × 1
-##   number_of_people_rated_starburst_as_despair
-##                                         &lt;int&gt;
-## 1                                        1990</code></pre>
-<p>** For the next three questions, count despair as -1, joy as +1, and
-meh as 0**</p>
-</div>
-<div id="q6" class="section level2">
-<h2>Q6</h2>
-<p>What was the most popular candy bar by this rating system for each
-gender in the dataset ?</p>
-<pre class="r"><code># candy bars only
-candy_data_with_rating_numbers %&gt;%
-  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
-  group_by(gender, candy) %&gt;%
-  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;gender&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre><code>## # A tibble: 5 × 3
-## # Groups:   gender [5]
-##   gender             candy         rating_value
-##   &lt;chr&gt;              &lt;chr&gt;                &lt;dbl&gt;
-## 1 Female             dove bars              641
-## 2 I&#39;d rather not say dove bars               53
-## 3 Male               dove bars              979
-## 4 Other              dove bars               21
-## 5 &lt;NA&gt;               100 grand bar         1897</code></pre>
-<pre class="r"><code># all candy
-candy_data_with_rating_numbers %&gt;%
-  group_by(gender, candy) %&gt;%
-  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;gender&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre><code>## # A tibble: 5 × 3
-## # Groups:   gender [5]
-##   gender             candy rating_value
-##   &lt;chr&gt;              &lt;chr&gt;        &lt;dbl&gt;
-## 1 Female             m&amp;m           2606
-## 2 I&#39;d rather not say m&amp;m            217
-## 3 Male               m&amp;m           4494
-## 4 Other              m&amp;m            103
-## 5 &lt;NA&gt;               m&amp;m           6585</code></pre>
-</div>
-<div id="q7" class="section level2">
-<h2>Q7</h2>
-<p>What was the most popular candy bar in each year?</p>
-<pre class="r"><code># candy bars only
-candy_data_with_rating_numbers %&gt;%
-  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
-  group_by(year, candy) %&gt;%
-  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre><code>## # A tibble: 3 × 3
-## # Groups:   year [3]
-##    year candy         rating_value
-##   &lt;dbl&gt; &lt;chr&gt;                &lt;dbl&gt;
-## 1  2015 100 grand bar         1889
-## 2  2016 dove bars              636
-## 3  2017 dove bars             1068</code></pre>
-<pre class="r"><code># all candy
-candy_data_with_rating_numbers %&gt;%
-  group_by(year, candy) %&gt;%
-  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre><code>## # A tibble: 3 × 3
-## # Groups:   year [3]
-##    year candy rating_value
-##   &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;
-## 1  2015 m&amp;m           6534
-## 2  2016 m&amp;m           2138
-## 3  2017 m&amp;m           5333</code></pre>
-</div>
-<div id="q8" class="section level2">
-<h2>Q8</h2>
-<p>What was the most popular candy bar by this rating for people in US,
-Canada, UK, and all other countries?</p>
-<pre class="r"><code># candy bars only
-candy_data_with_rating_numbers %&gt;%
-  filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
-  group_by(country, candy) %&gt;%
-  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;country&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<div id="q5" class="section level3">
+<h3>Q5</h3>
+<p>What was the average points for competitors who ran the 400m in less
+than 50 seconds vs. those than ran 400m in more than 50 seconds?</p>
+<pre class="r"><code># across both competitions
+decathlon_data %&gt;% 
+  filter(event == &quot;400m&quot;) %&gt;% 
+  mutate(less_than_50s = score &lt; 50) %&gt;%
+  summarise(average_points = mean(points),
+            .by = less_than_50s)</code></pre>
+<pre><code>## # A tibble: 2 × 2
+##   less_than_50s average_points
+##   &lt;lgl&gt;                  &lt;dbl&gt;
+## 1 TRUE                   8120.
+## 2 FALSE                  7727.</code></pre>
+<pre class="r"><code># for each competition
+decathlon_data %&gt;% 
+  filter(event == &quot;400m&quot;) %&gt;% 
+  mutate(less_than_50s = score &lt; 50) %&gt;%
+  summarise(average_points = mean(points),
+            .by = c(competition, less_than_50s))</code></pre>
 <pre><code>## # A tibble: 4 × 3
-## # Groups:   country [4]
-##   country                  candy         rating_value
-##   &lt;chr&gt;                    &lt;chr&gt;                &lt;dbl&gt;
-## 1 Canada                   dove bars               86
-## 2 Other or Unknown         100 grand bar         1945
-## 3 United Kingdom           dove bars                9
-## 4 United States of America dove bars             1542</code></pre>
-<pre class="r"><code># all candy
-candy_data_with_rating_numbers %&gt;%
-  group_by(country, candy) %&gt;%
-  summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;country&#39;. You can override using the
-## `.groups` argument.</code></pre>
-<pre><code>## # A tibble: 4 × 3
-## # Groups:   country [4]
-##   country                  candy rating_value
-##   &lt;chr&gt;                    &lt;chr&gt;        &lt;dbl&gt;
-## 1 Canada                   m&amp;m            747
-## 2 Other or Unknown         m&amp;m           6834
-## 3 United Kingdom           m&amp;m            110
-## 4 United States of America m&amp;m           6314</code></pre>
+##   competition less_than_50s average_points
+##   &lt;chr&gt;       &lt;lgl&gt;                  &lt;dbl&gt;
+## 1 Decastar    TRUE                   7988.
+## 2 Decastar    FALSE                  7721 
+## 3 OlympicG    TRUE                   8180.
+## 4 OlympicG    FALSE                  7730.</code></pre>
 </div>
 </div>
 

@@ -359,7 +359,8 @@ display: none;
 
 <div id="import-libraries-and-data-sets" class="section level1">
 <h1>Import libraries and data sets</h1>
-<p>Import statements</p>
+<div id="import-libraries" class="section level3">
+<h3>Import libraries</h3>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.0     ✔ readr     2.1.4
@@ -371,11 +372,25 @@ display: none;
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
 ## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
-<p>Import data and have a quick review</p>
+<pre class="r"><code>library(assertr)</code></pre>
+</div>
+<div id="import-data-with-verification" class="section level3">
+<h3>Import data with verification</h3>
+<ul>
+<li>Check all fields required for analysis are present
+<ul>
+<li><code>record</code>, <code>record_id</code> and
+<code>longitude</code> not required</li>
+</ul></li>
+<li>Check <code>count</code> and <code>latitude</code> are numeric</li>
+</ul>
 <pre class="r"><code>seabirds_data &lt;- read_csv(here::here(&quot;clean_data/seabirds_clean.csv&quot;),
                            show_col_types = FALSE)
-
-summary(seabirds_data)</code></pre>
+seabirds_data %&gt;% 
+  verify(has_all_names(&quot;common_name&quot;, &quot;scientific_name&quot;, &quot;abbreviation&quot;,
+                       &quot;count&quot;, &quot;latitude&quot;)) %&gt;% 
+  verify(is.numeric(c(count, latitude))) %&gt;%
+  summary()</code></pre>
 <pre><code>##      record        record_id        common_name        scientific_name   
 ##  Min.   :    1   Min.   : 1083001   Length:48328       Length:48328      
 ##  1st Qu.:12189   1st Qu.: 6058018   Class :character   Class :character  
@@ -447,104 +462,75 @@ summary(seabirds_data)</code></pre>
 ## 10 CHIALB          11
 ## # … with 143 more rows</code></pre>
 </div>
+</div>
 <div id="analysis-questions" class="section level1">
 <h1>Analysis questions</h1>
-<div id="q1" class="section level2">
-<h2>Q1</h2>
+<div id="q1" class="section level3">
+<h3>Q1</h3>
 <p>Which bird had the most individual sightings?</p>
 <pre class="r"><code>seabirds_data %&gt;% 
   select(common_name, scientific_name, abbreviation) %&gt;% 
-  group_by(common_name) %&gt;% 
-  mutate(number_of_sightings = n()) %&gt;%
-  arrange(desc(number_of_sightings)) %&gt;% 
-  head(1)</code></pre>
+  mutate(number_of_sightings = n(),
+         .by = common_name) %&gt;%
+  unique() %&gt;% 
+  slice_max(number_of_sightings)</code></pre>
 <pre><code>## # A tibble: 1 × 4
-## # Groups:   common_name [1]
 ##   common_name                    scientific_name                 abbre…¹ numbe…²
 ##   &lt;chr&gt;                          &lt;chr&gt;                           &lt;chr&gt;     &lt;int&gt;
 ## 1 Wandering albatross sensu lato Diomedea antipodensis / exulans DIOANT…   11293
 ## # … with abbreviated variable names ¹​abbreviation, ²​number_of_sightings</code></pre>
-<pre class="r"><code># alt method which only gets common name
-seabirds_data %&gt;%
-  group_by(common_name) %&gt;% 
-  summarise(total_count = n()) %&gt;% 
-  slice_max(total_count)</code></pre>
-<pre><code>## # A tibble: 1 × 2
-##   common_name                    total_count
-##   &lt;chr&gt;                                &lt;int&gt;
-## 1 Wandering albatross sensu lato       11293</code></pre>
 </div>
-<div id="q2" class="section level2">
-<h2>Q2</h2>
+<div id="q2" class="section level3">
+<h3>Q2</h3>
 <p>Which bird had the highest total count?</p>
 <pre class="r"><code>seabirds_data %&gt;% 
-  group_by(common_name) %&gt;% 
-  mutate(total_count = sum(count, na.rm = TRUE)) %&gt;%
+  mutate(total_count = sum(count, na.rm = TRUE),
+         .by = common_name) %&gt;%
   select(common_name, scientific_name, abbreviation, total_count) %&gt;%
-  arrange(desc(total_count)) %&gt;% 
-  head(1)</code></pre>
+  unique() %&gt;% 
+  slice_max(total_count)</code></pre>
 <pre><code>## # A tibble: 1 × 4
-## # Groups:   common_name [1]
 ##   common_name             scientific_name       abbreviation total_count
 ##   &lt;chr&gt;                   &lt;chr&gt;                 &lt;chr&gt;              &lt;dbl&gt;
 ## 1 Short-tailed shearwater Puffinus tenuirostris PUFTEN            982553</code></pre>
-<pre class="r"><code># alt method which only gets common name
-seabirds_data %&gt;%
-  group_by(common_name) %&gt;% 
-  summarise(total_count = sum(count, na.rm = TRUE)) %&gt;% 
-  slice_max(total_count)</code></pre>
-<pre><code>## # A tibble: 1 × 2
-##   common_name             total_count
-##   &lt;chr&gt;                         &lt;dbl&gt;
-## 1 Short-tailed shearwater      982553</code></pre>
 </div>
-<div id="q3" class="section level2">
-<h2>Q3</h2>
+<div id="q3" class="section level3">
+<h3>Q3</h3>
 <p>Which bird had the highest total count above a latitude of -30?</p>
 <pre class="r"><code>seabirds_data %&gt;% 
   filter(latitude &gt; -30) %&gt;% 
-  group_by(common_name) %&gt;% 
-  mutate(total_count = sum(count, na.rm = TRUE)) %&gt;%
+  mutate(total_count = sum(count, na.rm = TRUE),
+         .by = common_name) %&gt;%
   select(common_name, scientific_name, abbreviation, total_count) %&gt;%
-  arrange(desc(total_count)) %&gt;% 
-  head(1)</code></pre>
+  unique() %&gt;% 
+  slice_max(total_count)</code></pre>
 <pre><code>## # A tibble: 1 × 4
-## # Groups:   common_name [1]
 ##   common_name             scientific_name    abbreviation total_count
 ##   &lt;chr&gt;                   &lt;chr&gt;              &lt;chr&gt;              &lt;dbl&gt;
 ## 1 Wedge-tailed shearwater Puffinus pacificus PUFPAC               855</code></pre>
-<pre class="r"><code># alt method which only gets common name
-seabirds_data %&gt;%
-  filter(latitude &gt; -30) %&gt;% 
-  group_by(common_name) %&gt;% 
-  summarise(total_count = sum(count, na.rm = TRUE)) %&gt;% 
-  slice_max(total_count)</code></pre>
-<pre><code>## # A tibble: 1 × 2
-##   common_name             total_count
-##   &lt;chr&gt;                         &lt;dbl&gt;
-## 1 Wedge-tailed shearwater         855</code></pre>
 </div>
-<div id="q4" class="section level2">
-<h2>Q4</h2>
+<div id="q4" class="section level3">
+<h3>Q4</h3>
 <p>How many different types of birds were only ever seen in groups of
 1?</p>
 <pre class="r"><code>seabirds_data %&gt;% 
   filter(count == 1) %&gt;%
-  distinct(common_name)</code></pre>
-<pre><code>## # A tibble: 148 × 1
-##    common_name                      
-##    &lt;chr&gt;                            
-##  1 Seabird (Unidentified)           
-##  2 White-chinned petrel             
-##  3 Sooty shearwater                 
-##  4 Northern giant petrel            
-##  5 Wandering albatross sensu lato   
-##  6 Royal albatross sensu lato       
-##  7 Australasian gannet              
-##  8 Diving-petrel (unidentified)     
-##  9 Skua (unidentified)              
-## 10 Black-browed albatross sensu lato
-## # … with 138 more rows</code></pre>
+  select(common_name, scientific_name, abbreviation) %&gt;% 
+  unique()</code></pre>
+<pre><code>## # A tibble: 148 × 3
+##    common_name                       scientific_name                 abbreviat…¹
+##    &lt;chr&gt;                             &lt;chr&gt;                           &lt;chr&gt;      
+##  1 Seabird (Unidentified)            &lt;NA&gt;                            SEABUN     
+##  2 White-chinned petrel              Procellaria aequinoctialis      PROAEQ     
+##  3 Sooty shearwater                  Puffinus griseus                PUFGRI     
+##  4 Northern giant petrel             Macronectes halli               MACHAL     
+##  5 Wandering albatross sensu lato    Diomedea antipodensis / exulans DIOANTEXU  
+##  6 Royal albatross sensu lato        Diomedea epomophora / sanfordi  DIOEPOSAN  
+##  7 Australasian gannet               Morus serrator                  MORSER     
+##  8 Diving-petrel (unidentified)      Pelecanoides sp.                PELSP      
+##  9 Skua (unidentified)               Catharacta / Stercorarius sp.   SKUAUN     
+## 10 Black-browed albatross sensu lato Diomedea impavida / melanophrys DIOIMPMEL  
+## # … with 138 more rows, and abbreviated variable name ¹​abbreviation</code></pre>
 <pre class="r"><code>seabirds_data %&gt;% 
   filter(count == 1) %&gt;%
   distinct(common_name) %&gt;% 
@@ -554,13 +540,12 @@ seabirds_data %&gt;%
 ##   &lt;int&gt;
 ## 1   148</code></pre>
 </div>
-<div id="q5" class="section level2">
-<h2>Q5</h2>
+<div id="q5" class="section level3">
+<h3>Q5</h3>
 <p>How many penguins were seen? (Hint: there are many types of
 penguin)</p>
 <pre class="r"><code>seabirds_data %&gt;% 
-  mutate(is_penguin = str_detect(common_name, &quot;(?i)penguin&quot;)) %&gt;%
-  filter(is_penguin) %&gt;% 
+  filter(str_detect(common_name, &quot;(?i)penguin&quot;)) %&gt;% 
   summarise(number_penguin_sightings = n(),
             number_of_penguins_seen = sum(count, na.rm = TRUE))</code></pre>
 <pre><code>## # A tibble: 1 × 2

@@ -7,19 +7,27 @@ output: html_document
 
 # Import libraries and data sets
 
-Import statements
+### Import libraries
 
 ```{r}
 library(tidyverse)
+library(assertr)
 ```
 
-Import data and have a quick review
+### Import data with verification
+
+- Check all fields required for analysis are present
+
+- Check `quantity` is numeric
 
 ```{r}
 cake_data <- read_csv(here::here("clean_data/cake_ingredients_clean.csv"),
                            show_col_types = FALSE)
 
-summary(cake_data)
+cake_data %>% 
+  verify(has_all_names("cake", "ingredient", "quantity", "measure")) %>% 
+  verify(is.numeric(quantity)) %>%
+  summary()
 ```
 
 ```{r}
@@ -43,7 +51,7 @@ cake_data %>%
 
 # Analysis questions
 
-## Q1
+### Q1
 Which cake has the most cocoa in it?
 ```{r}
 cake_data %>% 
@@ -52,7 +60,7 @@ cake_data %>%
   slice_max(quantity)
 ```
 
-## Q2
+### Q2
 For sponge cake, how many cups of ingredients are used in total?
 
 ```{r}
@@ -60,13 +68,14 @@ cake_data %>%
   filter(cake == "Sponge" & measure == "cup") %>% 
   summarise(quantity_of_cups_of_ingredients = sum(quantity, na.rm = TRUE))
 
+# all units of measure
 cake_data %>% 
   filter(cake == "Sponge") %>% 
-  group_by(measure) %>% 
-  summarise(quantity_per_measure = sum(quantity, na.rm = TRUE))
+  summarise(quantity_per_measure = sum(quantity, na.rm = TRUE),
+            .by = measure)
 ```
 
-## Q3
+### Q3
 How many ingredients are measured in teaspoons?
 
 ```{r}
@@ -76,18 +85,18 @@ cake_data %>%
   arrange(ingredient)
 ```
 
-## Q4
+### Q4
 Which cake has the most unique ingredients?
 
 ```{r}
 cake_data %>% 
-  group_by(cake) %>%
   filter(!is.na(quantity)) %>%
-  summarise(number_of_ingredients = n()) %>% 
+  summarise(number_of_ingredients = n(),
+            .by = cake) %>% 
   slice_max(number_of_ingredients, n = 1)
 ```
 
-## Q5
+### Q5
 Which ingredients are used only once?
 
 ```{r}

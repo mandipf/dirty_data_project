@@ -7,19 +7,28 @@ output: html_document
 
 # Import libraries and data sets
 
-Import statements
+### Import libraries
 
 ```{r}
 library(tidyverse)
+library(assertr)
 ```
 
-Import data and have a quick review
+### Import data with verification
+
+- Check all fields required for analysis are present
+  - `record`, `record_id` and `longitude` not required
+  
+- Check `count` and `latitude` are numeric
 
 ```{r}
 seabirds_data <- read_csv(here::here("clean_data/seabirds_clean.csv"),
                            show_col_types = FALSE)
-
-summary(seabirds_data)
+seabirds_data %>% 
+  verify(has_all_names("common_name", "scientific_name", "abbreviation",
+                       "count", "latitude")) %>% 
+  verify(is.numeric(c(count, latitude))) %>%
+  summary()
 ```
 
 ```{r}
@@ -38,69 +47,51 @@ seabirds_data %>%
 
 # Analysis questions
 
-## Q1
+### Q1
 Which bird had the most individual sightings?
 
 ```{r}
 seabirds_data %>% 
   select(common_name, scientific_name, abbreviation) %>% 
-  group_by(common_name) %>% 
-  mutate(number_of_sightings = n()) %>%
-  arrange(desc(number_of_sightings)) %>% 
-  head(1)
-
-# alt method which only gets common name
-seabirds_data %>%
-  group_by(common_name) %>% 
-  summarise(total_count = n()) %>% 
-  slice_max(total_count)
+  mutate(number_of_sightings = n(),
+         .by = common_name) %>%
+  unique() %>% 
+  slice_max(number_of_sightings)
 ```
 
-## Q2
+### Q2
 Which bird had the highest total count?
 
 ```{r}
 seabirds_data %>% 
-  group_by(common_name) %>% 
-  mutate(total_count = sum(count, na.rm = TRUE)) %>%
+  mutate(total_count = sum(count, na.rm = TRUE),
+         .by = common_name) %>%
   select(common_name, scientific_name, abbreviation, total_count) %>%
-  arrange(desc(total_count)) %>% 
-  head(1)
-
-# alt method which only gets common name
-seabirds_data %>%
-  group_by(common_name) %>% 
-  summarise(total_count = sum(count, na.rm = TRUE)) %>% 
+  unique() %>% 
   slice_max(total_count)
 ```
 
-## Q3
+### Q3
 Which bird had the highest total count above a latitude of -30?
 
 ```{r}
 seabirds_data %>% 
   filter(latitude > -30) %>% 
-  group_by(common_name) %>% 
-  mutate(total_count = sum(count, na.rm = TRUE)) %>%
+  mutate(total_count = sum(count, na.rm = TRUE),
+         .by = common_name) %>%
   select(common_name, scientific_name, abbreviation, total_count) %>%
-  arrange(desc(total_count)) %>% 
-  head(1)
-
-# alt method which only gets common name
-seabirds_data %>%
-  filter(latitude > -30) %>% 
-  group_by(common_name) %>% 
-  summarise(total_count = sum(count, na.rm = TRUE)) %>% 
+  unique() %>% 
   slice_max(total_count)
 ```
 
-## Q4
+### Q4
 How many different types of birds were only ever seen in groups of 1?
 
 ```{r}
 seabirds_data %>% 
   filter(count == 1) %>%
-  distinct(common_name)
+  select(common_name, scientific_name, abbreviation) %>% 
+  unique()
 
 seabirds_data %>% 
   filter(count == 1) %>%
@@ -108,13 +99,12 @@ seabirds_data %>%
   count()
 ```
 
-## Q5
+### Q5
 How many penguins were seen? (Hint: there are many types of penguin)
 
 ```{r}
 seabirds_data %>% 
-  mutate(is_penguin = str_detect(common_name, "(?i)penguin")) %>%
-  filter(is_penguin) %>% 
+  filter(str_detect(common_name, "(?i)penguin")) %>% 
   summarise(number_penguin_sightings = n(),
             number_of_penguins_seen = sum(count, na.rm = TRUE))
 ```
