@@ -10,7 +10,7 @@ editor_options:
 
 ## Project Description
 
-This project cleans some Halloween Candy Data and performs some analysis on that cleaned data. The data itself, which is in the form of three Excel-based questionnaires (2015, 2016 and 2017), was provided as part of a CodeClan Dirty Data Project. 
+This project cleans some Halloween Candy data and performs some analysis on that cleaned data. The data itself, which is in the form of three Excel-based questionnaires (2015, 2016 and 2017), was provided as part of a CodeClan Dirty Data Project. 
 
 Assumptions made about the data:
 
@@ -88,7 +88,7 @@ This section is used to deep clean the combined data set as follows:
 - Convert age column to numeric and set all entries below 1 or above 100 to N/A.
 
 
-### Section 4:Export clean data as CSV
+### Section 4: Export clean data as CSV
 This section selects the required variables (columns) for data analysis and exports the data to a CSV file.
 
 
@@ -109,11 +109,11 @@ library(here)
 library(tidyverse)
 ```
 
-The presence of all required fields within the imported file are verified before any analysis is conducted. This also includes a class verification for numeric fields.
+The presence of all required variables within the imported file are verified before any analysis is conducted. This also includes a class verification for numeric fields.
 
 ### Analysis questions
 
-With the exception of Q1, the answers provided by both data analysis scripts matched although the numbers were slightly higher in the complete data set.
+With the exception of Q1, the answers provided by both data analysis scripts matched although the numbers were slightly higher in the complete data set. The example outputs are provided only for the complete data set, i.e. the data set also containing the free text fields.
 
 #### Q1
 
@@ -122,11 +122,19 @@ What is the total number of candy ratings given across the three years?
 ```         
 candy_data  %>%
   summarise(number_of_ratings = n())
+
+##   number_of_ratings
+##               <int>
+## 1            623513
 ```
 
-This code chunk showed that there were 623513 candy ratings within the complete data set. Split by year, this was 384024 in 2015, 97340 in 2016, and 142149 in 2017.
+This code chunk showed that there were 623513 candy ratings within the complete data set. 
 
-When using the reduced data set (no free text field), this was reduced to 620373 candy ratings.Split by year, this was 381871 in 2015, 96959 in 2016, and 141543 in 2017.
+- Split by year, this was 384024 in 2015, 97340 in 2016, and 142149 in 2017.
+
+When using the reduced data set (no free text field), this was reduced to 620373 candy ratings.
+
+- Split by year, this was 381871 in 2015, 96959 in 2016, and 141543 in 2017.
 
 
 #### Q2
@@ -137,6 +145,10 @@ What was the average age of people who are going out trick or treating?
 candy_data_unique_rater  %>%
   filter(going_trick_or_treating == "Yes") %>% 
   summarise(average_age = mean(age, na.rm = TRUE))
+  
+##   average_age
+##         <dbl>
+## 1        35.1
 ```
 
 The average age for trick or treaters was 35.1 years old.
@@ -150,6 +162,10 @@ What was the average age of people who are not going trick or treating?
 candy_data_unique_rater  %>%
   filter(going_trick_or_treating == "No") %>% 
   summarise(average_age = mean(age, na.rm = TRUE))
+  
+##   average_age
+##         <dbl>
+## 1        39.0
 ```
 
 The average age for people not trick or treating was 39.0 years old.
@@ -165,6 +181,12 @@ candy_data %>%
   group_by(rating, candy) %>% 
   summarise(number_of_ratings = n()) %>%
   slice_max(number_of_ratings, n = 1)
+  
+##   rating  candy              number_of_ratings
+##   <chr>   <chr>                          <int>
+## 1 despair peanut butter bars              6006
+## 2 joy     toblerone bar                   6176
+## 3 meh     100 grand bar                   1307
 ```
 
 For candy bars:
@@ -187,6 +209,10 @@ How many people rated Starburst as despair?
 candy_data %>% 
   filter(candy == "starburst" & rating == "despair") %>% 
   summarise(number_of_people_rated_starburst_as_despair = n())
+  
+##   number_of_people_rated_starburst_as_despair
+##                                         <int>
+## 1                                        1990
 ```
 
 1990 people rated Starburst as despair.
@@ -202,6 +228,14 @@ candy_data_with_rating_numbers %>%
   group_by(gender, candy) %>%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
   slice_max(rating_value)
+  
+##   gender             candy         rating_value
+##   <chr>              <chr>                <dbl>
+## 1 Female             toblerone bar          716
+## 2 I'd rather not say dove bars               53
+## 3 Male               toblerone bar         1238
+## 4 Other              toblerone bar           23
+## 5 <NA>               toblerone bar         2807
 ```
 
 For candy bars:
@@ -225,6 +259,12 @@ candy_data_with_rating_numbers %>%
   group_by(year, candy) %>%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
   slice_max(rating_value)
+  
+##    year candy         rating_value
+##   <dbl> <chr>                <dbl>
+## 1  2015 toblerone bar         2797
+## 2  2016 toblerone bar          802
+## 3  2017 toblerone bar         1236
 ```
 
 The highest rated candy bar every year was Toblerone bar.
@@ -242,16 +282,15 @@ candy_data_with_rating_numbers %>%
   group_by(country, candy) %>%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
   slice_max(rating_value)
+  
+##   country                  candy         rating_value
+##   <chr>                    <chr>                <dbl>
+## 1 Canada                   toblerone bar          220
+## 2 Other or Unknown         toblerone bar         2894
+## 3 United Kingdom           toblerone bar           33
+## 4 United States of America toblerone bar         1688
 ```
 
 The highest rated candy bar every region was Toblerone bar.
 
 For all candy types, it was m&ms for every region.
-
-
-------------------------------------------------------------------------
-
-## License
-
-Distributed under the MIT License.
-See `LICENSE.txt` for more information.

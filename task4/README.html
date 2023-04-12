@@ -357,7 +357,7 @@ display: none;
 <hr />
 <div id="project-description" class="section level2">
 <h2>Project Description</h2>
-<p>This project cleans some Halloween Candy Data and performs some
+<p>This project cleans some Halloween Candy data and performs some
 analysis on that cleaned data. The data itself, which is in the form of
 three Excel-based questionnaires (2015, 2016 and 2017), was provided as
 part of a CodeClan Dirty Data Project.</p>
@@ -464,8 +464,8 @@ errors etc) using <code>alt_entry_names_for_countries.R</code>;</li>
 100 to N/A.</li>
 </ul>
 </div>
-<div id="section-4" class="section level3">
-<h3>Section 4:</h3>
+<div id="section-4-export-clean-data-as-csv" class="section level3">
+<h3>Section 4: Export clean data as CSV</h3>
 <p>This section selects the required variables (columns) for data
 analysis and exports the data to a CSV file.</p>
 <hr />
@@ -486,26 +486,38 @@ within this folder:</p>
 <pre><code>library(assertr)
 library(here)
 library(tidyverse)</code></pre>
-<p>The presence of all required fields within the imported file are
+<p>The presence of all required variables within the imported file are
 verified before any analysis is conducted. This also includes a class
 verification for numeric fields.</p>
 <div id="analysis-questions" class="section level3">
 <h3>Analysis questions</h3>
 <p>With the exception of Q1, the answers provided by both data analysis
 scripts matched although the numbers were slightly higher in the
-complete data set.</p>
+complete data set. The example outputs are provided only for the
+complete data set, i.e. the data set also containing the free text
+fields.</p>
 <div id="q1" class="section level4">
 <h4>Q1</h4>
 <p>What is the total number of candy ratings given across the three
 years?</p>
 <pre><code>candy_data  %&gt;%
-  summarise(number_of_ratings = n())</code></pre>
+  summarise(number_of_ratings = n())
+
+##   number_of_ratings
+##               &lt;int&gt;
+## 1            623513</code></pre>
 <p>This code chunk showed that there were 623513 candy ratings within
-the complete data set. Split by year, this was 384024 in 2015, 97340 in
-2016, and 142149 in 2017.</p>
+the complete data set.</p>
+<ul>
+<li>Split by year, this was 384024 in 2015, 97340 in 2016, and 142149 in
+2017.</li>
+</ul>
 <p>When using the reduced data set (no free text field), this was
-reduced to 620373 candy ratings.Split by year, this was 381871 in 2015,
-96959 in 2016, and 141543 in 2017.</p>
+reduced to 620373 candy ratings.</p>
+<ul>
+<li>Split by year, this was 381871 in 2015, 96959 in 2016, and 141543 in
+2017.</li>
+</ul>
 </div>
 <div id="q2" class="section level4">
 <h4>Q2</h4>
@@ -513,7 +525,11 @@ reduced to 620373 candy ratings.Split by year, this was 381871 in 2015,
 treating?</p>
 <pre><code>candy_data_unique_rater  %&gt;%
   filter(going_trick_or_treating == &quot;Yes&quot;) %&gt;% 
-  summarise(average_age = mean(age, na.rm = TRUE))</code></pre>
+  summarise(average_age = mean(age, na.rm = TRUE))
+  
+##   average_age
+##         &lt;dbl&gt;
+## 1        35.1</code></pre>
 <p>The average age for trick or treaters was 35.1 years old.</p>
 </div>
 <div id="q3" class="section level4">
@@ -522,7 +538,11 @@ treating?</p>
 treating?</p>
 <pre><code>candy_data_unique_rater  %&gt;%
   filter(going_trick_or_treating == &quot;No&quot;) %&gt;% 
-  summarise(average_age = mean(age, na.rm = TRUE))</code></pre>
+  summarise(average_age = mean(age, na.rm = TRUE))
+  
+##   average_age
+##         &lt;dbl&gt;
+## 1        39.0</code></pre>
 <p>The average age for people not trick or treating was 39.0 years
 old.</p>
 </div>
@@ -534,7 +554,13 @@ of these ratings?</p>
   filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
   group_by(rating, candy) %&gt;% 
   summarise(number_of_ratings = n()) %&gt;%
-  slice_max(number_of_ratings, n = 1)</code></pre>
+  slice_max(number_of_ratings, n = 1)
+  
+##   rating  candy              number_of_ratings
+##   &lt;chr&gt;   &lt;chr&gt;                          &lt;int&gt;
+## 1 despair peanut butter bars              6006
+## 2 joy     toblerone bar                   6176
+## 3 meh     100 grand bar                   1307</code></pre>
 <p>For candy bars:</p>
 <ul>
 <li>the highest rating for joy was Toblerone bar</li>
@@ -552,7 +578,11 @@ of these ratings?</p>
 <p>How many people rated Starburst as despair?</p>
 <pre><code>candy_data %&gt;% 
   filter(candy == &quot;starburst&quot; &amp; rating == &quot;despair&quot;) %&gt;% 
-  summarise(number_of_people_rated_starburst_as_despair = n())</code></pre>
+  summarise(number_of_people_rated_starburst_as_despair = n())
+  
+##   number_of_people_rated_starburst_as_despair
+##                                         &lt;int&gt;
+## 1                                        1990</code></pre>
 <p>1990 people rated Starburst as despair.</p>
 </div>
 <div id="q6" class="section level4">
@@ -563,7 +593,15 @@ Count despair as -1, joy as +1, and meh as 0.</p>
   filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
   group_by(gender, candy) %&gt;%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
+  slice_max(rating_value)
+  
+##   gender             candy         rating_value
+##   &lt;chr&gt;              &lt;chr&gt;                &lt;dbl&gt;
+## 1 Female             toblerone bar          716
+## 2 I&#39;d rather not say dove bars               53
+## 3 Male               toblerone bar         1238
+## 4 Other              toblerone bar           23
+## 5 &lt;NA&gt;               toblerone bar         2807</code></pre>
 <p>For candy bars:</p>
 <ul>
 <li>the highest rating for female was Toblerone bar</li>
@@ -582,7 +620,13 @@ Count despair as -1, joy as +1, and meh as 0.</p>
   filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
   group_by(year, candy) %&gt;%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
+  slice_max(rating_value)
+  
+##    year candy         rating_value
+##   &lt;dbl&gt; &lt;chr&gt;                &lt;dbl&gt;
+## 1  2015 toblerone bar         2797
+## 2  2016 toblerone bar          802
+## 3  2017 toblerone bar         1236</code></pre>
 <p>The highest rated candy bar every year was Toblerone bar.</p>
 <p>For all candy types, it was m&amp;ms every year.</p>
 </div>
@@ -595,17 +639,18 @@ meh as 0.</p>
   filter(str_detect(candy, &quot;bar&quot;)) %&gt;% 
   group_by(country, candy) %&gt;%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
-  slice_max(rating_value)</code></pre>
+  slice_max(rating_value)
+  
+##   country                  candy         rating_value
+##   &lt;chr&gt;                    &lt;chr&gt;                &lt;dbl&gt;
+## 1 Canada                   toblerone bar          220
+## 2 Other or Unknown         toblerone bar         2894
+## 3 United Kingdom           toblerone bar           33
+## 4 United States of America toblerone bar         1688</code></pre>
 <p>The highest rated candy bar every region was Toblerone bar.</p>
 <p>For all candy types, it was m&amp;ms for every region.</p>
-<hr />
 </div>
 </div>
-</div>
-<div id="license" class="section level2">
-<h2>License</h2>
-<p>Distributed under the MIT License. See <code>LICENSE.txt</code> for
-more information.</p>
 </div>
 </div>
 

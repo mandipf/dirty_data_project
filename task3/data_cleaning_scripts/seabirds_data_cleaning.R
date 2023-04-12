@@ -1,5 +1,24 @@
 library(tidyverse)
 
+
+#####
+# SECTION 1: FUNCTION DEFINITIONS
+
+# function to clean species names to remove age, wanplum, plphase and sex
+species_split <- function(df, col_name) {
+  case_when(
+    !is.na(df$age) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
+    !is.na(df$wanplum) ~ str_remove(col_name, " PL[// [:alnum:]]*"),
+    !is.na(df$plphase) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
+    !is.na(df$sex) ~ str_remove(col_name, " [MF]$"),
+    TRUE ~ col_name
+  )
+}
+
+
+#####
+# SECTION 2: IMPORT AND CLEAN DATA SET, THEN EXPORT
+
 # import dirty data
 bird_dirty_data <- readxl::read_xls(here::here("raw_data/seabirds.xls"),
                             sheet = "Bird data by record ID",
@@ -21,16 +40,6 @@ seabirds_joined_data <- bird_dirty_data %>%
 
 
 # clean species names to remove age, wanplum, plphase and sex
-species_split <- function(df, col_name) {
-  case_when(
-    !is.na(df$age) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
-    !is.na(df$wanplum) ~ str_remove(col_name, " PL[// [:alnum:]]*"),
-    !is.na(df$plphase) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
-    !is.na(df$sex) ~ str_remove(col_name, " [MF]$"),
-    TRUE ~ col_name
-  )
-}
-
 seabirds_clean_data <- seabirds_joined_data %>% 
   mutate(across(.cols = c(com_name, sci_name, abr_name),
                 .fns = ~ species_split(seabirds_joined_data, .x),

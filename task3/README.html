@@ -9,11 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-04-12" />
 
-<title>seabirds_data_cleaning.R</title>
+<title>README</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,29 +348,52 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">seabirds_data_cleaning.R</h1>
-<h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-12</h4>
 
 </div>
 
 
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.0     ✔ readr     2.1.4
-## ✔ forcats   1.0.0     ✔ stringr   1.5.0
-## ✔ ggplot2   3.4.1     ✔ tibble    3.2.0
-## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
-## ✔ purrr     1.0.1     
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
-<pre class="r"><code>#####
-# SECTION 1: FUNCTION DEFINITIONS
-
-# function to clean species names to remove age, wanplum, plphase and sex
-species_split &lt;- function(df, col_name) {
+<div id="task-3---seabird-observation-data" class="section level1">
+<h1><strong>Task 3 - Seabird Observation Data</strong></h1>
+<hr />
+<div id="project-description" class="section level2">
+<h2>Project Description</h2>
+<p>This project cleans some Seabird observation data and performs some
+analysis on that cleaned data. The data itself, which is in the form of
+an XLS file with two sheets, was provided as part of a CodeClan Dirty
+Data Project.</p>
+<p>The first sheet <code>Bird data by record ID</code> contains the
+names and appearance of the seabirds observed. The second sheet
+<code>Ship data by record ID</code> contains the times and location of
+each sighting.</p>
+<p>It is assumed that there are no duplicates within the data set.</p>
+<hr />
+</div>
+<div id="data-cleaning" class="section level2">
+<h2>Data cleaning</h2>
+<p>The data cleaning script is located in the
+<code>data_cleaning_scripts</code> folder. The libraries required to run
+the data cleaning script are:</p>
+<pre><code>library(here)
+library(janitor)
+library(readxl)
+library(tidyverse)</code></pre>
+<div id="section-1-function-definitions" class="section level3">
+<h3>Section 1: Function definitions</h3>
+<p>The function removes age, sex and plummage data from the species
+names and abbreviations using REGEX patterns in a specific order based
+on the order they appear in the species names.</p>
+<p>The REGEX patterns originally consisted of the data within the
+<code>age</code>, <code>wanplum</code> and <code>plphase</code> columns.
+Records 25238 and 28499 of “Bird data by record ID” sheet list
+<code>age</code> as <em>JUV</em>, however <em>AD</em> is appended to the
+species names and abbreviations. Record 25733 of “Bird data by record
+ID” sheet lists <code>wanplum</code> as <em>5</em>, however <em>6</em>
+is appended to the species names and abbreviations. A value of 6 for
+<code>wanplum</code> is not valid based on the definitions the “Bird
+date codes” sheet of the XLS file. As a result, more generic patterns
+have been used for <code>age</code>, <code>wanplum</code> and
+<code>plphase</code>.</p>
+<pre><code>species_split &lt;- function(df, col_name) {
   case_when(
     !is.na(df$age) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
     !is.na(df$wanplum) ~ str_remove(col_name, &quot; PL[// [:alnum:]]*&quot;),
@@ -380,55 +401,145 @@ species_split &lt;- function(df, col_name) {
     !is.na(df$sex) ~ str_remove(col_name, &quot; [MF]$&quot;),
     TRUE ~ col_name
   )
-}
+}</code></pre>
+</div>
+<div id="section-2-import-and-clean-data-set-then-export-as-csv" class="section level3">
+<h3>Section 2: Import and clean data set, then export as CSV</h3>
+<p>The following data cleaning tasks are carried out:</p>
+<ul>
+<li>Import both sheets from the XLS file;</li>
+<li>Join the two data sets using <code>RECORD ID</code> as the key;</li>
+<li>Clean the column names;</li>
+<li>Filter out observations marked as [NO BIRDS RECORDED];</li>
+<li>Use the above function to remove age, sex and plummage data from the
+species names and abbreviations as these are thought to be entry errors
+and duplication of the dedicated <code>age</code>, <code>wanplum</code>,
+<code>plphase</code> and <code>sex</code> columns;</li>
+<li>Remove variables not required for data analysis;</li>
+<li>Export data to CSV file.</li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="data-analysis" class="section level2">
+<h2>Data analysis</h2>
+<p>The data analysis script is located in the
+<code>analysis_and_documentation</code> folder. The libraries required
+to run the data analysis script are:</p>
+<pre><code>library(assertr)
+library(here)
+library(tidyverse)</code></pre>
+<p>The presence of all required variables within the imported file are
+verified before any analysis is conducted. This also includes a class
+verification for numeric fields.</p>
+<div id="analysis-questions" class="section level3">
+<h3>Analysis questions</h3>
+<div id="q1" class="section level4">
+<h4>Q1</h4>
+<p>Which bird had the most individual sightings?</p>
+<pre><code>seabirds_data %&gt;% 
+  select(common_name, scientific_name, abbreviation) %&gt;% 
+  mutate(number_of_sightings = n(),
+         .by = common_name) %&gt;%
+  unique() %&gt;% 
+  slice_max(number_of_sightings)
 
-
-#####
-# SECTION 2: IMPORT AND CLEAN DATA SET, THEN EXPORT
-
-# import dirty data
-bird_dirty_data &lt;- readxl::read_xls(here::here(&quot;raw_data/seabirds.xls&quot;),
-                            sheet = &quot;Bird data by record ID&quot;,
-                            col_types = &quot;text&quot;)
-
-ship_dirty_data &lt;- readxl::read_xls(here::here(&quot;raw_data/seabirds.xls&quot;),
-                            sheet = &quot;Ship data by record ID&quot;,
-                            col_types = &quot;text&quot;)
-
-
-# join data sets, clean column names and remove empty observations/records
-seabirds_joined_data &lt;- bird_dirty_data %&gt;% 
-  left_join(ship_dirty_data, by = &quot;RECORD ID&quot;) %&gt;% 
-  janitor::clean_names() %&gt;% 
-  rename(com_name = species_common_name_taxon_age_sex_plumage_phase,
-         sci_name = species_scientific_name_taxon_age_sex_plumage_phase,
-         abr_name = species_abbreviation) %&gt;% 
-  filter(com_name != &quot;[NO BIRDS RECORDED]&quot;)
-
-
-# clean species names to remove age, wanplum, plphase and sex
-seabirds_clean_data &lt;- seabirds_joined_data %&gt;% 
-  mutate(across(.cols = c(com_name, sci_name, abr_name),
-                .fns = ~ species_split(seabirds_joined_data, .x),
-                .names = &quot;{.col}_1&quot;
-                ),
-         .after = abr_name
-         )
-
-
-# select required variables and export clean data
-seabirds_clean_data %&gt;%
-  select(
-    record = record_x,
-    record_id,
-    common_name = com_name_1,
-    scientific_name = sci_name_1,
-    abbreviation = abr_name_1,
-    count,
-    latitude = lat,
-    longitude = long
-    ) %&gt;%
-  write_csv(here::here(&quot;clean_data/seabirds_clean.csv&quot;))</code></pre>
+##   common_name                    scientific_name                 abbre…¹ numbe…²
+##   &lt;chr&gt;                          &lt;chr&gt;                           &lt;chr&gt;     &lt;int&gt;
+## 1 Wandering albatross sensu lato Diomedea antipodensis / exulans DIOANT…   11293
+## # … with abbreviated variable names ¹​abbreviation, ²​number_of_sightings</code></pre>
+<p>The bird with the most sightings was:</p>
+<ul>
+<li>common name: Wandering albatross sensu lato<br />
+</li>
+<li>scientific name: Diomedea antipodensis / exulans</li>
+<li>species abbreviation: DIOANTEXU</li>
+</ul>
+</div>
+<div id="q2" class="section level4">
+<h4>Q2</h4>
+<p>Which bird had the highest total count?</p>
+<pre><code>seabirds_data %&gt;% 
+  mutate(total_count = sum(count, na.rm = TRUE),
+         .by = common_name) %&gt;%
+  select(common_name, scientific_name, abbreviation, total_count) %&gt;%
+  unique() %&gt;% 
+  slice_max(total_count)
+  
+##   common_name             scientific_name       abbreviation total_count
+##   &lt;chr&gt;                   &lt;chr&gt;                 &lt;chr&gt;              &lt;dbl&gt;
+## 1 Short-tailed shearwater Puffinus tenuirostris PUFTEN            982553</code></pre>
+<p>The bird with the highest total count was:</p>
+<ul>
+<li>common name: Short-tailed shearwater<br />
+</li>
+<li>scientific name: Puffinus tenuirostris</li>
+<li>species abbreviation: PUFTEN</li>
+</ul>
+</div>
+<div id="q3" class="section level4">
+<h4>Q3</h4>
+<p>Which bird had the highest total count above a latitude of -30?</p>
+<pre><code>seabirds_data %&gt;% 
+  filter(latitude &gt; -30) %&gt;% 
+  mutate(total_count = sum(count, na.rm = TRUE),
+         .by = common_name) %&gt;%
+  select(common_name, scientific_name, abbreviation, total_count) %&gt;%
+  unique() %&gt;% 
+  slice_max(total_count)
+  
+##   common_name             scientific_name    abbreviation total_count
+##   &lt;chr&gt;                   &lt;chr&gt;              &lt;chr&gt;              &lt;dbl&gt;
+## 1 Wedge-tailed shearwater Puffinus pacificus PUFPAC               855</code></pre>
+<p>The bird with the highest total count above a latitude of -30
+was:</p>
+<ul>
+<li>common name: Wedge-tailed shearwater<br />
+</li>
+<li>scientific name: Puffinus pacificus</li>
+<li>species abbreviation: PUFPAC</li>
+</ul>
+</div>
+<div id="q4" class="section level4">
+<h4>Q4</h4>
+<p>How many different types of birds were only ever seen in groups of
+1?</p>
+<pre><code>seabirds_data %&gt;% 
+  filter(count == 1) %&gt;%
+  select(common_name, scientific_name, abbreviation) %&gt;% 
+  unique()
+  
+##    common_name                       scientific_name                 abbreviat…¹
+##    &lt;chr&gt;                             &lt;chr&gt;                           &lt;chr&gt;      
+##  1 Seabird (Unidentified)            &lt;NA&gt;                            SEABUN     
+##  2 White-chinned petrel              Procellaria aequinoctialis      PROAEQ     
+##  3 Sooty shearwater                  Puffinus griseus                PUFGRI     
+##  4 Northern giant petrel             Macronectes halli               MACHAL     
+##  5 Wandering albatross sensu lato    Diomedea antipodensis / exulans DIOANTEXU  
+##  6 Royal albatross sensu lato        Diomedea epomophora / sanfordi  DIOEPOSAN  
+##  7 Australasian gannet               Morus serrator                  MORSER     
+##  8 Diving-petrel (unidentified)      Pelecanoides sp.                PELSP      
+##  9 Skua (unidentified)               Catharacta / Stercorarius sp.   SKUAUN     
+## 10 Black-browed albatross sensu lato Diomedea impavida / melanophrys DIOIMPMEL  
+## # … with 138 more rows, and abbreviated variable name ¹​abbreviation</code></pre>
+<p>There were 148 types of bird that were only ever seen alone.</p>
+</div>
+<div id="q5" class="section level4">
+<h4>Q5</h4>
+<p>How many penguins were seen?</p>
+<pre><code>seabirds_data %&gt;% 
+  filter(str_detect(common_name, &quot;(?i)penguin&quot;)) %&gt;% 
+  summarise(number_penguin_sightings = n(),
+            number_of_penguins_seen = sum(count, na.rm = TRUE))
+            
+##   number_penguin_sightings number_of_penguins_seen
+##                      &lt;int&gt;                   &lt;dbl&gt;
+## 1                       70                     158</code></pre>
+<p>There were 158 penguins seen during 70 sightings.</p>
+</div>
+</div>
+</div>
+</div>
 
 
 
