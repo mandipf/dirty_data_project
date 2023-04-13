@@ -5,6 +5,7 @@ editor_options:
 ---
 
 # **Task 2 - Cake Ingredients**
+By Mandip Farmahan (2023-04-12)
 
 ------------------------------------------------------------------------
 
@@ -29,6 +30,8 @@ library(janitor)
 library(tidyverse)
 ```
 
+<br>
+
 The following data cleaning tasks are carried out:
 
 -   Import both CSV files;
@@ -52,7 +55,10 @@ library(tidyverse)
 
 The presence of all required variables within the imported file are verified before any analysis is conducted. This also includes a class verification for numeric fields.
 
+<br>
+
 ### Analysis questions
+
 
 #### Q1
 
@@ -70,6 +76,8 @@ cake_data %>%
 ```
 
 One Bowl Chocolate has the most cocoa in it.
+
+<br>
 
 
 #### Q2
@@ -97,6 +105,8 @@ cake_data %>%
 Sponge cake has 3.5 *cups* of ingredients.
 
 
+<br>
+
 #### Q3
 
 How many ingredients are measured in teaspoons?
@@ -122,6 +132,8 @@ cake_data %>%
 8 ingredients are measured in teaspoons.
 
 
+<br>
+
 #### Q4
 
 Which cake has the most unique ingredients?
@@ -140,6 +152,8 @@ cake_data %>%
 ```
 
 Babas au Rhum and One Bowl Chocolate were tied for the most unique ingredients.
+
+<br>
 
 #### Q5
 

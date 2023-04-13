@@ -6,11 +6,14 @@ editor_options:
 
 # **Task 1 - Decathlon Data**
 
+By Mandip Farmahan (2023-04-12)
+
 ------------------------------------------------------------------------
 
 ## Project Description
 
-This project cleans some Decathlon Data and performs some analysis on that cleaned data. The data itself, which is in the form of a RDS file, was provided as part of a CodeClan Dirty Data Project.
+This project cleans some Decathlon Data and performs some analysis on that cleaned data.
+The data itself, which is in the form of a RDS file, was provided as part of a CodeClan Dirty Data Project.
 
 It is assumed that there are no duplicates within the data set.
 
@@ -28,6 +31,8 @@ library(readr)
 library(tidyverse)
 ```
 
+<br>
+
 The following data cleaning tasks are carried out:
 
 -   Import file using the `readr` library;
@@ -41,7 +46,8 @@ The following data cleaning tasks are carried out:
 
 ## Data analysis
 
-The data analysis script is located in the `analysis_and_documentation` folder. The libraries required to run the data analysis script are:
+The data analysis script is located in the `analysis_and_documentation` folder.
+The libraries required to run the data analysis script are:
 
 ```         
 library(assertr)
@@ -49,7 +55,10 @@ library(here)
 library(tidyverse)
 ```
 
-The presence of all required variables within the imported file are verified before any analysis is conducted. This also includes a class verification for numeric fields.
+The presence of all required variables within the imported file are verified before any analysis is conducted.
+This also includes a class verification for numeric fields.
+
+<br>
 
 ### Analysis questions
 
@@ -69,6 +78,8 @@ decathlon_data %>%
 
 Clay had the longest jump.
 
+<br>
+
 #### Q2
 
 What was the average 100m time in each competition?
@@ -87,6 +98,8 @@ decathlon_data %>%
 
 The average 100m time was 11.2 seconds in Decastar and 10.9 seconds in OlympicG.
 
+<br>
+
 #### Q3
 
 Who had the highest total points across both competitions?
@@ -103,6 +116,8 @@ decathlon_data %>%
 ```
 
 Serble had the highest points total across both competitions.
+
+<br>
 
 #### Q4
 
@@ -132,6 +147,8 @@ OlympicG
 
 -   The top three shot-put scores were 16.4m (Sebrle), 15.9m (Karpov) and 15.7m (Macey)
 
+<br>
+
 #### Q5
 
 What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?
@@ -154,6 +171,6 @@ The average points for competitors across both competitions who ran the 400m in 
 If this was split by competition, the results were:
 
 |               | Decastar | OlympicG |
-|---------------|----------|----------|
-| \< 50 seconds | 7988     | 8180     |
-| \> 50 seconds | 7721     | 7730     |
+|:-------------:|:--------:|:--------:|
+| \< 50 seconds |   7988   |   8180   |
+| \> 50 seconds |   7721   |   7730   |

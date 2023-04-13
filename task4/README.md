@@ -5,6 +5,7 @@ editor_options:
 ---
 
 # **Task 4 - Halloween Candy Data**
+By Mandip Farmahan (2023-04-12)
 
 ------------------------------------------------------------------------
 
@@ -17,7 +18,7 @@ Assumptions made about the data:
 -   There are no duplicates (raters) across the three year data set;
 -   Age range of people surveyed were 4 to 100. Anything outside this range was marked N/A;
 -   Candy names within the free text columns were separated using full stops, commas or semi-colons;
-- Any candy which had less than 10 entries was removed from the data set to remove any pattern errors when searching free text columns.
+- Any candy which had less than 10 entries is removed from the data set to remove any pattern errors when searching free text columns.
 
 ------------------------------------------------------------------------
 
@@ -43,63 +44,56 @@ library(readxl)
 library(tidyverse)
 ```
 
-### Section 1: Function definitions
-This section defines the two functions used later in the data cleaning script.
+<br>
 
-**Function 1**
+The following data cleaning tasks are carried out in four stages:
 
-- Imports the xlsx file;
-- Adds columns for `year` and `rater_id`, which is made up of the row number and questionnaire year;
-- Cleans the column names.
+**1. Function definitions**
 
+- Function 1
+  - Imports the xlsx file;
+  - Adds columns for `year` and `rater_id`, which is made up of the row number and questionnaire year;
+  - Cleans the column names.
 
-**Function 2** (only required for free text field search)
-
-- Converts the data to long format (headers `candy` and `rating`);
-- Searches through the free text columns for additional candy ratings;
-- Remove any empty (N/A) ratings.
-
-
-### Section 2: Import and clean each data set, then combine them
-This section is used to import each data file and standardise it to combine all three data sets into one data set. For each data set (2015, 2016, 2017), the following is carried out:
-
-- Import file using Function 1;
-- Rename columns relating the rater (age, country etc) to be consistent across all three files;
-- Convert the data from the candy named columns into long format (`candy` and `rating`) and remove any empty (N/A) ratings;
-- Use Function 2 to extract ratings for free text candy;
-- Combine the data from the named columns and the extracted columns for a complete data set for that year.
-
-Each of the three data sets were then combined for further processing.
-
-Note: Function 2 is not used in `candy_data_cleaning_without_text_field.R`. Therefore only the data from the named columns is used in this reduced analysis.
+- Function 2 (`candy_data_cleaning.R` only)
+  - Converts the data to long format (headers `candy` and `rating`);
+  - Searches through the free text columns for additional candy ratings;
+  - Remove any empty (N/A) ratings.
 
 
-### Section 3: Deep clean of full data set
-This section is used to deep clean the combined data set as follows:
+**2. Import and clean each data set to standardise them, then combine them**
 
-- Create a table of accepted alternative candy entries (spelling errors etc) using `alt_entry_names_for_candy.R`;
-- Join this table to the combined data set;
-- Create a table of recognised candy names using `candy_names.R`;
-- Filter the combined data set against this candy name table;
-- Remove any candies with less than 10 entries for pattern detection errors;
-- Decode country entries using REGEX patterns;
-- Create a table of accepted alternative country entries (spelling errors etc) using `alt_entry_names_for_countries.R`;
-- Join this table to the combined data set;
-- Convert age column to numeric and set all entries below 1 or above 100 to N/A.
+- For each data set:
+  - Import file using Function 1;
+  - Rename columns relating the rater (age, country etc) to be consistent across all three files;
+  - Convert the data from the candy named columns into long format (`candy` and `rating`) and remove any empty (N/A) ratings;
+  - Use Function 2 to extract ratings for free text candy  (`candy_data_cleaning.R` only);
+  - Combine the data from the named columns and the extracted columns for a complete data set for that year (`candy_data_cleaning.R` only).
+
+- Combine all three files for further processing.
 
 
-### Section 4: Export clean data as CSV
-This section selects the required variables (columns) for data analysis and exports the data to a CSV file.
+**3. Deep clean of full data set**
+
+  - Create a table of accepted alternative candy entries (spelling errors etc) using `alt_entry_names_for_candy.R`;
+  - Join this table to the combined data set;
+  - Create a table of recognised candy names using `candy_names.R`;
+  - Filter the combined data set against this candy name table;
+  - Remove any candies with less than 10 entries for pattern detection errors;
+  - Decode country entries using REGEX patterns;
+  - Create a table of accepted alternative country entries (spelling errors etc) using `alt_entry_names_for_countries.R`;
+  - Join this table to the combined data set;
+  - Convert age column to numeric and set all entries below 1 or above 100 to N/A.
+
+
+**4. Select required columns for data analysis and export to CSV**
 
 
 ------------------------------------------------------------------------
 
 ## Data analysis
 
-The data analysis scripts are located in the `analysis_and_documentation` folder. There are two scripts within this folder:
-
--   The first analyses data cleaned with `candy_data_cleaning_without_text_field.R`.
--   The other analyses data cleaned with `candy_data_cleaning.R`.
+The data analysis scripts are located in the `analysis_and_documentation` folder. There are two scripts within this folder, which correspond to `candy_data_cleaning.R`and `candy_data_cleaning_without_text_field.R`. The only difference between these data analysis scripts is the location of the CSV file produced by the respective cleaning script.
 
 The libraries required to run the data analysis script are:
 
@@ -111,9 +105,14 @@ library(tidyverse)
 
 The presence of all required variables within the imported file are verified before any analysis is conducted. This also includes a class verification for numeric fields.
 
+<br>
+
 ### Analysis questions
 
 With the exception of Q1, the answers provided by both data analysis scripts matched although the numbers were slightly higher in the complete data set. The example outputs are provided only for the complete data set, i.e. the data set also containing the free text fields.
+
+
+<br>
 
 #### Q1
 
@@ -137,6 +136,8 @@ When using the reduced data set (no free text field), this was reduced to 620373
 - Split by year, this was 381871 in 2015, 96959 in 2016, and 141543 in 2017.
 
 
+<br>
+
 #### Q2
 
 What was the average age of people who are going out trick or treating?
@@ -154,6 +155,8 @@ candy_data_unique_rater  %>%
 The average age for trick or treaters was 35.1 years old.
 
 
+<br>
+
 #### Q3
 
 What was the average age of people who are not going trick or treating?
@@ -170,6 +173,8 @@ candy_data_unique_rater  %>%
 
 The average age for people not trick or treating was 39.0 years old.
 
+
+<br>
 
 #### Q4
 
@@ -201,6 +206,8 @@ For all candy:
 -   the highest rating for despair was Mary Jane
 
 
+<br>
+
 #### Q5
 
 How many people rated Starburst as despair?
@@ -217,6 +224,8 @@ candy_data %>%
 
 1990 people rated Starburst as despair.
 
+
+<br>
 
 #### Q6
 
@@ -249,6 +258,8 @@ For candy bars:
 For all candy, the highest rated by everyone was m&ms.
 
 
+<br>
+
 #### Q7
 
 What was the most popular candy bar in each year? Count despair as -1, joy as +1, and meh as 0.
@@ -271,6 +282,8 @@ The highest rated candy bar every year was Toblerone bar.
 
 For all candy types, it was m&ms every year.
 
+
+<br>
 
 #### Q8
 

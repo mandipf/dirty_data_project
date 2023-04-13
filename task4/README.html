@@ -354,6 +354,7 @@ display: none;
 
 <div id="task-4---halloween-candy-data" class="section level1">
 <h1><strong>Task 4 - Halloween Candy Data</strong></h1>
+<p>By Mandip Farmahan (2023-04-12)</p>
 <hr />
 <div id="project-description" class="section level2">
 <h2>Project Description</h2>
@@ -369,7 +370,7 @@ set;</li>
 range was marked N/A;</li>
 <li>Candy names within the free text columns were separated using full
 stops, commas or semi-colons;</li>
-<li>Any candy which had less than 10 entries was removed from the data
+<li>Any candy which had less than 10 entries is removed from the data
 set to remove any pattern errors when searching free text columns.</li>
 </ul>
 <hr />
@@ -400,32 +401,30 @@ questionnaires (<code>alt_entry_names_for_countries.R</code>).</li>
 library(janitor)
 library(readxl)
 library(tidyverse)</code></pre>
-<div id="section-1-function-definitions" class="section level3">
-<h3>Section 1: Function definitions</h3>
-<p>This section defines the two functions used later in the data
-cleaning script.</p>
-<p><strong>Function 1</strong></p>
+<p><br></p>
+<p>The following data cleaning tasks are carried out in four stages:</p>
+<p><strong>1. Function definitions</strong></p>
+<ul>
+<li>Function 1
 <ul>
 <li>Imports the xlsx file;</li>
 <li>Adds columns for <code>year</code> and <code>rater_id</code>, which
 is made up of the row number and questionnaire year;</li>
 <li>Cleans the column names.</li>
-</ul>
-<p><strong>Function 2</strong> (only required for free text field
-search)</p>
+</ul></li>
+<li>Function 2 (<code>candy_data_cleaning.R</code> only)
 <ul>
 <li>Converts the data to long format (headers <code>candy</code> and
 <code>rating</code>);</li>
 <li>Searches through the free text columns for additional candy
 ratings;</li>
 <li>Remove any empty (N/A) ratings.</li>
+</ul></li>
 </ul>
-</div>
-<div id="section-2-import-and-clean-each-data-set-then-combine-them" class="section level3">
-<h3>Section 2: Import and clean each data set, then combine them</h3>
-<p>This section is used to import each data file and standardise it to
-combine all three data sets into one data set. For each data set (2015,
-2016, 2017), the following is carried out:</p>
+<p><strong>2. Import and clean each data set to standardise them, then
+combine them</strong></p>
+<ul>
+<li>For each data set:
 <ul>
 <li>Import file using Function 1;</li>
 <li>Rename columns relating the rater (age, country etc) to be
@@ -433,20 +432,15 @@ consistent across all three files;</li>
 <li>Convert the data from the candy named columns into long format
 (<code>candy</code> and <code>rating</code>) and remove any empty (N/A)
 ratings;</li>
-<li>Use Function 2 to extract ratings for free text candy;</li>
+<li>Use Function 2 to extract ratings for free text candy
+(<code>candy_data_cleaning.R</code> only);</li>
 <li>Combine the data from the named columns and the extracted columns
-for a complete data set for that year.</li>
+for a complete data set for that year
+(<code>candy_data_cleaning.R</code> only).</li>
+</ul></li>
+<li>Combine all three files for further processing.</li>
 </ul>
-<p>Each of the three data sets were then combined for further
-processing.</p>
-<p>Note: Function 2 is not used in
-<code>candy_data_cleaning_without_text_field.R</code>. Therefore only
-the data from the named columns is used in this reduced analysis.</p>
-</div>
-<div id="section-3-deep-clean-of-full-data-set" class="section level3">
-<h3>Section 3: Deep clean of full data set</h3>
-<p>This section is used to deep clean the combined data set as
-follows:</p>
+<p><strong>3. Deep clean of full data set</strong></p>
 <ul>
 <li>Create a table of accepted alternative candy entries (spelling
 errors etc) using <code>alt_entry_names_for_candy.R</code>;</li>
@@ -463,25 +457,19 @@ errors etc) using <code>alt_entry_names_for_countries.R</code>;</li>
 <li>Convert age column to numeric and set all entries below 1 or above
 100 to N/A.</li>
 </ul>
-</div>
-<div id="section-4-export-clean-data-as-csv" class="section level3">
-<h3>Section 4: Export clean data as CSV</h3>
-<p>This section selects the required variables (columns) for data
-analysis and exports the data to a CSV file.</p>
+<p><strong>4. Select required columns for data analysis and export to
+CSV</strong></p>
 <hr />
-</div>
 </div>
 <div id="data-analysis" class="section level2">
 <h2>Data analysis</h2>
 <p>The data analysis scripts are located in the
 <code>analysis_and_documentation</code> folder. There are two scripts
-within this folder:</p>
-<ul>
-<li>The first analyses data cleaned with
-<code>candy_data_cleaning_without_text_field.R</code>.</li>
-<li>The other analyses data cleaned with
-<code>candy_data_cleaning.R</code>.</li>
-</ul>
+within this folder, which correspond to
+<code>candy_data_cleaning.R</code>and
+<code>candy_data_cleaning_without_text_field.R</code>. The only
+difference between these data analysis scripts is the location of the
+CSV file produced by the respective cleaning script.</p>
 <p>The libraries required to run the data analysis script are:</p>
 <pre><code>library(assertr)
 library(here)
@@ -489,6 +477,7 @@ library(tidyverse)</code></pre>
 <p>The presence of all required variables within the imported file are
 verified before any analysis is conducted. This also includes a class
 verification for numeric fields.</p>
+<p><br></p>
 <div id="analysis-questions" class="section level3">
 <h3>Analysis questions</h3>
 <p>With the exception of Q1, the answers provided by both data analysis
@@ -496,6 +485,7 @@ scripts matched although the numbers were slightly higher in the
 complete data set. The example outputs are provided only for the
 complete data set, i.e. the data set also containing the free text
 fields.</p>
+<p><br></p>
 <div id="q1" class="section level4">
 <h4>Q1</h4>
 <p>What is the total number of candy ratings given across the three
@@ -518,6 +508,7 @@ reduced to 620373 candy ratings.</p>
 <li>Split by year, this was 381871 in 2015, 96959 in 2016, and 141543 in
 2017.</li>
 </ul>
+<p><br></p>
 </div>
 <div id="q2" class="section level4">
 <h4>Q2</h4>
@@ -531,6 +522,7 @@ treating?</p>
 ##         &lt;dbl&gt;
 ## 1        35.1</code></pre>
 <p>The average age for trick or treaters was 35.1 years old.</p>
+<p><br></p>
 </div>
 <div id="q3" class="section level4">
 <h4>Q3</h4>
@@ -545,6 +537,7 @@ treating?</p>
 ## 1        39.0</code></pre>
 <p>The average age for people not trick or treating was 39.0 years
 old.</p>
+<p><br></p>
 </div>
 <div id="q4" class="section level4">
 <h4>Q4</h4>
@@ -572,6 +565,7 @@ of these ratings?</p>
 <li>the highest rating for joy and meh was m&amp;ms</li>
 <li>the highest rating for despair was Mary Jane</li>
 </ul>
+<p><br></p>
 </div>
 <div id="q5" class="section level4">
 <h4>Q5</h4>
@@ -584,6 +578,7 @@ of these ratings?</p>
 ##                                         &lt;int&gt;
 ## 1                                        1990</code></pre>
 <p>1990 people rated Starburst as despair.</p>
+<p><br></p>
 </div>
 <div id="q6" class="section level4">
 <h4>Q6</h4>
@@ -611,6 +606,7 @@ Count despair as -1, joy as +1, and meh as 0.</p>
 <li>the highest rating for unanswered (N/A) was Toblerone bar</li>
 </ul>
 <p>For all candy, the highest rated by everyone was m&amp;ms.</p>
+<p><br></p>
 </div>
 <div id="q7" class="section level4">
 <h4>Q7</h4>
@@ -629,6 +625,7 @@ Count despair as -1, joy as +1, and meh as 0.</p>
 ## 3  2017 toblerone bar         1236</code></pre>
 <p>The highest rated candy bar every year was Toblerone bar.</p>
 <p>For all candy types, it was m&amp;ms every year.</p>
+<p><br></p>
 </div>
 <div id="q8" class="section level4">
 <h4>Q8</h4>

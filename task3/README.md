@@ -5,6 +5,7 @@ editor_options:
 ---
 
 # **Task 3 - Seabird Observation Data**
+By Mandip Farmahan (2023-04-12)
 
 ------------------------------------------------------------------------
 
@@ -32,35 +33,25 @@ library(readxl)
 library(tidyverse)
 ```
 
-### Section 1: Function definitions
+<br>
 
-The function removes age, sex and plummage data from the species names and abbreviations using REGEX patterns in a specific order based on the order they appear in the species names.
+The following data cleaning tasks are carried out in two stages:
 
-The REGEX patterns originally consisted of the data within the `age`, `wanplum` and `plphase` columns. Records 25238 and 28499 of "Bird data by record ID" sheet list `age` as *JUV*, however *AD* is appended to the species names and abbreviations. Record 25733 of "Bird data by record ID" sheet lists `wanplum` as *5*, however *6* is appended to the species names and abbreviations. A value of 6 for `wanplum` is not valid based on the definitions the "Bird date codes" sheet of the XLS file. As a result, more generic patterns have been used for `age`, `wanplum` and `plphase`.
+**1. Function definitions**
 
-```
-species_split <- function(df, col_name) {
-  case_when(
-    !is.na(df$age) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
-    !is.na(df$wanplum) ~ str_remove(col_name, " PL[// [:alnum:]]*"),
-    !is.na(df$plphase) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
-    !is.na(df$sex) ~ str_remove(col_name, " [MF]$"),
-    TRUE ~ col_name
-  )
-}
-```
+  - The function removes age, sex and plummage data from the species names and abbreviations using REGEX patterns in a specific order based on the order they appear in the species names.
 
-### Section 2: Import and clean data set, then export as CSV
+  - The REGEX patterns originally consisted of the data within the `age`, `wanplum` and `plphase` columns. Records 25238 and 28499 of "Bird data by record ID" sheet list `age` as *JUV*, however *AD* is appended to the species names and abbreviations. Record 25733 of "Bird data by record ID" sheet lists `wanplum` as *5*, however *6* is appended to the species names and abbreviations. A value of 6 for `wanplum` is not valid based on the definitions the "Bird date codes" sheet of the XLS file. As a result, more generic patterns are used for `age`, `wanplum` and `plphase`.
 
-The following data cleaning tasks are carried out:
+**2. Import and clean data set, then export as CSV**
 
--   Import both sheets from the XLS file;
--   Join the two data sets using `RECORD ID` as the key;
--   Clean the column names;
--   Filter out observations marked as [NO BIRDS RECORDED];
-- Use the above function to remove age, sex and plummage data from the species names and abbreviations as these are thought to be entry errors and duplication of the dedicated `age`, `wanplum`, `plphase` and `sex` columns;
-- Remove variables not required for data analysis;
--   Export data to CSV file.
+  -   Import both sheets from the XLS file;
+  -   Join the two data sets using `RECORD ID` as the key;
+  -   Clean the column names;
+  -   Filter out observations marked as [NO BIRDS RECORDED];
+  - Use the above function to remove age, sex and plummage data from the species names and abbreviations as these are thought to be entry errors and duplication of the dedicated `age`, `wanplum`, `plphase` and `sex` columns;
+  - Remove variables not required for data analysis;
+  -   Export data to CSV file.
 
 ------------------------------------------------------------------------
 
@@ -104,6 +95,8 @@ The bird with the most sightings was:
 - scientific name: Diomedea antipodensis / exulans
 - species abbreviation: DIOANTEXU
 
+<br>
+
 
 #### Q2
 
@@ -127,6 +120,8 @@ The bird with the highest total count was:
 - common name: Short-tailed shearwater	
 - scientific name: Puffinus tenuirostris
 - species abbreviation: PUFTEN
+
+<br>
 
 
 #### Q3
@@ -152,6 +147,8 @@ The bird with the highest total count above a latitude of -30 was:
 - common name: Wedge-tailed shearwater	
 - scientific name: Puffinus pacificus
 - species abbreviation: PUFPAC
+
+<br>
 
 
 #### Q4
@@ -180,6 +177,8 @@ seabirds_data %>%
 ```
 
 There were 148 types of bird that were only ever seen alone.
+
+<br>
 
 #### Q5
 

@@ -354,6 +354,7 @@ display: none;
 
 <div id="task-3---seabird-observation-data" class="section level1">
 <h1><strong>Task 3 - Seabird Observation Data</strong></h1>
+<p>By Mandip Farmahan (2023-04-12)</p>
 <hr />
 <div id="project-description" class="section level2">
 <h2>Project Description</h2>
@@ -377,12 +378,14 @@ the data cleaning script are:</p>
 library(janitor)
 library(readxl)
 library(tidyverse)</code></pre>
-<div id="section-1-function-definitions" class="section level3">
-<h3>Section 1: Function definitions</h3>
-<p>The function removes age, sex and plummage data from the species
+<p><br></p>
+<p>The following data cleaning tasks are carried out in two stages:</p>
+<p><strong>1. Function definitions</strong></p>
+<ul>
+<li><p>The function removes age, sex and plummage data from the species
 names and abbreviations using REGEX patterns in a specific order based
-on the order they appear in the species names.</p>
-<p>The REGEX patterns originally consisted of the data within the
+on the order they appear in the species names.</p></li>
+<li><p>The REGEX patterns originally consisted of the data within the
 <code>age</code>, <code>wanplum</code> and <code>plphase</code> columns.
 Records 25238 and 28499 of “Bird data by record ID” sheet list
 <code>age</code> as <em>JUV</em>, however <em>AD</em> is appended to the
@@ -391,21 +394,10 @@ ID” sheet lists <code>wanplum</code> as <em>5</em>, however <em>6</em>
 is appended to the species names and abbreviations. A value of 6 for
 <code>wanplum</code> is not valid based on the definitions the “Bird
 date codes” sheet of the XLS file. As a result, more generic patterns
-have been used for <code>age</code>, <code>wanplum</code> and
-<code>plphase</code>.</p>
-<pre><code>species_split &lt;- function(df, col_name) {
-  case_when(
-    !is.na(df$age) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-    !is.na(df$wanplum) ~ str_remove(col_name, &quot; PL[// [:alnum:]]*&quot;),
-    !is.na(df$plphase) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-    !is.na(df$sex) ~ str_remove(col_name, &quot; [MF]$&quot;),
-    TRUE ~ col_name
-  )
-}</code></pre>
-</div>
-<div id="section-2-import-and-clean-data-set-then-export-as-csv" class="section level3">
-<h3>Section 2: Import and clean data set, then export as CSV</h3>
-<p>The following data cleaning tasks are carried out:</p>
+are used for <code>age</code>, <code>wanplum</code> and
+<code>plphase</code>.</p></li>
+</ul>
+<p><strong>2. Import and clean data set, then export as CSV</strong></p>
 <ul>
 <li>Import both sheets from the XLS file;</li>
 <li>Join the two data sets using <code>RECORD ID</code> as the key;</li>
@@ -419,7 +411,6 @@ and duplication of the dedicated <code>age</code>, <code>wanplum</code>,
 <li>Export data to CSV file.</li>
 </ul>
 <hr />
-</div>
 </div>
 <div id="data-analysis" class="section level2">
 <h2>Data analysis</h2>
@@ -455,6 +446,7 @@ verification for numeric fields.</p>
 <li>scientific name: Diomedea antipodensis / exulans</li>
 <li>species abbreviation: DIOANTEXU</li>
 </ul>
+<p><br></p>
 </div>
 <div id="q2" class="section level4">
 <h4>Q2</h4>
@@ -476,6 +468,7 @@ verification for numeric fields.</p>
 <li>scientific name: Puffinus tenuirostris</li>
 <li>species abbreviation: PUFTEN</li>
 </ul>
+<p><br></p>
 </div>
 <div id="q3" class="section level4">
 <h4>Q3</h4>
@@ -499,6 +492,7 @@ was:</p>
 <li>scientific name: Puffinus pacificus</li>
 <li>species abbreviation: PUFPAC</li>
 </ul>
+<p><br></p>
 </div>
 <div id="q4" class="section level4">
 <h4>Q4</h4>
@@ -523,6 +517,7 @@ was:</p>
 ## 10 Black-browed albatross sensu lato Diomedea impavida / melanophrys DIOIMPMEL  
 ## # … with 138 more rows, and abbreviated variable name ¹​abbreviation</code></pre>
 <p>There were 148 types of bird that were only ever seen alone.</p>
+<p><br></p>
 </div>
 <div id="q5" class="section level4">
 <h4>Q5</h4>
