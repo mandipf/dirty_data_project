@@ -1,0 +1,117 @@
+---
+title: "Task 6 - Dog owners survey"
+author: "Mandip"
+date: "2023-04-13"
+output: html_document
+---
+
+# Import libraries and data sets
+
+### Import libraries
+
+```{r}
+library(assertr)
+library(tidyverse)
+```
+
+### Import data with verification
+
+- Check all fields required for analysis are present
+  - `id`, `title` and `first_name` not required
+
+- Check `amount_spent_on_dog_food` and `dog_age` are numeric
+
+```{r}
+survey_data <- read_csv(here::here("clean_data/dog_owners_survey_clean.csv"),
+                           show_col_types = FALSE)
+
+survey_data %>% 
+  verify(has_all_names("last_name", "email", "amount_spent_on_dog_food",
+                       "dog_size", "dog_gender", "dog_age")) %>% 
+  verify(is.numeric(c(amount_spent_on_dog_food, dog_age))) %>%
+  summary()
+```
+
+```{r}
+survey_data %>% 
+  head()
+
+survey_data %>% 
+  summarise(across(.cols = everything(),
+                   .fns = ~ sum(is.na(.x))))
+
+survey_data %>% 
+  group_by(dog_size) %>% 
+  count()
+
+survey_data %>% 
+  group_by(dog_gender) %>% 
+  count()
+```
+
+
+# Analysis questions
+
+### Q1
+The client only counts a valid email address as one ending in ‘.com’. How many survey results have a valid email address?
+
+```{r}
+survey_data %>% 
+  filter(str_detect(email, ".com$")) %>% 
+  summarise(number_of_valid_email_addresses = n())
+```
+
+### Q2
+What’s the average amount spent on dog food for each dog size?
+
+```{r}
+survey_data %>% 
+  summarise(average_amount_spent = mean(amount_spent_on_dog_food, na.rm = TRUE),
+            .by = dog_size) %>% 
+  arrange(desc(average_amount_spent))
+```
+
+### Q3
+For owners whose surname starts with a letter in the second half of the alphabet (N onwards) what is the average age of their dog?
+
+```{r}
+survey_data %>% 
+  filter(str_detect(last_name, "^(?i)[N-Z]")) %>% 
+  summarise(average_age_of_dog = mean(dog_age, na.rm = TRUE))
+```
+
+### Q4
+The dog_age column is the age in dog years. If the conversion is 1 human year = 6 dog years, then what is the average human age for dogs of each gender?
+
+```{r}
+survey_data %>%
+  mutate(human_age = dog_age / 6) %>% 
+  summarise(average_human_age_of_dog = mean(human_age, na.rm = TRUE),
+            .by = dog_gender)
+```
+
+### Q5
+Create a plot of results of question 4.
+
+```{r}
+# using ggplot after filtering data
+survey_data %>%
+  mutate(human_age = dog_age / 6,
+         dog_gender = case_when(is.na(dog_gender) ~ "Unknown",
+                                TRUE ~ dog_gender)) %>% 
+  summarise(average_human_age_of_dog = mean(human_age, na.rm = TRUE),
+            .by = dog_gender) %>% 
+  ggplot(aes(x=dog_gender, y=average_human_age_of_dog, fill=dog_gender)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label=round(average_human_age_of_dog, 2)),
+            vjust=2, color="black", show.legend = FALSE) +
+  ggtitle("Plot of Average human age of dog \n by Gender") +
+  xlab("Gender") +
+  ylab("Average human age (years)") +
+  ylim(0, 10) +
+  theme(plot.title = element_text(hjust=0.5, color="black", 
+                                  size=14, face="bold.italic"),
+        panel.grid.minor=element_blank())
+```
+
+
