@@ -370,7 +370,7 @@ expected to be typographical errors;</li>
 <li><code>email</code> addresses ending in <em>.co</em> were not updated
 as it is unclear if these should be <em>.com</em>, <em>.co.uk</em> or
 some other variant;</li>
-<li><code>amount_spent_on_dog_food</code> should be at least £10 based
+<li><code>amount_spent_on_dog_food</code> should be at least B#10 based
 on the entries within that column. Any values less than this are
 expected to be typographical errors (e.g. missing one or more zeroes)
 and therefore marked NA.</li>
@@ -407,7 +407,7 @@ in assumptions above;</li>
 no indication of food cost split per dog given;</li>
 <li>Replace any string that does not give a single cost for food
 (e.g. between x and y) with NA;</li>
-<li>Replace any value less than £10 with NA as specified in assumptions
+<li>Replace any value less than B#10 with NA as specified in assumptions
 above.</li>
 </ul>
 <pre><code>dos_cost_clean &lt;- dos_personal_info_clean %&gt;%
@@ -532,7 +532,7 @@ address?</p>
 <thead>
 <tr class="header">
 <th align="center">Size of dog</th>
-<th align="center">Amount spent (£)</th>
+<th align="center">Amount spent (B#)</th>
 </tr>
 </thead>
 <tbody>
@@ -559,7 +559,7 @@ address?</p>
 </tbody>
 </table>
 <p>For dogs whose size was not recorded, the average amount spent on dog
-food was £64.70.</p>
+food was B#64.70.</p>
 <p><br></p>
 </div>
 <div id="q3" class="section level4">

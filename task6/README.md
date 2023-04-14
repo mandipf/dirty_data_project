@@ -1,8 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: sentence
----
 
 # **Task 6 - Dog Owners Survey**
 By Mandip Farmahan (2023-04-13)
@@ -18,7 +13,7 @@ Assumptions made about the data set:
 
 -   `email` addresses ending in variations of *.com* (e.g. *.comm*) were updated to *.com* as these are expected to be typographical errors;
 -   `email` addresses ending in *.co* were not updated as it is unclear if these should be *.com*, *.co.uk* or some other variant;
--   `amount_spent_on_dog_food` should be at least £10 based on the entries within that column. Any values less than this are expected to be typographical errors (e.g. missing one or more zeroes) and therefore marked NA.
+-   `amount_spent_on_dog_food` should be at least B#10 based on the entries within that column. Any values less than this are expected to be typographical errors (e.g. missing one or more zeroes) and therefore marked NA.
 
 ------------------------------------------------------------------------
 
@@ -57,7 +52,7 @@ dog_owners_survey_data <- read_csv(here::here("raw_data/dog_survey.csv"),
 
   -   Locate any rows with multiple entries for dog details and mark NA as no indication of food cost split per dog given;
   -   Replace any string that does not give a single cost for food (e.g. between x and y) with NA;
-  -   Replace any value less than £10 with NA as specified in assumptions above.
+  -   Replace any value less than B#10 with NA as specified in assumptions above.
 
 ```
 dos_cost_clean <- dos_personal_info_clean %>%
@@ -197,7 +192,7 @@ survey_data %>%
 
 The average amount spent on dog food per size was:
 
-| Size of dog | Amount spent (£) |
+| Size of dog | Amount spent (B#) |
 |:-----------:|:----------------:|
 |     XS      |      61.40       |
 |      S      |      57.10       |
@@ -205,7 +200,7 @@ The average amount spent on dog food per size was:
 |      L      |      55.40       |
 |     XL      |      54.70       |
 
-For dogs whose size was not recorded, the average amount spent on dog food was £64.70.
+For dogs whose size was not recorded, the average amount spent on dog food was B#64.70.
 
 <br>
 

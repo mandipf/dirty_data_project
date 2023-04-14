@@ -1,8 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: sentence
----
 
 # **Task 4 - Halloween Candy Data**
 By Mandip Farmahan (2023-04-12)

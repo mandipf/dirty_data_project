@@ -1,8 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: sentence
----
 
 # **Task 2 - Cake Ingredients**
 By Mandip Farmahan (2023-04-12)
