@@ -13,7 +13,7 @@ Assumptions made about the data set:
 
 -   `email` addresses ending in variations of *.com* (e.g. *.comm*) were updated to *.com* as these are expected to be typographical errors;
 -   `email` addresses ending in *.co* were not updated as it is unclear if these should be *.com*, *.co.uk* or some other variant;
--   `amount_spent_on_dog_food` should be at least B#10 based on the entries within that column. Any values less than this are expected to be typographical errors (e.g. missing one or more zeroes) and therefore marked NA.
+-   `amount_spent_on_dog_food` should be at least \£10 based on the entries within that column. Any values less than this are expected to be typographical errors (e.g. missing one or more zeroes) and therefore marked NA.
 
 ------------------------------------------------------------------------
 
