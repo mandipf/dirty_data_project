@@ -30,6 +30,7 @@ library(tidyverse)
 The following data cleaning tasks are carried out:
 
 -   Import both CSV files;
+- Fix measure marked as N/A in one row of abbreviations key CSV;
 -   Convert the cake data (first CSV file) from wide format to long format (headings: `code` and `quantity`);
 -   Clean the column names;
 -   Join the two data sets using `code` as the key;
@@ -45,6 +46,29 @@ cake_ingredients_dirty <- read_csv(here::here("raw_data/cake-ingredients-1961.cs
 
 cake_ingredients_code <- read_csv(here::here("raw_data/cake_ingredient_code.csv"),
                                    show_col_types = FALSE)
+```
+```
+# find units of measure (exclude NA) in code CSV and create REGEX pattern
+
+units_measure_pattern <- cake_ingredients_code %>% 
+  distinct(measure) %>% 
+  drop_na() %>% 
+  pull() %>% 
+  str_c(collapse="|")
+```
+```
+# split any concatenated ingredient-measure strings in code CSV
+
+cake_ingredients_code_fixed <- cake_ingredients_code %>% 
+  mutate(ingredient_2 =  if_else(str_detect(ingredient, units_measure_pattern),
+                                 str_remove(ingredient, str_c(" ", units_measure_pattern)),
+                                 ingredient),
+         measure_2 = if_else(str_detect(ingredient, units_measure_pattern),
+                             str_extract(ingredient, units_measure_pattern),
+                             measure)) %>% 
+  select(code,
+         ingredient = ingredient_2,
+         measure = measure_2)
 ```
 ```
 # convert to long format data and convert ingredient abbreviations
@@ -203,3 +227,13 @@ cake_data %>%
 ```
 
 8 ingredients are used only once.
+
+-----
+
+Update 2023-04-14
+
+  - Data Cleaning:
+    - added code chunk to find units of measure in abbreviations code CSV and create REGEX pattern from these
+    - added code chunk to split any concatenated ingredient-measure strings in abbreviations code CSV 
+  - Data Analysis:
+    - no change required as a result of data cleaning additions

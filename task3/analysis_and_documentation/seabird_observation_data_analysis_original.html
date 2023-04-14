@@ -9,11 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Mandip Farmahan" />
+<meta name="author" content="Mandip" />
 
-<meta name="date" content="2023-04-14" />
+<meta name="date" content="2023-04-11" />
 
-<title>candy_data_cleaning.R</title>
+<title>Task 3 - Seabird observation data</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,13 +350,17 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">candy_data_cleaning.R</h1>
-<h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-14</h4>
+<h1 class="title toc-ignore">Task 3 - Seabird observation data</h1>
+<h4 class="author">Mandip</h4>
+<h4 class="date">2023-04-11</h4>
 
 </div>
 
 
+<div id="import-libraries-and-data-sets" class="section level1">
+<h1>Import libraries and data sets</h1>
+<div id="import-libraries" class="section level3">
+<h3>Import libraries</h3>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
 ## ✔ dplyr     1.1.0     ✔ readr     2.1.4
@@ -368,222 +372,188 @@ display: none;
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
 ## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
-<pre class="r"><code>#####
-# SECTION 1: FUNCTION DEFINITIONS
-
-# function to import dirty data and perform general clean of column names
-import_xlsx_and_clean_names &lt;- function(file_name) {
-  df &lt;- readxl::read_xlsx(here::here(str_c(&quot;raw_data/&quot;, file_name)),
-                          col_types = &quot;text&quot;)
-  
-  df_clean &lt;- df %&gt;% 
-    mutate(year = str_extract(file_name, &quot;20[:digit:]{2}&quot;),
-           tibble::rowid_to_column(df, &quot;rater_id&quot;),
-           rater_id = str_c(year, &quot;_&quot;, rater_id),
-           .before = everything()
-    ) %&gt;% 
-    janitor::clean_names()
-}
-
-# function to convert other candy bar column to usable candy and rating data
-others_to_candy &lt;- function(df, start_column, end_column) {
-  df %&gt;% 
-    pivot_longer(cols = all_of(start_column):all_of(end_column),
-                 names_to = &quot;rating&quot;,
-                 values_to = &quot;candy&quot;
-    ) %&gt;%
-    separate_longer_delim(cols = candy,
-                          delim = regex(&quot;[\\.\\,\\;]&quot;)
-    ) %&gt;% 
-    filter(!is.na(candy) &amp; candy != &quot;&quot;)
-}
-
-
-
-##### 
-# SECTION 2: IMPORT AND CLEAN EACH DATA SET, THEN COMBINE THEM
-
-# import and extract relevant data from 2015 data file (file specific)
-candy_2015_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2015.xlsx&quot;)
-
-candy_2015_col_clean &lt;- candy_2015_import %&gt;%
-  rename(age = how_old_are_you,
-         going_trick_or_treating = are_you_going_actually_going_trick_or_treating_yourself,
-         joy = please_list_any_items_not_included_above_that_give_you_joy,
-         despair = please_list_any_items_not_included_above_that_give_you_despair
-  ) %&gt;% 
-  select(year:despair, necco_wafers)
-
-candy_2015_main_list &lt;- candy_2015_col_clean %&gt;%
-  select(-joy, -despair) %&gt;% 
-  pivot_longer(cols = butterfinger:last_col(),
-               names_to = &quot;candy&quot;,
-               values_to = &quot;rating&quot;
-  ) %&gt;% 
-  mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
-  filter(!is.na(rating))
-
-candy_2015_other_items &lt;- candy_2015_col_clean %&gt;% 
-  select(year, rater_id, age,
-         going_trick_or_treating,
-         joy, despair
-  ) %&gt;%
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2015_data &lt;- bind_rows(candy_2015_main_list,
-                             candy_2015_other_items)
-
-
-# import and extract relevant data from 2016 data file (file specific)
-candy_2016_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2016.xlsx&quot;)
-
-candy_2016_col_clean &lt;- candy_2016_import %&gt;%
-  rename(age = how_old_are_you,
-         going_trick_or_treating = are_you_going_actually_going_trick_or_treating_yourself,
-         gender = your_gender,
-         country = which_country_do_you_live_in,
-         joy = please_list_any_items_not_included_above_that_give_you_joy,
-         despair = please_list_any_items_not_included_above_that_give_you_despair
-  ) %&gt;% 
-  select(year:despair)
-
-candy_2016_main_list &lt;- candy_2016_col_clean %&gt;%
-  select(-joy, -despair) %&gt;%
-  pivot_longer(cols = x100_grand_bar:last_col(),
-               names_to = &quot;candy&quot;,
-               values_to = &quot;rating&quot;
-  ) %&gt;% 
-  mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
-  filter(!is.na(rating))
-
-candy_2016_other_items &lt;- candy_2016_col_clean %&gt;% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %&gt;% 
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2016_data &lt;- bind_rows(candy_2016_main_list,
-                             candy_2016_other_items)
-
-
-# import and extract relevant data from 2017 data file (file specific)
-candy_2017_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2017.xlsx&quot;)</code></pre>
-<pre><code>## New names:
-## • `` -&gt; `...114`</code></pre>
-<pre class="r"><code>candy_2017_col_clean &lt;- candy_2017_import %&gt;%
-  rename_with(~str_remove(., &quot;^q[1-6]_&quot;)) %&gt;% 
-  rename(going_trick_or_treating = going_out,
-         joy = q7_joy_other,
-         despair = q8_despair_other) %&gt;% 
-  select(year:despair)
-
-candy_2017_main_list &lt;- candy_2017_col_clean %&gt;%
-  select(-joy, -despair) %&gt;% 
-  pivot_longer(cols = `100_grand_bar`:last_col(),
-               names_to = &quot;candy&quot;,
-               values_to = &quot;rating&quot;
-  ) %&gt;% 
-  mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
-  filter(!is.na(rating))
-
-candy_2017_other_items &lt;- candy_2017_col_clean %&gt;% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %&gt;%
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2017_data &lt;- bind_rows(candy_2017_main_list,
-                             candy_2017_other_items)
-
-
-# combine all 3 data sets and remove redundant columns
-all_candy_data_combined &lt;- bind_rows(candy_2015_data,
-                                     candy_2016_data,
-                                     candy_2017_data)
-
-
-all_candy_data_combined &lt;- all_candy_data_combined %&gt;% 
-  select(year, rater_id, age, gender, country, 
-         going_trick_or_treating, candy, rating)
-
-
-
-#####
-# SECTION 3: DEEP CLEAN OF FULL DATA SET
-
-# combine similar sounding candy names and only keep joy/meh/despair entries
-source(here::here(&quot;data_cleaning_scripts/lists/alt_entry_names_for_candy.R&quot;))
-
-alternative_candy_names &lt;- enframe(candy_list) %&gt;%
-  unnest_longer(col = value, values_to = &quot;replace_this&quot;)
-
-alt_candy_combined &lt;- all_candy_data_combined %&gt;%
-  mutate(rating = str_to_lower(str_trim(rating)),
-         candy = str_to_lower(str_trim(candy))
-  ) %&gt;%
-  filter(rating %in% c(&quot;joy&quot;, &quot;despair&quot;, &quot;meh&quot;)) %&gt;%
-  left_join(alternative_candy_names, by = join_by(candy == replace_this)) %&gt;%
-  mutate(candy = if_else(!is.na(name), name, candy)) %&gt;% 
-  select(-name)
-
-
-# check candy names exists and remove those with less than 10 entries 
-source(here::here(&quot;data_cleaning_scripts/lists/candy_names.R&quot;))
-
-fixed_candy_data &lt;- alt_candy_combined %&gt;% 
-  mutate(is_candy = (candy %in% candy_names)) %&gt;%
-  filter(is_candy) %&gt;%
-  group_by(candy) %&gt;%
-  filter(n() &gt; 9) %&gt;%
-  ungroup() %&gt;% 
-  select(-is_candy)
-
-
-# filter countries into Canada, UK, USA, others and NA
-source(here::here(&quot;data_cleaning_scripts/lists/alt_entry_names_for_countries.R&quot;))
-
-alternative_country_names &lt;- enframe(country_list) %&gt;%
-  unnest_longer(col = value, values_to = &quot;replace_this&quot;)
-
-candy_and_country_data &lt;- fixed_candy_data %&gt;% 
-  left_join(alternative_country_names, by = join_by(country == replace_this)) %&gt;% 
-  mutate(name_2 = case_when(str_detect(country, &quot;^(?i)canada&quot;) ~ &quot;Canada&quot;,
-                            str_detect(country, &quot;^(?i)unite[sd] st&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;^(?i)U[\\ \\.]*S&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;mer&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;^(?i)U[\\ ]*K$&quot;) ~ &quot;United Kingdom&quot;,
-                            str_detect(country, &quot;^United Ki[:alpha:]*om$&quot;) ~ &quot;United Kingdom&quot;,
-                            TRUE ~ NA),
-         .after = name
-  ) %&gt;%
-  mutate(country = case_when(is.na(country) ~ NA,
-                             is.numeric(country) ~ NA,
-                             !is.na(name_2) ~ name_2,
-                             !is.na(name) ~ name,
-                             TRUE ~ &quot;Other&quot;)
-  ) %&gt;% 
-  select(-name, -name_2)
-
-
-# update age list to be 1-100 years old, rest are NA
-age_candy_country_data &lt;- candy_and_country_data %&gt;% 
-  mutate(age_floor = floor(as.numeric(age)),
-         age = if_else(age_floor &gt; 0 &amp; age_floor &lt;= 100,
-                       age_floor,
-                       NA)) %&gt;% 
-  select(-age_floor)</code></pre>
-<pre><code>## Warning: There was 1 warning in `mutate()`.
-## ℹ In argument: `age_floor = floor(as.numeric(age))`.
-## Caused by warning:
-## ! NAs introduced by coercion</code></pre>
-<pre class="r"><code>#####
-# SECTION 4: EXPORT CLEAN DATA AS CSV
-age_candy_country_data %&gt;%
-  select(year, rater_id, age, gender, country, 
-         going_trick_or_treating, candy, rating) %&gt;% 
-  write_csv(here::here(&quot;clean_data/candy_clean.csv&quot;))</code></pre>
+<pre class="r"><code>library(assertr)</code></pre>
+</div>
+<div id="import-data-with-verification" class="section level3">
+<h3>Import data with verification</h3>
+<ul>
+<li>Check all fields required for analysis are present
+<ul>
+<li><code>record</code>, <code>record_id</code> and
+<code>longitude</code> not required</li>
+</ul></li>
+<li>Check <code>count</code> and <code>latitude</code> are numeric</li>
+</ul>
+<pre class="r"><code>seabirds_data &lt;- read_csv(here::here(&quot;clean_data/seabirds_clean.csv&quot;),
+                           show_col_types = FALSE)
+seabirds_data %&gt;% 
+  verify(has_all_names(&quot;common_name&quot;, &quot;scientific_name&quot;, &quot;abbreviation&quot;,
+                       &quot;count&quot;, &quot;latitude&quot;)) %&gt;% 
+  verify(is.numeric(c(count, latitude))) %&gt;%
+  summary()</code></pre>
+<pre><code>##      record        record_id        common_name        scientific_name   
+##  Min.   :    1   Min.   : 1083001   Length:48328       Length:48328      
+##  1st Qu.:12189   1st Qu.: 6058018   Class :character   Class :character  
+##  Median :24492   Median :13004001   Mode  :character   Mode  :character  
+##  Mean   :24476   Mean   :39546715                                        
+##  3rd Qu.:36744   3rd Qu.:84016019                                        
+##  Max.   :49019   Max.   :88007036                                        
+##                                                                          
+##  abbreviation           count             latitude        longitude    
+##  Length:48328       Min.   :    1.00   Min.   :-68.00   Min.   : 50.0  
+##  Class :character   1st Qu.:    1.00   1st Qu.:-41.15   1st Qu.:151.0  
+##  Mode  :character   Median :    2.00   Median :-38.78   Median :163.2  
+##                     Mean   :   41.93   Mean   :-39.42   Mean   :159.9  
+##                     3rd Qu.:    4.00   3rd Qu.:-36.00   3rd Qu.:172.8  
+##                     Max.   :99999.00   Max.   :-19.00   Max.   :180.0  
+##                     NA&#39;s   :2008       NA&#39;s   :29       NA&#39;s   :30</code></pre>
+<pre class="r"><code>seabirds_data %&gt;% 
+  group_by(common_name) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 154 × 2
+## # Groups:   common_name [154]
+##    common_name                            n
+##    &lt;chr&gt;                              &lt;int&gt;
+##  1 Adelie penguin                        14
+##  2 Albatross (unidentified)              12
+##  3 All dark petrel (unidentified)       220
+##  4 All dark shearwater (unidentified)    28
+##  5 Antarctic / Broad-billed Prion         2
+##  6 Antarctic / Salvin&#39;s prion             1
+##  7 Antarctic fulmar                     165
+##  8 Antarctic petrel                      94
+##  9 Antarctic prion                       96
+## 10 Antarctic tern                         2
+## # … with 144 more rows</code></pre>
+<pre class="r"><code>seabirds_data %&gt;% 
+  group_by(scientific_name) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 145 × 2
+## # Groups:   scientific_name [145]
+##    scientific_name                   n
+##    &lt;chr&gt;                         &lt;int&gt;
+##  1 Anous minutus                     2
+##  2 Anous sp                          4
+##  3 Anous stolidus                    6
+##  4 Aptenodytes forsteri              6
+##  5 Bulweria bulwerii                 1
+##  6 Calonectris leucomelas            5
+##  7 Catharacta / Stercorarius sp.    10
+##  8 Catharacta antarctica           135
+##  9 Catharacta maccormicki           23
+## 10 Chionis albus                    11
+## # … with 135 more rows</code></pre>
+<pre class="r"><code>seabirds_data %&gt;% 
+  group_by(abbreviation) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 153 × 2
+## # Groups:   abbreviation [153]
+##    abbreviation     n
+##    &lt;chr&gt;        &lt;int&gt;
+##  1 ALBUNI          12
+##  2 ANOMIN           2
+##  3 ANOSP            4
+##  4 ANOSTO           6
+##  5 APTFOR           6
+##  6 BULBUL           1
+##  7 CALLEU           5
+##  8 CATANT         135
+##  9 CATMAC          23
+## 10 CHIALB          11
+## # … with 143 more rows</code></pre>
+</div>
+</div>
+<div id="analysis-questions" class="section level1">
+<h1>Analysis questions</h1>
+<div id="q1" class="section level3">
+<h3>Q1</h3>
+<p>Which bird had the most individual sightings?</p>
+<pre class="r"><code>seabirds_data %&gt;% 
+  select(common_name, scientific_name, abbreviation) %&gt;% 
+  mutate(number_of_sightings = n(),
+         .by = common_name) %&gt;%
+  unique() %&gt;% 
+  slice_max(number_of_sightings)</code></pre>
+<pre><code>## # A tibble: 1 × 4
+##   common_name                    scientific_name                 abbre…¹ numbe…²
+##   &lt;chr&gt;                          &lt;chr&gt;                           &lt;chr&gt;     &lt;int&gt;
+## 1 Wandering albatross sensu lato Diomedea antipodensis / exulans DIOANT…   11293
+## # … with abbreviated variable names ¹​abbreviation, ²​number_of_sightings</code></pre>
+</div>
+<div id="q2" class="section level3">
+<h3>Q2</h3>
+<p>Which bird had the highest total count?</p>
+<pre class="r"><code>seabirds_data %&gt;% 
+  mutate(total_count = sum(count, na.rm = TRUE),
+         .by = common_name) %&gt;%
+  select(common_name, scientific_name, abbreviation, total_count) %&gt;%
+  unique() %&gt;% 
+  slice_max(total_count)</code></pre>
+<pre><code>## # A tibble: 1 × 4
+##   common_name             scientific_name       abbreviation total_count
+##   &lt;chr&gt;                   &lt;chr&gt;                 &lt;chr&gt;              &lt;dbl&gt;
+## 1 Short-tailed shearwater Puffinus tenuirostris PUFTEN            982553</code></pre>
+</div>
+<div id="q3" class="section level3">
+<h3>Q3</h3>
+<p>Which bird had the highest total count above a latitude of -30?</p>
+<pre class="r"><code>seabirds_data %&gt;% 
+  filter(latitude &gt; -30) %&gt;% 
+  mutate(total_count = sum(count, na.rm = TRUE),
+         .by = common_name) %&gt;%
+  select(common_name, scientific_name, abbreviation, total_count) %&gt;%
+  unique() %&gt;% 
+  slice_max(total_count)</code></pre>
+<pre><code>## # A tibble: 1 × 4
+##   common_name             scientific_name    abbreviation total_count
+##   &lt;chr&gt;                   &lt;chr&gt;              &lt;chr&gt;              &lt;dbl&gt;
+## 1 Wedge-tailed shearwater Puffinus pacificus PUFPAC               855</code></pre>
+</div>
+<div id="q4" class="section level3">
+<h3>Q4</h3>
+<p>How many different types of birds were only ever seen in groups of
+1?</p>
+<pre class="r"><code>seabirds_data %&gt;% 
+  filter(count == 1) %&gt;%
+  select(common_name, scientific_name, abbreviation) %&gt;% 
+  unique()</code></pre>
+<pre><code>## # A tibble: 148 × 3
+##    common_name                       scientific_name                 abbreviat…¹
+##    &lt;chr&gt;                             &lt;chr&gt;                           &lt;chr&gt;      
+##  1 Seabird (Unidentified)            &lt;NA&gt;                            SEABUN     
+##  2 White-chinned petrel              Procellaria aequinoctialis      PROAEQ     
+##  3 Sooty shearwater                  Puffinus griseus                PUFGRI     
+##  4 Northern giant petrel             Macronectes halli               MACHAL     
+##  5 Wandering albatross sensu lato    Diomedea antipodensis / exulans DIOANTEXU  
+##  6 Royal albatross sensu lato        Diomedea epomophora / sanfordi  DIOEPOSAN  
+##  7 Australasian gannet               Morus serrator                  MORSER     
+##  8 Diving-petrel (unidentified)      Pelecanoides sp.                PELSP      
+##  9 Skua (unidentified)               Catharacta / Stercorarius sp.   SKUAUN     
+## 10 Black-browed albatross sensu lato Diomedea impavida / melanophrys DIOIMPMEL  
+## # … with 138 more rows, and abbreviated variable name ¹​abbreviation</code></pre>
+<pre class="r"><code>seabirds_data %&gt;% 
+  filter(count == 1) %&gt;%
+  distinct(common_name) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##       n
+##   &lt;int&gt;
+## 1   148</code></pre>
+</div>
+<div id="q5" class="section level3">
+<h3>Q5</h3>
+<p>How many penguins were seen? (Hint: there are many types of
+penguin)</p>
+<pre class="r"><code>seabirds_data %&gt;% 
+  filter(str_detect(common_name, &quot;(?i)penguin&quot;)) %&gt;% 
+  summarise(number_penguin_sightings = n(),
+            number_of_penguins_seen = sum(count, na.rm = TRUE))</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##   number_penguin_sightings number_of_penguins_seen
+##                      &lt;int&gt;                   &lt;dbl&gt;
+## 1                       70                     158</code></pre>
+</div>
+</div>
 
 
 

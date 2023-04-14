@@ -381,6 +381,7 @@ library(tidyverse)</code></pre>
 <p>The following data cleaning tasks are carried out:</p>
 <ul>
 <li>Import both CSV files;</li>
+<li>Fix measure marked as N/A in one row of abbreviations key CSV;</li>
 <li>Convert the cake data (first CSV file) from wide format to long
 format (headings: <code>code</code> and <code>quantity</code>);</li>
 <li>Clean the column names;</li>
@@ -395,6 +396,25 @@ cake_ingredients_dirty &lt;- read_csv(here::here(&quot;raw_data/cake-ingredients
 
 cake_ingredients_code &lt;- read_csv(here::here(&quot;raw_data/cake_ingredient_code.csv&quot;),
                                    show_col_types = FALSE)</code></pre>
+<pre><code># find units of measure (exclude NA) in code CSV and create REGEX pattern
+
+units_measure_pattern &lt;- cake_ingredients_code %&gt;% 
+  distinct(measure) %&gt;% 
+  drop_na() %&gt;% 
+  pull() %&gt;% 
+  str_c(collapse=&quot;|&quot;)</code></pre>
+<pre><code># split any concatenated ingredient-measure strings in code CSV
+
+cake_ingredients_code_fixed &lt;- cake_ingredients_code %&gt;% 
+  mutate(ingredient_2 =  if_else(str_detect(ingredient, units_measure_pattern),
+                                 str_remove(ingredient, str_c(&quot; &quot;, units_measure_pattern)),
+                                 ingredient),
+         measure_2 = if_else(str_detect(ingredient, units_measure_pattern),
+                             str_extract(ingredient, units_measure_pattern),
+                             measure)) %&gt;% 
+  select(code,
+         ingredient = ingredient_2,
+         measure = measure_2)</code></pre>
 <pre><code># convert to long format data and convert ingredient abbreviations
 
 cake_ingredients_clean &lt;- cake_ingredients_dirty %&gt;% 
@@ -517,6 +537,21 @@ ingredients.</p>
 ## 7 Nuts                1
 ## 8 Zwiebach            1</code></pre>
 <p>8 ingredients are used only once.</p>
+<hr />
+<p>Update 2023-04-14</p>
+<ul>
+<li>Data Cleaning:
+<ul>
+<li>added code chunk to find units of measure in abbreviations code CSV
+and create REGEX pattern from these</li>
+<li>added code chunk to split any concatenated ingredient-measure
+strings in abbreviations code CSV</li>
+</ul></li>
+<li>Data Analysis:
+<ul>
+<li>no change required as a result of data cleaning additions</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>

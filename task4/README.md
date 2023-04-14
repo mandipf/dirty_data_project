@@ -82,7 +82,7 @@ others_to_candy <- function(df, start_column, end_column) {
                  values_to = "candy"
     ) %>%
     separate_longer_delim(cols = candy,
-                          delim = regex("[//.//,//;]")
+                          delim = regex("[\\.\\,\\;]")
     ) %>% 
     filter(!is.na(candy) & candy != "")
 }
@@ -135,6 +135,7 @@ candy_2015_data <- bind_rows(candy_2015_main_list,
 ```
 ```
 # import and extract relevant data from 2016 data file (file specific)
+
 candy_2016_import <- import_xlsx_and_clean_names("boing-boing-candy-2016.xlsx")
 
 candy_2016_col_clean <- candy_2016_import %>%
@@ -168,6 +169,7 @@ candy_2016_data <- bind_rows(candy_2016_main_list,
 ```
 ```
 # import and extract relevant data from 2017 data file (file specific)
+
 candy_2017_import <- import_xlsx_and_clean_names("boing-boing-candy-2017.xlsx")
 
 candy_2017_col_clean <- candy_2017_import %>%
@@ -254,7 +256,7 @@ fixed_candy_data <- alt_candy_combined %>%
   select(-is_candy)
 ```
 ```
-# filter countries into Canada, UK, USA and others_unknown
+# filter countries into Canada, UK, USA, others and NA
 
 source(here::here("data_cleaning_scripts/lists/alt_entry_names_for_countries.R"))
 
@@ -263,19 +265,20 @@ alternative_country_names <- enframe(country_list) %>%
 
 candy_and_country_data <- fixed_candy_data %>% 
   left_join(alternative_country_names, by = join_by(country == replace_this)) %>% 
-  mutate(name_2 = case_when(
-    str_detect(country, "^(?i)canada") ~ "Canada",
-    str_detect(country, "^(?i)unite[sd] st") ~ "United States of America",
-    str_detect(country, "^(?i)U[// //.]*S") ~ "United States of America",
-    str_detect(country, "mer") ~ "United States of America",
-    str_detect(country, "^(?i)U[// ]*K$") ~ "United Kingdom",
-    str_detect(country, "^United Ki[:alpha:]*om$") ~ "United Kingdom",
-    TRUE ~ NA),
-    .after = name
+  mutate(name_2 = case_when(str_detect(country, "^(?i)canada") ~ "Canada",
+                            str_detect(country, "^(?i)unite[sd] st") ~ "United States of America",
+                            str_detect(country, "^(?i)U[\\ \\.]*S") ~ "United States of America",
+                            str_detect(country, "mer") ~ "United States of America",
+                            str_detect(country, "^(?i)U[\\ ]*K$") ~ "United Kingdom",
+                            str_detect(country, "^United Ki[:alpha:]*om$") ~ "United Kingdom",
+                            TRUE ~ NA),
+         .after = name
   ) %>%
-  mutate(country = case_when(
-    !is.na(name_2) ~ name_2, !is.na(name) ~ name,
-    TRUE ~ "Other or Unknown")
+  mutate(country = case_when(is.na(country) ~ NA,
+                             is.numeric(country) ~ NA,
+                             !is.na(name_2) ~ name_2,
+                             !is.na(name) ~ name,
+                             TRUE ~ "Other")
   ) %>% 
   select(-name, -name_2)
 ```
@@ -285,7 +288,8 @@ candy_and_country_data <- fixed_candy_data %>%
 age_candy_country_data <- candy_and_country_data %>% 
   mutate(age_floor = floor(as.numeric(age)),
          age = if_else(age_floor > 0 & age_floor <= 100,
-                       age_floor, NA)) %>% 
+                       age_floor,
+                       NA)) %>% 
   select(-age_floor)
 ```
 
@@ -334,12 +338,12 @@ candy_data  %>%
 
 ##   number_of_ratings
 ##               <int>
-## 1            623513
+## 1            623468
 ```
 
-This code chunk showed that there were 623513 candy ratings within the complete data set. 
+This code chunk showed that there were 623468 candy ratings within the complete data set. 
 
-- Split by year, this was 384024 in 2015, 97340 in 2016, and 142149 in 2017.
+- Split by year, this was 383995 in 2015, 97336 in 2016, and 142137 in 2017.
 
 When using the reduced data set (no free text field), this was reduced to 620373 candy ratings.
 
@@ -509,11 +513,23 @@ candy_data_with_rating_numbers %>%
 ##   country                  candy         rating_value
 ##   <chr>                    <chr>                <dbl>
 ## 1 Canada                   toblerone bar          220
-## 2 Other or Unknown         toblerone bar         2894
+## 2 Other                    toblerone bar           70
 ## 3 United Kingdom           toblerone bar           33
 ## 4 United States of America toblerone bar         1688
+## 5 <NA>                     toblerone bar         2824
 ```
 
 The highest rated candy bar every region was Toblerone bar.
 
 For all candy types, it was m&ms for every region.
+
+-----
+
+Update 2023-04-14
+
+  - Data Cleaning:
+    - corrected REGEX escape character from “//” to “\\\\”
+    - countries were filtered into Canada, UK, USA, others and NA, i.e. others and unknown was split into others and NA
+  - Data Analysis:
+    - Number of ratings increased marginally for the free text ratings as a result of the REGEX change in Function 2
+    - Q8 was updated due to the addition of NA

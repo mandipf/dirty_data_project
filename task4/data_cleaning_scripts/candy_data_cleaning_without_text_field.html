@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-04-12" />
+<meta name="date" content="2023-04-14" />
 
 <title>candy_data_cleaning_without_text_field.R</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">candy_data_cleaning_without_text_field.R</h1>
 <h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-12</h4>
+<h4 class="date">2023-04-14</h4>
 
 </div>
 
@@ -498,7 +498,7 @@ fixed_candy_data &lt;- alt_candy_combined %&gt;%
   select(-is_candy)
 
 
-# filter countries into Canada, UK, USA and others_unknown
+# filter countries into Canada, UK, USA, others and NA
 source(here::here(&quot;data_cleaning_scripts/lists/alt_entry_names_for_countries.R&quot;))
 
 alternative_country_names &lt;- enframe(country_list) %&gt;%
@@ -506,19 +506,20 @@ alternative_country_names &lt;- enframe(country_list) %&gt;%
 
 candy_and_country_data &lt;- fixed_candy_data %&gt;% 
   left_join(alternative_country_names, by = join_by(country == replace_this)) %&gt;% 
-  mutate(name_2 = case_when(
-    str_detect(country, &quot;^(?i)canada&quot;) ~ &quot;Canada&quot;,
-    str_detect(country, &quot;^(?i)unite[sd] st&quot;) ~ &quot;United States of America&quot;,
-    str_detect(country, &quot;^(?i)U[// //.]*S&quot;) ~ &quot;United States of America&quot;,
-    str_detect(country, &quot;mer&quot;) ~ &quot;United States of America&quot;,
-    str_detect(country, &quot;^(?i)U[// ]*K$&quot;) ~ &quot;United Kingdom&quot;,
-    str_detect(country, &quot;^United Ki[:alpha:]*om$&quot;) ~ &quot;United Kingdom&quot;,
-    TRUE ~ NA),
-    .after = name
+  mutate(name_2 = case_when(str_detect(country, &quot;^(?i)canada&quot;) ~ &quot;Canada&quot;,
+                            str_detect(country, &quot;^(?i)unite[sd] st&quot;) ~ &quot;United States of America&quot;,
+                            str_detect(country, &quot;^(?i)U[\\ \\.]*S&quot;) ~ &quot;United States of America&quot;,
+                            str_detect(country, &quot;mer&quot;) ~ &quot;United States of America&quot;,
+                            str_detect(country, &quot;^(?i)U[\\ ]*K$&quot;) ~ &quot;United Kingdom&quot;,
+                            str_detect(country, &quot;^United Ki[:alpha:]*om$&quot;) ~ &quot;United Kingdom&quot;,
+                            TRUE ~ NA),
+         .after = name
   ) %&gt;%
-  mutate(country = case_when(
-    !is.na(name_2) ~ name_2, !is.na(name) ~ name,
-    TRUE ~ &quot;Other or Unknown&quot;)
+  mutate(country = case_when(is.na(country) ~ NA,
+                             is.numeric(country) ~ NA,
+                             !is.na(name_2) ~ name_2,
+                             !is.na(name) ~ name,
+                             TRUE ~ &quot;Other&quot;)
   ) %&gt;% 
   select(-name, -name_2)
 
@@ -527,7 +528,8 @@ candy_and_country_data &lt;- fixed_candy_data %&gt;%
 age_candy_country_data &lt;- candy_and_country_data %&gt;% 
   mutate(age_floor = floor(as.numeric(age)),
          age = if_else(age_floor &gt; 0 &amp; age_floor &lt;= 100,
-                       age_floor, NA)) %&gt;% 
+                       age_floor,
+                       NA)) %&gt;% 
   select(-age_floor)</code></pre>
 <pre><code>## Warning: There was 1 warning in `mutate()`.
 ## ℹ In argument: `age_floor = floor(as.numeric(age))`.

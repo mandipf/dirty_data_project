@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-04-13" />
+<meta name="date" content="2023-04-14" />
 
 <title>dog_owners_survey_cleaning.R</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">dog_owners_survey_cleaning.R</h1>
 <h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-13</h4>
+<h4 class="date">2023-04-14</h4>
 
 </div>
 
@@ -397,8 +397,7 @@ dos_cost_clean &lt;- dos_personal_info_clean %&gt;%
   # extract cost without units and set other rows to NA
   mutate(cost = case_when(str_detect(cost, &quot; and &quot;) ~ NA,
                           str_detect(cost, &quot;-&quot;) ~ NA,
-                          str_detect(cost, &quot;/&quot;) ~ NA,
-                          TRUE ~ str_extract(cost, &quot;[//.[:digit:]]+&quot;)),
+                          TRUE ~ str_extract(cost, &quot;[\\.[:digit:]]+&quot;)),
          # check cost is between 10 and 100 or set NA for typos
          cost = if_else(as.numeric(cost) &lt; 10 | as.numeric(cost) &gt; 100,
                         NA, cost))
@@ -423,7 +422,7 @@ dog_owners_final &lt;- dos_cost_clean %&gt;%
                               NA),
          .after = dog_size) %&gt;%
   # convert words for gender (e.g. female) to abbreviation (e.g. M, F)
-  mutate(dog_gender_2 = str_remove_all(dog_gender, &quot;[ [:digit:]]*&quot;),
+  mutate(dog_gender_2 = str_remove_all(dog_gender, &quot;[\\ [:digit:]]*&quot;),
          dog_gender_2 = case_when(str_detect(dog_gender_2, &quot;^(?i)m&quot;) ~ &quot;M&quot;,
                                   str_detect(dog_gender_2, &quot;^(?i)f&quot;) ~ &quot;F&quot;,
                                   TRUE ~ NA),

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mandip" />
 
-<meta name="date" content="2023-04-11" />
+<meta name="date" content="2023-04-14" />
 
 <title>Task 4 - Halloween Candy Data</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Task 4 - Halloween Candy Data</h1>
 <h4 class="author">Mandip</h4>
-<h4 class="date">2023-04-11</h4>
+<h4 class="date">2023-04-14</h4>
 
 </div>
 
@@ -397,15 +397,15 @@ candy_data %&gt;%
   verify(is.numeric(age)) %&gt;%
   summary()</code></pre>
 <pre><code>##       year        rater_id              age            gender         
-##  Min.   :2015   Length:623513      Min.   :  4.00   Length:623513     
+##  Min.   :2015   Length:623468      Min.   :  4.00   Length:623468     
 ##  1st Qu.:2015   Class :character   1st Qu.: 31.00   Class :character  
 ##  Median :2015   Mode  :character   Median : 38.00   Mode  :character  
 ##  Mean   :2016                      Mean   : 38.85                     
 ##  3rd Qu.:2016                      3rd Qu.: 46.00                     
 ##  Max.   :2017                      Max.   :100.00                     
-##                                    NA&#39;s   :29158                      
+##                                    NA&#39;s   :29156                      
 ##    country          going_trick_or_treating    candy          
-##  Length:623513      Length:623513           Length:623513     
+##  Length:623468      Length:623468           Length:623468     
 ##  Class :character   Class :character        Class :character  
 ##  Mode  :character   Mode  :character        Mode  :character  
 ##                                                               
@@ -413,7 +413,7 @@ candy_data %&gt;%
 ##                                                               
 ##                                                               
 ##     rating         
-##  Length:623513     
+##  Length:623468     
 ##  Class :character  
 ##  Mode  :character  
 ##                    
@@ -454,14 +454,15 @@ candy_data_with_rating_numbers &lt;- candy_data %&gt;%
 <pre class="r"><code>candy_data_unique_rater  %&gt;%
   group_by(country) %&gt;% 
   count()</code></pre>
-<pre><code>## # A tibble: 4 × 2
-## # Groups:   country [4]
+<pre><code>## # A tibble: 5 × 2
+## # Groups:   country [5]
 ##   country                      n
 ##   &lt;chr&gt;                    &lt;int&gt;
 ## 1 Canada                     277
-## 2 Other or Unknown          5698
+## 2 Other                      123
 ## 3 United Kingdom              44
-## 4 United States of America  2573</code></pre>
+## 4 United States of America  2573
+## 5 &lt;NA&gt;                      5575</code></pre>
 <pre class="r"><code>candy_data_unique_rater  %&gt;%
   group_by(going_trick_or_treating) %&gt;% 
   count()</code></pre>
@@ -484,7 +485,7 @@ candy_data_with_rating_numbers &lt;- candy_data %&gt;%
 ##  3 abba zabba          13
 ##  4 aero bar            18
 ##  5 airheads            17
-##  6 almond joy bar     355
+##  6 almond joy bar     344
 ##  7 andes mints         11
 ##  8 atomic fireballs    20
 ##  9 babe ruth bar       82
@@ -497,8 +498,8 @@ candy_data_with_rating_numbers &lt;- candy_data %&gt;%
 ## # Groups:   rating [3]
 ##   rating       n
 ##   &lt;chr&gt;    &lt;int&gt;
-## 1 despair 277824
-## 2 joy     267123
+## 1 despair 277809
+## 2 joy     267093
 ## 3 meh      78566</code></pre>
 </div>
 </div>
@@ -517,7 +518,7 @@ candy_data  %&gt;%
 <pre><code>## # A tibble: 1 × 1
 ##   number_of_ratings
 ##               &lt;int&gt;
-## 1            623513</code></pre>
+## 1            623468</code></pre>
 <pre class="r"><code># split by year
 candy_data  %&gt;%
   summarise(number_of_ratings = n(),
@@ -525,9 +526,9 @@ candy_data  %&gt;%
 <pre><code>## # A tibble: 3 × 2
 ##    year number_of_ratings
 ##   &lt;dbl&gt;             &lt;int&gt;
-## 1  2015            384024
-## 2  2016             97340
-## 3  2017            142149</code></pre>
+## 1  2015            383995
+## 2  2016             97336
+## 3  2017            142137</code></pre>
 </div>
 <div id="q2" class="section level3">
 <h3>Q2</h3>
@@ -672,27 +673,29 @@ candy_data_with_rating_numbers %&gt;%
   group_by(country, candy) %&gt;%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
   slice_max(rating_value)</code></pre>
-<pre><code>## # A tibble: 4 × 3
-## # Groups:   country [4]
+<pre><code>## # A tibble: 5 × 3
+## # Groups:   country [5]
 ##   country                  candy         rating_value
 ##   &lt;chr&gt;                    &lt;chr&gt;                &lt;dbl&gt;
 ## 1 Canada                   toblerone bar          220
-## 2 Other or Unknown         toblerone bar         2894
+## 2 Other                    toblerone bar           70
 ## 3 United Kingdom           toblerone bar           33
-## 4 United States of America toblerone bar         1688</code></pre>
+## 4 United States of America toblerone bar         1688
+## 5 &lt;NA&gt;                     toblerone bar         2824</code></pre>
 <pre class="r"><code># all candy
 candy_data_with_rating_numbers %&gt;%
   group_by(country, candy) %&gt;%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %&gt;% 
   slice_max(rating_value)</code></pre>
-<pre><code>## # A tibble: 4 × 3
-## # Groups:   country [4]
+<pre><code>## # A tibble: 5 × 3
+## # Groups:   country [5]
 ##   country                  candy rating_value
 ##   &lt;chr&gt;                    &lt;chr&gt;        &lt;dbl&gt;
 ## 1 Canada                   m&amp;ms           747
-## 2 Other or Unknown         m&amp;ms          6834
+## 2 Other                    m&amp;ms           226
 ## 3 United Kingdom           m&amp;ms           110
-## 4 United States of America m&amp;ms          6314</code></pre>
+## 4 United States of America m&amp;ms          6314
+## 5 &lt;NA&gt;                     m&amp;ms          6608</code></pre>
 </div>
 </div>
 </div>

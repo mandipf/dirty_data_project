@@ -29,8 +29,7 @@ dos_cost_clean <- dos_personal_info_clean %>%
   # extract cost without units and set other rows to NA
   mutate(cost = case_when(str_detect(cost, " and ") ~ NA,
                           str_detect(cost, "-") ~ NA,
-                          str_detect(cost, "/") ~ NA,
-                          TRUE ~ str_extract(cost, "[//.[:digit:]]+")),
+                          TRUE ~ str_extract(cost, "[\\.[:digit:]]+")),
          # check cost is between 10 and 100 or set NA for typos
          cost = if_else(as.numeric(cost) < 10 | as.numeric(cost) > 100,
                         NA, cost))
@@ -55,7 +54,7 @@ dog_owners_final <- dos_cost_clean %>%
                               NA),
          .after = dog_size) %>%
   # convert words for gender (e.g. female) to abbreviation (e.g. M, F)
-  mutate(dog_gender_2 = str_remove_all(dog_gender, "[ [:digit:]]*"),
+  mutate(dog_gender_2 = str_remove_all(dog_gender, "[\\ [:digit:]]*"),
          dog_gender_2 = case_when(str_detect(dog_gender_2, "^(?i)m") ~ "M",
                                   str_detect(dog_gender_2, "^(?i)f") ~ "F",
                                   TRUE ~ NA),

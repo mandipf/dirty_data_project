@@ -11,9 +11,9 @@
 
 <meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-04-14" />
+<meta name="date" content="2023-04-12" />
 
-<title>candy_data_cleaning.R</title>
+<title>seabirds_data_cleaning.R</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,9 +350,9 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">candy_data_cleaning.R</h1>
+<h1 class="title toc-ignore">seabirds_data_cleaning.R</h1>
 <h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-14</h4>
+<h4 class="date">2023-04-12</h4>
 
 </div>
 
@@ -371,219 +371,64 @@ display: none;
 <pre class="r"><code>#####
 # SECTION 1: FUNCTION DEFINITIONS
 
-# function to import dirty data and perform general clean of column names
-import_xlsx_and_clean_names &lt;- function(file_name) {
-  df &lt;- readxl::read_xlsx(here::here(str_c(&quot;raw_data/&quot;, file_name)),
-                          col_types = &quot;text&quot;)
-  
-  df_clean &lt;- df %&gt;% 
-    mutate(year = str_extract(file_name, &quot;20[:digit:]{2}&quot;),
-           tibble::rowid_to_column(df, &quot;rater_id&quot;),
-           rater_id = str_c(year, &quot;_&quot;, rater_id),
-           .before = everything()
-    ) %&gt;% 
-    janitor::clean_names()
+# function to clean species names to remove age, wanplum, plphase and sex
+species_split &lt;- function(df, col_name) {
+  case_when(
+    !is.na(df$age) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
+    !is.na(df$wanplum) ~ str_remove(col_name, &quot; PL[// [:alnum:]]*&quot;),
+    !is.na(df$plphase) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
+    !is.na(df$sex) ~ str_remove(col_name, &quot; [MF]$&quot;),
+    TRUE ~ col_name
+  )
 }
-
-# function to convert other candy bar column to usable candy and rating data
-others_to_candy &lt;- function(df, start_column, end_column) {
-  df %&gt;% 
-    pivot_longer(cols = all_of(start_column):all_of(end_column),
-                 names_to = &quot;rating&quot;,
-                 values_to = &quot;candy&quot;
-    ) %&gt;%
-    separate_longer_delim(cols = candy,
-                          delim = regex(&quot;[\\.\\,\\;]&quot;)
-    ) %&gt;% 
-    filter(!is.na(candy) &amp; candy != &quot;&quot;)
-}
-
-
-
-##### 
-# SECTION 2: IMPORT AND CLEAN EACH DATA SET, THEN COMBINE THEM
-
-# import and extract relevant data from 2015 data file (file specific)
-candy_2015_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2015.xlsx&quot;)
-
-candy_2015_col_clean &lt;- candy_2015_import %&gt;%
-  rename(age = how_old_are_you,
-         going_trick_or_treating = are_you_going_actually_going_trick_or_treating_yourself,
-         joy = please_list_any_items_not_included_above_that_give_you_joy,
-         despair = please_list_any_items_not_included_above_that_give_you_despair
-  ) %&gt;% 
-  select(year:despair, necco_wafers)
-
-candy_2015_main_list &lt;- candy_2015_col_clean %&gt;%
-  select(-joy, -despair) %&gt;% 
-  pivot_longer(cols = butterfinger:last_col(),
-               names_to = &quot;candy&quot;,
-               values_to = &quot;rating&quot;
-  ) %&gt;% 
-  mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
-  filter(!is.na(rating))
-
-candy_2015_other_items &lt;- candy_2015_col_clean %&gt;% 
-  select(year, rater_id, age,
-         going_trick_or_treating,
-         joy, despair
-  ) %&gt;%
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2015_data &lt;- bind_rows(candy_2015_main_list,
-                             candy_2015_other_items)
-
-
-# import and extract relevant data from 2016 data file (file specific)
-candy_2016_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2016.xlsx&quot;)
-
-candy_2016_col_clean &lt;- candy_2016_import %&gt;%
-  rename(age = how_old_are_you,
-         going_trick_or_treating = are_you_going_actually_going_trick_or_treating_yourself,
-         gender = your_gender,
-         country = which_country_do_you_live_in,
-         joy = please_list_any_items_not_included_above_that_give_you_joy,
-         despair = please_list_any_items_not_included_above_that_give_you_despair
-  ) %&gt;% 
-  select(year:despair)
-
-candy_2016_main_list &lt;- candy_2016_col_clean %&gt;%
-  select(-joy, -despair) %&gt;%
-  pivot_longer(cols = x100_grand_bar:last_col(),
-               names_to = &quot;candy&quot;,
-               values_to = &quot;rating&quot;
-  ) %&gt;% 
-  mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
-  filter(!is.na(rating))
-
-candy_2016_other_items &lt;- candy_2016_col_clean %&gt;% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %&gt;% 
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2016_data &lt;- bind_rows(candy_2016_main_list,
-                             candy_2016_other_items)
-
-
-# import and extract relevant data from 2017 data file (file specific)
-candy_2017_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2017.xlsx&quot;)</code></pre>
-<pre><code>## New names:
-## • `` -&gt; `...114`</code></pre>
-<pre class="r"><code>candy_2017_col_clean &lt;- candy_2017_import %&gt;%
-  rename_with(~str_remove(., &quot;^q[1-6]_&quot;)) %&gt;% 
-  rename(going_trick_or_treating = going_out,
-         joy = q7_joy_other,
-         despair = q8_despair_other) %&gt;% 
-  select(year:despair)
-
-candy_2017_main_list &lt;- candy_2017_col_clean %&gt;%
-  select(-joy, -despair) %&gt;% 
-  pivot_longer(cols = `100_grand_bar`:last_col(),
-               names_to = &quot;candy&quot;,
-               values_to = &quot;rating&quot;
-  ) %&gt;% 
-  mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
-  filter(!is.na(rating))
-
-candy_2017_other_items &lt;- candy_2017_col_clean %&gt;% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %&gt;%
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2017_data &lt;- bind_rows(candy_2017_main_list,
-                             candy_2017_other_items)
-
-
-# combine all 3 data sets and remove redundant columns
-all_candy_data_combined &lt;- bind_rows(candy_2015_data,
-                                     candy_2016_data,
-                                     candy_2017_data)
-
-
-all_candy_data_combined &lt;- all_candy_data_combined %&gt;% 
-  select(year, rater_id, age, gender, country, 
-         going_trick_or_treating, candy, rating)
-
 
 
 #####
-# SECTION 3: DEEP CLEAN OF FULL DATA SET
+# SECTION 2: IMPORT AND CLEAN DATA SET, THEN EXPORT
 
-# combine similar sounding candy names and only keep joy/meh/despair entries
-source(here::here(&quot;data_cleaning_scripts/lists/alt_entry_names_for_candy.R&quot;))
+# import dirty data
+bird_dirty_data &lt;- readxl::read_xls(here::here(&quot;raw_data/seabirds.xls&quot;),
+                            sheet = &quot;Bird data by record ID&quot;,
+                            col_types = &quot;text&quot;)
 
-alternative_candy_names &lt;- enframe(candy_list) %&gt;%
-  unnest_longer(col = value, values_to = &quot;replace_this&quot;)
-
-alt_candy_combined &lt;- all_candy_data_combined %&gt;%
-  mutate(rating = str_to_lower(str_trim(rating)),
-         candy = str_to_lower(str_trim(candy))
-  ) %&gt;%
-  filter(rating %in% c(&quot;joy&quot;, &quot;despair&quot;, &quot;meh&quot;)) %&gt;%
-  left_join(alternative_candy_names, by = join_by(candy == replace_this)) %&gt;%
-  mutate(candy = if_else(!is.na(name), name, candy)) %&gt;% 
-  select(-name)
+ship_dirty_data &lt;- readxl::read_xls(here::here(&quot;raw_data/seabirds.xls&quot;),
+                            sheet = &quot;Ship data by record ID&quot;,
+                            col_types = &quot;text&quot;)
 
 
-# check candy names exists and remove those with less than 10 entries 
-source(here::here(&quot;data_cleaning_scripts/lists/candy_names.R&quot;))
-
-fixed_candy_data &lt;- alt_candy_combined %&gt;% 
-  mutate(is_candy = (candy %in% candy_names)) %&gt;%
-  filter(is_candy) %&gt;%
-  group_by(candy) %&gt;%
-  filter(n() &gt; 9) %&gt;%
-  ungroup() %&gt;% 
-  select(-is_candy)
+# join data sets, clean column names and remove empty observations/records
+seabirds_joined_data &lt;- bird_dirty_data %&gt;% 
+  left_join(ship_dirty_data, by = &quot;RECORD ID&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  rename(com_name = species_common_name_taxon_age_sex_plumage_phase,
+         sci_name = species_scientific_name_taxon_age_sex_plumage_phase,
+         abr_name = species_abbreviation) %&gt;% 
+  filter(com_name != &quot;[NO BIRDS RECORDED]&quot;)
 
 
-# filter countries into Canada, UK, USA, others and NA
-source(here::here(&quot;data_cleaning_scripts/lists/alt_entry_names_for_countries.R&quot;))
-
-alternative_country_names &lt;- enframe(country_list) %&gt;%
-  unnest_longer(col = value, values_to = &quot;replace_this&quot;)
-
-candy_and_country_data &lt;- fixed_candy_data %&gt;% 
-  left_join(alternative_country_names, by = join_by(country == replace_this)) %&gt;% 
-  mutate(name_2 = case_when(str_detect(country, &quot;^(?i)canada&quot;) ~ &quot;Canada&quot;,
-                            str_detect(country, &quot;^(?i)unite[sd] st&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;^(?i)U[\\ \\.]*S&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;mer&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;^(?i)U[\\ ]*K$&quot;) ~ &quot;United Kingdom&quot;,
-                            str_detect(country, &quot;^United Ki[:alpha:]*om$&quot;) ~ &quot;United Kingdom&quot;,
-                            TRUE ~ NA),
-         .after = name
-  ) %&gt;%
-  mutate(country = case_when(is.na(country) ~ NA,
-                             is.numeric(country) ~ NA,
-                             !is.na(name_2) ~ name_2,
-                             !is.na(name) ~ name,
-                             TRUE ~ &quot;Other&quot;)
-  ) %&gt;% 
-  select(-name, -name_2)
+# clean species names to remove age, wanplum, plphase and sex
+seabirds_clean_data &lt;- seabirds_joined_data %&gt;% 
+  mutate(across(.cols = c(com_name, sci_name, abr_name),
+                .fns = ~ species_split(seabirds_joined_data, .x),
+                .names = &quot;{.col}_1&quot;
+                ),
+         .after = abr_name
+         )
 
 
-# update age list to be 1-100 years old, rest are NA
-age_candy_country_data &lt;- candy_and_country_data %&gt;% 
-  mutate(age_floor = floor(as.numeric(age)),
-         age = if_else(age_floor &gt; 0 &amp; age_floor &lt;= 100,
-                       age_floor,
-                       NA)) %&gt;% 
-  select(-age_floor)</code></pre>
-<pre><code>## Warning: There was 1 warning in `mutate()`.
-## ℹ In argument: `age_floor = floor(as.numeric(age))`.
-## Caused by warning:
-## ! NAs introduced by coercion</code></pre>
-<pre class="r"><code>#####
-# SECTION 4: EXPORT CLEAN DATA AS CSV
-age_candy_country_data %&gt;%
-  select(year, rater_id, age, gender, country, 
-         going_trick_or_treating, candy, rating) %&gt;% 
-  write_csv(here::here(&quot;clean_data/candy_clean.csv&quot;))</code></pre>
+# select required variables and export clean data
+seabirds_clean_data %&gt;%
+  select(
+    record = record_x,
+    record_id,
+    common_name = com_name_1,
+    scientific_name = sci_name_1,
+    abbreviation = abr_name_1,
+    count,
+    latitude = lat,
+    longitude = long
+    ) %&gt;%
+  write_csv(here::here(&quot;clean_data/seabirds_clean.csv&quot;))</code></pre>
 
 
 

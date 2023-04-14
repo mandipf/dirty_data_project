@@ -7,9 +7,9 @@ library(tidyverse)
 # function to clean species names to remove age, wanplum, plphase and sex
 species_split <- function(df, col_name) {
   case_when(
-    !is.na(df$age) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
-    !is.na(df$wanplum) ~ str_remove(col_name, " PL[// [:alnum:]]*"),
-    !is.na(df$plphase) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
+    !is.na(df$age) ~ str_remove(col_name, " [A-Z]{2}[\\ [:alnum:]]*"),
+    !is.na(df$wanplum) ~ str_remove(col_name, " PL[\\ [:alnum:]]*"),
+    !is.na(df$plphase) ~ str_remove(col_name, " [A-Z]{2}[\\ [:alnum:]]*"),
     !is.na(df$sex) ~ str_remove(col_name, " [MF]$"),
     TRUE ~ col_name
   )

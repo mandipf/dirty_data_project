@@ -11,9 +11,9 @@
 
 <meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-04-14" />
+<meta name="date" content="2023-04-12" />
 
-<title>candy_data_cleaning.R</title>
+<title>candy_data_cleaning_without_text_field.R</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,9 +350,9 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">candy_data_cleaning.R</h1>
+<h1 class="title toc-ignore">candy_data_cleaning_without_text_field.R</h1>
 <h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-14</h4>
+<h4 class="date">2023-04-12</h4>
 
 </div>
 
@@ -385,19 +385,6 @@ import_xlsx_and_clean_names &lt;- function(file_name) {
     janitor::clean_names()
 }
 
-# function to convert other candy bar column to usable candy and rating data
-others_to_candy &lt;- function(df, start_column, end_column) {
-  df %&gt;% 
-    pivot_longer(cols = all_of(start_column):all_of(end_column),
-                 names_to = &quot;rating&quot;,
-                 values_to = &quot;candy&quot;
-    ) %&gt;%
-    separate_longer_delim(cols = candy,
-                          delim = regex(&quot;[\\.\\,\\;]&quot;)
-    ) %&gt;% 
-    filter(!is.na(candy) &amp; candy != &quot;&quot;)
-}
-
 
 
 ##### 
@@ -423,16 +410,6 @@ candy_2015_main_list &lt;- candy_2015_col_clean %&gt;%
   mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
   filter(!is.na(rating))
 
-candy_2015_other_items &lt;- candy_2015_col_clean %&gt;% 
-  select(year, rater_id, age,
-         going_trick_or_treating,
-         joy, despair
-  ) %&gt;%
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2015_data &lt;- bind_rows(candy_2015_main_list,
-                             candy_2015_other_items)
-
 
 # import and extract relevant data from 2016 data file (file specific)
 candy_2016_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2016.xlsx&quot;)
@@ -456,16 +433,6 @@ candy_2016_main_list &lt;- candy_2016_col_clean %&gt;%
   mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
   filter(!is.na(rating))
 
-candy_2016_other_items &lt;- candy_2016_col_clean %&gt;% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %&gt;% 
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2016_data &lt;- bind_rows(candy_2016_main_list,
-                             candy_2016_other_items)
-
 
 # import and extract relevant data from 2017 data file (file specific)
 candy_2017_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2017.xlsx&quot;)</code></pre>
@@ -487,21 +454,11 @@ candy_2017_main_list &lt;- candy_2017_col_clean %&gt;%
   mutate(candy = str_replace_all(candy, &quot;_&quot;, &quot; &quot;)) %&gt;% 
   filter(!is.na(rating))
 
-candy_2017_other_items &lt;- candy_2017_col_clean %&gt;% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %&gt;%
-  others_to_candy(&quot;joy&quot;, &quot;despair&quot;)
-
-candy_2017_data &lt;- bind_rows(candy_2017_main_list,
-                             candy_2017_other_items)
-
 
 # combine all 3 data sets and remove redundant columns
-all_candy_data_combined &lt;- bind_rows(candy_2015_data,
-                                     candy_2016_data,
-                                     candy_2017_data)
+all_candy_data_combined &lt;- bind_rows(candy_2015_main_list,
+                                     candy_2016_main_list,
+                                     candy_2017_main_list)
 
 
 all_candy_data_combined &lt;- all_candy_data_combined %&gt;% 
@@ -541,7 +498,7 @@ fixed_candy_data &lt;- alt_candy_combined %&gt;%
   select(-is_candy)
 
 
-# filter countries into Canada, UK, USA, others and NA
+# filter countries into Canada, UK, USA and others_unknown
 source(here::here(&quot;data_cleaning_scripts/lists/alt_entry_names_for_countries.R&quot;))
 
 alternative_country_names &lt;- enframe(country_list) %&gt;%
@@ -549,20 +506,19 @@ alternative_country_names &lt;- enframe(country_list) %&gt;%
 
 candy_and_country_data &lt;- fixed_candy_data %&gt;% 
   left_join(alternative_country_names, by = join_by(country == replace_this)) %&gt;% 
-  mutate(name_2 = case_when(str_detect(country, &quot;^(?i)canada&quot;) ~ &quot;Canada&quot;,
-                            str_detect(country, &quot;^(?i)unite[sd] st&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;^(?i)U[\\ \\.]*S&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;mer&quot;) ~ &quot;United States of America&quot;,
-                            str_detect(country, &quot;^(?i)U[\\ ]*K$&quot;) ~ &quot;United Kingdom&quot;,
-                            str_detect(country, &quot;^United Ki[:alpha:]*om$&quot;) ~ &quot;United Kingdom&quot;,
-                            TRUE ~ NA),
-         .after = name
+  mutate(name_2 = case_when(
+    str_detect(country, &quot;^(?i)canada&quot;) ~ &quot;Canada&quot;,
+    str_detect(country, &quot;^(?i)unite[sd] st&quot;) ~ &quot;United States of America&quot;,
+    str_detect(country, &quot;^(?i)U[// //.]*S&quot;) ~ &quot;United States of America&quot;,
+    str_detect(country, &quot;mer&quot;) ~ &quot;United States of America&quot;,
+    str_detect(country, &quot;^(?i)U[// ]*K$&quot;) ~ &quot;United Kingdom&quot;,
+    str_detect(country, &quot;^United Ki[:alpha:]*om$&quot;) ~ &quot;United Kingdom&quot;,
+    TRUE ~ NA),
+    .after = name
   ) %&gt;%
-  mutate(country = case_when(is.na(country) ~ NA,
-                             is.numeric(country) ~ NA,
-                             !is.na(name_2) ~ name_2,
-                             !is.na(name) ~ name,
-                             TRUE ~ &quot;Other&quot;)
+  mutate(country = case_when(
+    !is.na(name_2) ~ name_2, !is.na(name) ~ name,
+    TRUE ~ &quot;Other or Unknown&quot;)
   ) %&gt;% 
   select(-name, -name_2)
 
@@ -571,8 +527,7 @@ candy_and_country_data &lt;- fixed_candy_data %&gt;%
 age_candy_country_data &lt;- candy_and_country_data %&gt;% 
   mutate(age_floor = floor(as.numeric(age)),
          age = if_else(age_floor &gt; 0 &amp; age_floor &lt;= 100,
-                       age_floor,
-                       NA)) %&gt;% 
+                       age_floor, NA)) %&gt;% 
   select(-age_floor)</code></pre>
 <pre><code>## Warning: There was 1 warning in `mutate()`.
 ## ℹ In argument: `age_floor = floor(as.numeric(age))`.
@@ -583,7 +538,7 @@ age_candy_country_data &lt;- candy_and_country_data %&gt;%
 age_candy_country_data %&gt;%
   select(year, rater_id, age, gender, country, 
          going_trick_or_treating, candy, rating) %&gt;% 
-  write_csv(here::here(&quot;clean_data/candy_clean.csv&quot;))</code></pre>
+  write_csv(here::here(&quot;clean_data/candy_clean_without_text_field.csv&quot;))</code></pre>
 
 
 

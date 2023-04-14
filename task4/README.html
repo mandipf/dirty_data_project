@@ -446,7 +446,7 @@ others_to_candy &lt;- function(df, start_column, end_column) {
                  values_to = &quot;candy&quot;
     ) %&gt;%
     separate_longer_delim(cols = candy,
-                          delim = regex(&quot;[//.//,//;]&quot;)
+                          delim = regex(&quot;[\\.\\,\\;]&quot;)
     ) %&gt;% 
     filter(!is.na(candy) &amp; candy != &quot;&quot;)
 }</code></pre>
@@ -501,6 +501,7 @@ candy_2015_other_items &lt;- candy_2015_col_clean %&gt;%
 candy_2015_data &lt;- bind_rows(candy_2015_main_list,
                              candy_2015_other_items)</code></pre>
 <pre><code># import and extract relevant data from 2016 data file (file specific)
+
 candy_2016_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2016.xlsx&quot;)
 
 candy_2016_col_clean &lt;- candy_2016_import %&gt;%
@@ -532,6 +533,7 @@ candy_2016_other_items &lt;- candy_2016_col_clean %&gt;%
 candy_2016_data &lt;- bind_rows(candy_2016_main_list,
                              candy_2016_other_items)</code></pre>
 <pre><code># import and extract relevant data from 2017 data file (file specific)
+
 candy_2017_import &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2017.xlsx&quot;)
 
 candy_2017_col_clean &lt;- candy_2017_import %&gt;%
@@ -613,7 +615,7 @@ fixed_candy_data &lt;- alt_candy_combined %&gt;%
   filter(n() &gt; 9) %&gt;%
   ungroup() %&gt;% 
   select(-is_candy)</code></pre>
-<pre><code># filter countries into Canada, UK, USA and others_unknown
+<pre><code># filter countries into Canada, UK, USA, others and NA
 
 source(here::here(&quot;data_cleaning_scripts/lists/alt_entry_names_for_countries.R&quot;))
 
@@ -622,19 +624,20 @@ alternative_country_names &lt;- enframe(country_list) %&gt;%
 
 candy_and_country_data &lt;- fixed_candy_data %&gt;% 
   left_join(alternative_country_names, by = join_by(country == replace_this)) %&gt;% 
-  mutate(name_2 = case_when(
-    str_detect(country, &quot;^(?i)canada&quot;) ~ &quot;Canada&quot;,
-    str_detect(country, &quot;^(?i)unite[sd] st&quot;) ~ &quot;United States of America&quot;,
-    str_detect(country, &quot;^(?i)U[// //.]*S&quot;) ~ &quot;United States of America&quot;,
-    str_detect(country, &quot;mer&quot;) ~ &quot;United States of America&quot;,
-    str_detect(country, &quot;^(?i)U[// ]*K$&quot;) ~ &quot;United Kingdom&quot;,
-    str_detect(country, &quot;^United Ki[:alpha:]*om$&quot;) ~ &quot;United Kingdom&quot;,
-    TRUE ~ NA),
-    .after = name
+  mutate(name_2 = case_when(str_detect(country, &quot;^(?i)canada&quot;) ~ &quot;Canada&quot;,
+                            str_detect(country, &quot;^(?i)unite[sd] st&quot;) ~ &quot;United States of America&quot;,
+                            str_detect(country, &quot;^(?i)U[\\ \\.]*S&quot;) ~ &quot;United States of America&quot;,
+                            str_detect(country, &quot;mer&quot;) ~ &quot;United States of America&quot;,
+                            str_detect(country, &quot;^(?i)U[\\ ]*K$&quot;) ~ &quot;United Kingdom&quot;,
+                            str_detect(country, &quot;^United Ki[:alpha:]*om$&quot;) ~ &quot;United Kingdom&quot;,
+                            TRUE ~ NA),
+         .after = name
   ) %&gt;%
-  mutate(country = case_when(
-    !is.na(name_2) ~ name_2, !is.na(name) ~ name,
-    TRUE ~ &quot;Other or Unknown&quot;)
+  mutate(country = case_when(is.na(country) ~ NA,
+                             is.numeric(country) ~ NA,
+                             !is.na(name_2) ~ name_2,
+                             !is.na(name) ~ name,
+                             TRUE ~ &quot;Other&quot;)
   ) %&gt;% 
   select(-name, -name_2)</code></pre>
 <pre><code># update age list to be 1-100 years old, rest are NA
@@ -642,7 +645,8 @@ candy_and_country_data &lt;- fixed_candy_data %&gt;%
 age_candy_country_data &lt;- candy_and_country_data %&gt;% 
   mutate(age_floor = floor(as.numeric(age)),
          age = if_else(age_floor &gt; 0 &amp; age_floor &lt;= 100,
-                       age_floor, NA)) %&gt;% 
+                       age_floor,
+                       NA)) %&gt;% 
   select(-age_floor)</code></pre>
 <p><br></p>
 <p><strong>4. Select required columns for data analysis and export to
@@ -687,11 +691,11 @@ years?</p>
 
 ##   number_of_ratings
 ##               &lt;int&gt;
-## 1            623513</code></pre>
-<p>This code chunk showed that there were 623513 candy ratings within
+## 1            623468</code></pre>
+<p>This code chunk showed that there were 623468 candy ratings within
 the complete data set.</p>
 <ul>
-<li>Split by year, this was 384024 in 2015, 97340 in 2016, and 142149 in
+<li>Split by year, this was 383995 in 2015, 97336 in 2016, and 142137 in
 2017.</li>
 </ul>
 <p>When using the reduced data set (no free text field), this was
@@ -833,11 +837,28 @@ meh as 0.</p>
 ##   country                  candy         rating_value
 ##   &lt;chr&gt;                    &lt;chr&gt;                &lt;dbl&gt;
 ## 1 Canada                   toblerone bar          220
-## 2 Other or Unknown         toblerone bar         2894
+## 2 Other                    toblerone bar           70
 ## 3 United Kingdom           toblerone bar           33
-## 4 United States of America toblerone bar         1688</code></pre>
+## 4 United States of America toblerone bar         1688
+## 5 &lt;NA&gt;                     toblerone bar         2824</code></pre>
 <p>The highest rated candy bar every region was Toblerone bar.</p>
 <p>For all candy types, it was m&amp;ms for every region.</p>
+<hr />
+<p>Update 2023-04-14</p>
+<ul>
+<li>Data Cleaning:
+<ul>
+<li>corrected REGEX escape character from “//” to “\\”</li>
+<li>countries were filtered into Canada, UK, USA, others and NA,
+i.e. others and unknown was split into others and NA</li>
+</ul></li>
+<li>Data Analysis:
+<ul>
+<li>Number of ratings increased marginally for the free text ratings as
+a result of the REGEX change in Function 2</li>
+<li>Q8 was updated due to the addition of NA</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>

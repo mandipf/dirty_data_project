@@ -399,9 +399,9 @@ are used for <code>age</code>, <code>wanplum</code> and
 </ul>
 <pre><code>species_split &lt;- function(df, col_name) {
   case_when(
-    !is.na(df$age) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
-    !is.na(df$wanplum) ~ str_remove(col_name, &quot; PL[// [:alnum:]]*&quot;),
-    !is.na(df$plphase) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
+    !is.na(df$age) ~ str_remove(col_name, &quot; [A-Z]{2}[\\ [:alnum:]]*&quot;),
+    !is.na(df$wanplum) ~ str_remove(col_name, &quot; PL[\\ [:alnum:]]*&quot;),
+    !is.na(df$plphase) ~ str_remove(col_name, &quot; [A-Z]{2}[\\ [:alnum:]]*&quot;),
     !is.na(df$sex) ~ str_remove(col_name, &quot; [MF]$&quot;),
     TRUE ~ col_name
   )
@@ -550,24 +550,26 @@ was:</p>
 <p>How many different types of birds were only ever seen in groups of
 1?</p>
 <pre><code>seabirds_data %&gt;% 
-  filter(count == 1) %&gt;%
-  select(common_name, scientific_name, abbreviation) %&gt;% 
-  unique()
+  group_by(common_name, scientific_name, abbreviation) %&gt;% 
+  summarise(max_group_number = max(count),
+            .groups = &quot;drop&quot;) %&gt;%
+  filter(max_group_number == 1)
   
-##    common_name                       scientific_name                 abbreviat…¹
-##    &lt;chr&gt;                             &lt;chr&gt;                           &lt;chr&gt;      
-##  1 Seabird (Unidentified)            &lt;NA&gt;                            SEABUN     
-##  2 White-chinned petrel              Procellaria aequinoctialis      PROAEQ     
-##  3 Sooty shearwater                  Puffinus griseus                PUFGRI     
-##  4 Northern giant petrel             Macronectes halli               MACHAL     
-##  5 Wandering albatross sensu lato    Diomedea antipodensis / exulans DIOANTEXU  
-##  6 Royal albatross sensu lato        Diomedea epomophora / sanfordi  DIOEPOSAN  
-##  7 Australasian gannet               Morus serrator                  MORSER     
-##  8 Diving-petrel (unidentified)      Pelecanoides sp.                PELSP      
-##  9 Skua (unidentified)               Catharacta / Stercorarius sp.   SKUAUN     
-## 10 Black-browed albatross sensu lato Diomedea impavida / melanophrys DIOIMPMEL  
-## # … with 138 more rows, and abbreviated variable name ¹​abbreviation</code></pre>
-<p>There were 148 types of bird that were only ever seen alone.</p>
+##    common_name                            scientific_name        abbre…¹ max_g…²
+##    &lt;chr&gt;                                  &lt;chr&gt;                  &lt;chr&gt;     &lt;dbl&gt;
+##  1 Atlantic yellow-nosed mollymawk        Thalassarche chlororh… THACHL        1
+##  2 Audubon&#39;s shearwater                   Puffinus lherminieri   PUFLHE        1
+##  3 Barau&#39;s petrel                         Pterodroma baraui      PTEBAR        1
+##  4 Black / Westland petrel                Procellaria parkinson… PROPAR…       1
+##  5 Bulwer&#39;s petrel                        Bulweria bulwerii      BULBUL        1
+##  6 Caspian tern                           Hydroprogne caspia     HYDCAS        1
+##  7 Crested penguin (unidentified)         Eudyptes / Magadyptes… EUDMEG        1
+##  8 Flesh-footed / Wedge-tailed shearwater Puffinus carneipes / … PUFCAR…       1
+##  9 Frigatebird (unidentified)             Fregata sp             FRESP         1
+## 10 Herald petrel                          Pterodroma heraldica   PTEHER        1
+## # … with 11 more rows, and abbreviated variable names ¹​abbreviation,
+## #   ²​max_group_number</code></pre>
+<p>There were 21 types of bird that were only ever seen alone.</p>
 <p><br></p>
 </div>
 <div id="q5" class="section level4">
@@ -582,6 +584,18 @@ was:</p>
 ##                      &lt;int&gt;                   &lt;dbl&gt;
 ## 1                       70                     158</code></pre>
 <p>There were 158 penguins seen during 70 sightings.</p>
+<hr />
+<p>Update 2023-04-14</p>
+<ul>
+<li>Data Cleaning:
+<ul>
+<li>corrected REGEX escape character from “//” to “\\”</li>
+</ul></li>
+<li>Data Analysis:
+<ul>
+<li>corrected Q4 as misunderstood question</li>
+</ul></li>
+</ul>
 </div>
 </div>
 </div>

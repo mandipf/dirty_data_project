@@ -1,26 +1,24 @@
-
 # **Task 6 - Dog Owners Survey**
+
 By Mandip Farmahan (2023-04-13)
 
 ------------------------------------------------------------------------
 
 ## Project Description
 
-This project cleans some data from a dog owner survey and performs some analysis on that cleaned data.
-The data itself, which is in the form of a CSV file, was provided as part of a CodeClan Dirty Data Project.
+This project cleans some data from a dog owner survey and performs some analysis on that cleaned data. The data itself, which is in the form of a CSV file, was provided as part of a CodeClan Dirty Data Project.
 
 Assumptions made about the data set:
 
 -   `email` addresses ending in variations of *.com* (e.g. *.comm*) were updated to *.com* as these are expected to be typographical errors;
 -   `email` addresses ending in *.co* were not updated as it is unclear if these should be *.com*, *.co.uk* or some other variant;
--   `amount_spent_on_dog_food` should be at least \£10 based on the entries within that column. Any values less than this are expected to be typographical errors (e.g. missing one or more zeroes) and therefore marked NA.
+-   `amount_spent_on_dog_food` should be at least &#163;10 based on the entries within that column. Any values less than this are expected to be typographical errors (e.g. missing one or more zeroes) and therefore marked NA.
 
 ------------------------------------------------------------------------
 
 ## Data cleaning
 
-The data cleaning script is located in the `data_cleaning_scripts` folder.
-The libraries required to run the data cleaning script are:
+The data cleaning script is located in the `data_cleaning_scripts` folder. The libraries required to run the data cleaning script are:
 
 ```         
 library(here)
@@ -34,27 +32,42 @@ The following data cleaning tasks are carried out in four stages:
 
 **1. Import data, clean personal details and remove duplicates**
 
-  -   Import the data from the CSV file;
-  -   Clean the column names;
-  - Remove any blank colums (last 2 columns);
-  - Fix any typographical errors relating to *.com* as specified in assumptions above;
-  - General clean-up of email entries;
-  - Remove duplicate entries.
-  
-```
+-   Import the data from the CSV file;
+-   Clean the column names;
+-   Remove any blank columns (last 2 columns);
+-   Fix any typographical errors relating to *.com* as specified in assumptions above;
+-   General clean-up of email entries;
+-   Remove duplicate entries.
+
+```         
 dog_owners_survey_data <- read_csv(here::here("raw_data/dog_survey.csv"),
                                    show_col_types = FALSE)
+```
+
+```         
+# Clean personal details and remove duplicate entries
+
+dos_personal_info_clean <- dog_owners_survey_data %>% 
+  janitor::clean_names() %>% 
+  # remove blank columns
+  select(-x10, -x11) %>% 
+  # set email addresses without @ to NA
+  mutate(email_2 = str_replace(email, ".com[m]+", ".com"),
+         email_2 = case_when(str_detect(email_2, "@") ~ email_2, TRUE ~ NA),
+         .after = email) %>% 
+  # remove duplicates
+  unique()
 ```
 
 <br>
 
 **2. Clean the food cost column**
 
-  -   Locate any rows with multiple entries for dog details and mark NA as no indication of food cost split per dog given;
-  -   Replace any string that does not give a single cost for food (e.g. between x and y) with NA;
-  -   Replace any value less than B#10 with NA as specified in assumptions above.
+-   Locate any rows with multiple entries for dog details and mark NA as no indication of food cost split per dog given;
+-   Replace any string that does not give a single cost for food (e.g. between x and y) with NA;
+-   Replace any value less than &#163;10 with NA as specified in assumptions above.
 
-```
+```         
 dos_cost_clean <- dos_personal_info_clean %>%
 
   # set cost to NA if multiple dogs in row
@@ -66,8 +79,7 @@ dos_cost_clean <- dos_personal_info_clean %>%
   # extract cost without units and set other rows to NA
   mutate(cost = case_when(str_detect(cost, " and ") ~ NA,
                           str_detect(cost, "-") ~ NA,
-                          str_detect(cost, "/") ~ NA,
-                          TRUE ~ str_extract(cost, "[//.[:digit:]]+")),
+                          TRUE ~ str_extract(cost, "[\\.[:digit:]]+")),
                           
          # check cost is between 10 and 100 or set NA for typos
          cost = if_else(as.numeric(cost) < 10 | as.numeric(cost) > 100,
@@ -78,12 +90,12 @@ dos_cost_clean <- dos_personal_info_clean %>%
 
 **3. Clean all columns related to dog details**
 
-  -   Split any rows with multiple entries for dog details;
-  -   Use patterns to update sizes to be XS, S, M, L, XL or NA;
-  -   Use patterns to update gender to be M, F or NA;
-  - Replace any string that does not give a single age (e.g. 12+) with NA.
+-   Split any rows with multiple entries for dog details;
+-   Use patterns to update sizes to be XS, S, M, L, XL or NA;
+-   Use patterns to update gender to be M, F or NA;
+-   Replace any string that does not give a single age (e.g. 12+) with NA.
 
-```
+```         
 dog_owners_final <- dos_cost_clean %>%
 
   # split multiple entries within same row 
@@ -106,7 +118,7 @@ dog_owners_final <- dos_cost_clean %>%
          .after = dog_size) %>%
          
   # convert words for gender (e.g. female) to abbreviation (e.g. M, F)
-  mutate(dog_gender_2 = str_remove_all(dog_gender, "[ [:digit:]]*"),
+  mutate(dog_gender_2 = str_remove_all(dog_gender, "[\\ [:digit:]]*"),
          dog_gender_2 = case_when(str_detect(dog_gender_2, "^(?i)m") ~ "M",
                                   str_detect(dog_gender_2, "^(?i)f") ~ "F",
                                   TRUE ~ NA),
@@ -122,7 +134,8 @@ dog_owners_final <- dos_cost_clean %>%
 <br>
 
 **4. Select required columns for data analysis and export to CSV**
-```
+
+```         
 dog_owners_final %>% 
   select(id, title, first_name, last_name,
          email = email_2,
@@ -137,8 +150,7 @@ dog_owners_final %>%
 
 ## Data analysis
 
-The data analysis script is located in the `analysis_and_documentation` folder.
-The libraries required to run the data analysis script are:
+The data analysis script is located in the `analysis_and_documentation` folder. The libraries required to run the data analysis script are:
 
 ```         
 library(assertr)
@@ -146,15 +158,13 @@ library(here)
 library(tidyverse)
 ```
 
-The presence of all required variables within the imported file are verified before any analysis is conducted.
-This also includes a class verification for numeric fields.
+The presence of all required variables within the imported file are verified before any analysis is conducted. This also includes a class verification for numeric fields.
 
 ### Analysis questions
 
 #### Q1
 
-The client only counts a valid email address as one ending in `.com`.
-How many survey results have a valid email address?
+The client only counts a valid email address as one ending in `.com`. How many survey results have a valid email address?
 
 ```         
 survey_data %>% 
@@ -192,15 +202,15 @@ survey_data %>%
 
 The average amount spent on dog food per size was:
 
-| Size of dog | Amount spent (B#) |
-|:-----------:|:----------------:|
-|     XS      |      61.40       |
-|      S      |      57.10       |
-|      M      |      53.70       |
-|      L      |      55.40       |
-|     XL      |      54.70       |
+| Size of dog | Amount spent (\\£) |
+|:-----------:|:------------------:|
+|     XS      |       61.40        |
+|      S      |       57.10        |
+|      M      |       53.70        |
+|      L      |       55.40        |
+|     XL      |       54.70        |
 
-For dogs whose size was not recorded, the average amount spent on dog food was B#64.70.
+For dogs whose size was not recorded, the average amount spent on dog food was \\£64.70.
 
 <br>
 
@@ -224,8 +234,7 @@ For owners whose surname started with N to Z, the average age of dogs was 53.3 d
 
 #### Q4
 
-The `dog_age` column is the age in dog years.
-If the conversion is 1 human year = 6 dog years, then what is the average human age for dogs of each gender?
+The `dog_age` column is the age in dog years. If the conversion is 1 human year = 6 dog years, then what is the average human age for dogs of each gender?
 
 ```         
 survey_data %>%
@@ -240,8 +249,7 @@ survey_data %>%
 ## 3 <NA>                           7.47
 ```
 
-Within the survey, the average age of male dogs was 8.35 human years and for female dogs it was 7.88 human years.
-For dogs whose gender was not recorded, the average age was 7.47 human years.
+Within the survey, the average age of male dogs was 8.35 human years and for female dogs it was 7.88 human years. For dogs whose gender was not recorded, the average age was 7.47 human years.
 
 <br>
 
@@ -270,3 +278,13 @@ survey_data %>%
 ```
 
 ![](analysis_and_documentation/q5_plot.png)
+
+-----
+
+Update 2023-04-14
+
+  - Data Cleaning:
+    - corrected REGEX escape character from “//” to “\\\\”
+    - removed "str_detect(cost, "/") ~ NA" as no longer needed after correcting REGEX escape character
+  - Data Analysis:
+    - no change required as a result of data cleaning additions

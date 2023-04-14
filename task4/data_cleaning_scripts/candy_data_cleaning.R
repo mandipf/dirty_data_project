@@ -27,7 +27,7 @@ others_to_candy <- function(df, start_column, end_column) {
                  values_to = "candy"
     ) %>%
     separate_longer_delim(cols = candy,
-                          delim = regex("[//.//,//;]")
+                          delim = regex("[\\.\\,\\;]")
     ) %>% 
     filter(!is.na(candy) & candy != "")
 }
@@ -174,7 +174,7 @@ fixed_candy_data <- alt_candy_combined %>%
   select(-is_candy)
 
 
-# filter countries into Canada, UK, USA and others_unknown
+# filter countries into Canada, UK, USA, others and NA
 source(here::here("data_cleaning_scripts/lists/alt_entry_names_for_countries.R"))
 
 alternative_country_names <- enframe(country_list) %>%
@@ -182,19 +182,20 @@ alternative_country_names <- enframe(country_list) %>%
 
 candy_and_country_data <- fixed_candy_data %>% 
   left_join(alternative_country_names, by = join_by(country == replace_this)) %>% 
-  mutate(name_2 = case_when(
-    str_detect(country, "^(?i)canada") ~ "Canada",
-    str_detect(country, "^(?i)unite[sd] st") ~ "United States of America",
-    str_detect(country, "^(?i)U[// //.]*S") ~ "United States of America",
-    str_detect(country, "mer") ~ "United States of America",
-    str_detect(country, "^(?i)U[// ]*K$") ~ "United Kingdom",
-    str_detect(country, "^United Ki[:alpha:]*om$") ~ "United Kingdom",
-    TRUE ~ NA),
-    .after = name
+  mutate(name_2 = case_when(str_detect(country, "^(?i)canada") ~ "Canada",
+                            str_detect(country, "^(?i)unite[sd] st") ~ "United States of America",
+                            str_detect(country, "^(?i)U[\\ \\.]*S") ~ "United States of America",
+                            str_detect(country, "mer") ~ "United States of America",
+                            str_detect(country, "^(?i)U[\\ ]*K$") ~ "United Kingdom",
+                            str_detect(country, "^United Ki[:alpha:]*om$") ~ "United Kingdom",
+                            TRUE ~ NA),
+         .after = name
   ) %>%
-  mutate(country = case_when(
-    !is.na(name_2) ~ name_2, !is.na(name) ~ name,
-    TRUE ~ "Other or Unknown")
+  mutate(country = case_when(is.na(country) ~ NA,
+                             is.numeric(country) ~ NA,
+                             !is.na(name_2) ~ name_2,
+                             !is.na(name) ~ name,
+                             TRUE ~ "Other")
   ) %>% 
   select(-name, -name_2)
 
@@ -203,7 +204,8 @@ candy_and_country_data <- fixed_candy_data %>%
 age_candy_country_data <- candy_and_country_data %>% 
   mutate(age_floor = floor(as.numeric(age)),
          age = if_else(age_floor > 0 & age_floor <= 100,
-                       age_floor, NA)) %>% 
+                       age_floor,
+                       NA)) %>% 
   select(-age_floor)
 
 

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mandip" />
 
-<meta name="date" content="2023-04-11" />
+<meta name="date" content="2023-04-14" />
 
 <title>Task 2 - Cake ingredients</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Task 2 - Cake ingredients</h1>
 <h4 class="author">Mandip</h4>
-<h4 class="date">2023-04-11</h4>
+<h4 class="date">2023-04-14</h4>
 
 </div>
 
@@ -388,13 +388,12 @@ cake_data %&gt;%
   verify(is.numeric(quantity)) %&gt;%
   summary()</code></pre>
 <pre><code>##      cake            ingredient           quantity        measure         
-##  Length:612         Length:612         Min.   : 0.120   Length:612        
+##  Length:156         Length:156         Min.   : 0.120   Length:156        
 ##  Class :character   Class :character   1st Qu.: 0.600   Class :character  
 ##  Mode  :character   Mode  :character   Median : 1.000   Mode  :character  
 ##                                        Mean   : 1.541                     
 ##                                        3rd Qu.: 2.000                     
-##                                        Max.   :10.000                     
-##                                        NA&#39;s   :456</code></pre>
+##                                        Max.   :10.000</code></pre>
 <pre class="r"><code>cake_data %&gt;% 
   group_by(cake) %&gt;% 
   count()</code></pre>
@@ -402,47 +401,47 @@ cake_data %&gt;%
 ## # Groups:   cake [18]
 ##    cake                     n
 ##    &lt;chr&gt;                &lt;int&gt;
-##  1 Angel                   34
-##  2 Babas au Rhum           34
-##  3 Banana Shortcake        34
-##  4 Blender Cheesecake      34
-##  5 Buche de Noel           34
-##  6 Cheesecake              34
-##  7 Crumb and Nut           34
-##  8 Hungarian Cream         34
-##  9 One Bowl Chocolate      34
-## 10 Red Devil&#39;s Food        34
-## 11 Rum Cheesecake          34
-## 12 Savarin                 34
-## 13 Sour Cream Fudge        34
-## 14 Spiced Pound            34
-## 15 Sponge                  34
-## 16 Strawberry Roll         34
-## 17 Strawberry Shortcake    34
-## 18 Sweet Chocolate         34</code></pre>
+##  1 Angel                    7
+##  2 Babas au Rhum           11
+##  3 Banana Shortcake         8
+##  4 Blender Cheesecake       9
+##  5 Buche de Noel            5
+##  6 Cheesecake              10
+##  7 Crumb and Nut            8
+##  8 Hungarian Cream          8
+##  9 One Bowl Chocolate      11
+## 10 Red Devil&#39;s Food         9
+## 11 Rum Cheesecake          10
+## 12 Savarin                  9
+## 13 Sour Cream Fudge        10
+## 14 Spiced Pound             6
+## 15 Sponge                   7
+## 16 Strawberry Roll          8
+## 17 Strawberry Shortcake    10
+## 18 Sweet Chocolate         10</code></pre>
 <pre class="r"><code>cake_data %&gt;% 
   group_by(ingredient) %&gt;% 
   count()</code></pre>
-<pre><code>## # A tibble: 34 × 2
-## # Groups:   ingredient [34]
+<pre><code>## # A tibble: 33 × 2
+## # Groups:   ingredient [33]
 ##    ingredient          n
 ##    &lt;chr&gt;           &lt;int&gt;
-##  1 Almond essence     18
-##  2 Baking powder      18
-##  3 Bananas            18
-##  4 Butter             18
-##  5 Buttermilk         18
-##  6 Chocolate          18
-##  7 Cocoa              18
-##  8 Cottage Cheese     18
-##  9 Cream of tartar    18
-## 10 Crumbs             18
-## # … with 24 more rows</code></pre>
+##  1 Almond essence      3
+##  2 Baking powder       7
+##  3 Bananas             1
+##  4 Butter              7
+##  5 Chocolate           2
+##  6 Cocoa               2
+##  7 Cottage Cheese      5
+##  8 Cream of tartar     1
+##  9 Crumbs              2
+## 10 Crushed Ice         1
+## # … with 23 more rows</code></pre>
 <pre class="r"><code>cake_data %&gt;% 
   group_by(quantity) %&gt;% 
   count()</code></pre>
-<pre><code>## # A tibble: 23 × 2
-## # Groups:   quantity [23]
+<pre><code>## # A tibble: 22 × 2
+## # Groups:   quantity [22]
 ##    quantity     n
 ##       &lt;dbl&gt; &lt;int&gt;
 ##  1     0.12     1
@@ -455,22 +454,21 @@ cake_data %&gt;%
 ##  8     0.7      2
 ##  9     0.75     6
 ## 10     1       49
-## # … with 13 more rows</code></pre>
+## # … with 12 more rows</code></pre>
 <pre class="r"><code>cake_data %&gt;% 
   group_by(measure) %&gt;% 
   count()</code></pre>
-<pre><code>## # A tibble: 8 × 2
-## # Groups:   measure [8]
+<pre><code>## # A tibble: 7 × 2
+## # Groups:   measure [7]
 ##   measure        n
 ##   &lt;chr&gt;      &lt;int&gt;
-## 1 cup          180
-## 2 one           72
-## 3 ounce         72
-## 4 pound         18
-## 5 quart         18
-## 6 tablespoon    90
-## 7 teaspoon     144
-## 8 &lt;NA&gt;          18</code></pre>
+## 1 cup           66
+## 2 one           19
+## 3 ounce          7
+## 4 pound          5
+## 5 quart          2
+## 6 tablespoon    12
+## 7 teaspoon      45</code></pre>
 </div>
 </div>
 <div id="analysis-questions" class="section level1">
@@ -503,17 +501,12 @@ cake_data %&gt;%
   filter(cake == &quot;Sponge&quot;) %&gt;% 
   summarise(quantity_per_measure = sum(quantity, na.rm = TRUE),
             .by = measure)</code></pre>
-<pre><code>## # A tibble: 8 × 2
-##   measure    quantity_per_measure
-##   &lt;chr&gt;                     &lt;dbl&gt;
-## 1 teaspoon                   1.75
-## 2 cup                        3.5 
-## 3 one                        4   
-## 4 tablespoon                 0   
-## 5 pound                      0   
-## 6 ounce                      0   
-## 7 &lt;NA&gt;                       0   
-## 8 quart                      0</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   measure  quantity_per_measure
+##   &lt;chr&gt;                   &lt;dbl&gt;
+## 1 teaspoon                 1.75
+## 2 one                      4   
+## 3 cup                      3.5</code></pre>
 </div>
 <div id="q3" class="section level3">
 <h3>Q3</h3>

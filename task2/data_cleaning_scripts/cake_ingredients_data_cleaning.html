@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-04-11" />
+<meta name="date" content="2023-04-14" />
 
 <title>cake_ingredients_data_cleaning.R</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">cake_ingredients_data_cleaning.R</h1>
 <h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-04-11</h4>
+<h4 class="date">2023-04-14</h4>
 
 </div>
 
@@ -375,15 +375,39 @@ cake_ingredients_dirty &lt;- read_csv(here::here(&quot;raw_data/cake-ingredients
 cake_ingredients_code &lt;- read_csv(here::here(&quot;raw_data/cake_ingredient_code.csv&quot;),
                                    show_col_types = FALSE)
 
+
+# find units of measure (exclude NA) in code CSV and create REGEX pattern
+units_measure_pattern &lt;- cake_ingredients_code %&gt;% 
+  distinct(measure) %&gt;% 
+  drop_na() %&gt;% 
+  pull() %&gt;% 
+  str_c(collapse=&quot;|&quot;)
+
+  
+# split any concatenated ingredient-measure strings in code CSV
+cake_ingredients_code_fixed &lt;- cake_ingredients_code %&gt;% 
+  mutate(ingredient_2 =  if_else(str_detect(ingredient, units_measure_pattern),
+                                 str_remove(ingredient, str_c(&quot; &quot;, units_measure_pattern)),
+                                 ingredient),
+         measure_2 = if_else(str_detect(ingredient, units_measure_pattern),
+                             str_extract(ingredient, units_measure_pattern),
+                             measure)) %&gt;% 
+  select(code,
+         ingredient = ingredient_2,
+         measure = measure_2)
+            
+
 # convert to long format data and convert ingredient abbreviations
 cake_ingredients_clean &lt;- cake_ingredients_dirty %&gt;% 
   pivot_longer(cols = -Cake,
                names_to = &quot;code&quot;,
-               values_to = &quot;quantity&quot;
+               values_to = &quot;quantity&quot;,
+               values_drop_na = TRUE,
                ) %&gt;%
   janitor::clean_names() %&gt;% 
-  inner_join(cake_ingredients_code, by = &quot;code&quot;) %&gt;% 
+  inner_join(cake_ingredients_code_fixed, by = &quot;code&quot;) %&gt;% 
   select(cake, ingredient, quantity, measure)
+
 
 # export clean data
 cake_ingredients_clean %&gt;% 

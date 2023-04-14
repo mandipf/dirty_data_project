@@ -1,7 +1,7 @@
 ---
 title: "Task 3 - Seabird observation data"
 author: "Mandip"
-date: "2023-04-11"
+date: "2023-04-14"
 output: html_document
 ---
 
@@ -89,14 +89,10 @@ How many different types of birds were only ever seen in groups of 1?
 
 ```{r}
 seabirds_data %>% 
-  filter(count == 1) %>%
-  select(common_name, scientific_name, abbreviation) %>% 
-  unique()
-
-seabirds_data %>% 
-  filter(count == 1) %>%
-  distinct(common_name) %>% 
-  count()
+  group_by(common_name, scientific_name, abbreviation) %>% 
+  summarise(max_group_number = max(count),
+            .groups = "drop") %>%
+  filter(max_group_number == 1)
 ```
 
 ### Q5

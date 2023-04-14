@@ -41,9 +41,9 @@ The following data cleaning tasks are carried out in two stages:
 ```
 species_split <- function(df, col_name) {
   case_when(
-    !is.na(df$age) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
-    !is.na(df$wanplum) ~ str_remove(col_name, " PL[// [:alnum:]]*"),
-    !is.na(df$plphase) ~ str_remove(col_name, " [A-Z]{2}[// [:alnum:]]*"),
+    !is.na(df$age) ~ str_remove(col_name, " [A-Z]{2}[\\ [:alnum:]]*"),
+    !is.na(df$wanplum) ~ str_remove(col_name, " PL[\\ [:alnum:]]*"),
+    !is.na(df$plphase) ~ str_remove(col_name, " [A-Z]{2}[\\ [:alnum:]]*"),
     !is.na(df$sex) ~ str_remove(col_name, " [MF]$"),
     TRUE ~ col_name
   )
@@ -216,26 +216,28 @@ How many different types of birds were only ever seen in groups of 1?
 
 ```         
 seabirds_data %>% 
-  filter(count == 1) %>%
-  select(common_name, scientific_name, abbreviation) %>% 
-  unique()
+  group_by(common_name, scientific_name, abbreviation) %>% 
+  summarise(max_group_number = max(count),
+            .groups = "drop") %>%
+  filter(max_group_number == 1)
   
-##    common_name                       scientific_name                 abbreviat…¹
-##    <chr>                             <chr>                           <chr>      
-##  1 Seabird (Unidentified)            <NA>                            SEABUN     
-##  2 White-chinned petrel              Procellaria aequinoctialis      PROAEQ     
-##  3 Sooty shearwater                  Puffinus griseus                PUFGRI     
-##  4 Northern giant petrel             Macronectes halli               MACHAL     
-##  5 Wandering albatross sensu lato    Diomedea antipodensis / exulans DIOANTEXU  
-##  6 Royal albatross sensu lato        Diomedea epomophora / sanfordi  DIOEPOSAN  
-##  7 Australasian gannet               Morus serrator                  MORSER     
-##  8 Diving-petrel (unidentified)      Pelecanoides sp.                PELSP      
-##  9 Skua (unidentified)               Catharacta / Stercorarius sp.   SKUAUN     
-## 10 Black-browed albatross sensu lato Diomedea impavida / melanophrys DIOIMPMEL  
-## # … with 138 more rows, and abbreviated variable name ¹​abbreviation
+##    common_name                            scientific_name        abbre…¹ max_g…²
+##    <chr>                                  <chr>                  <chr>     <dbl>
+##  1 Atlantic yellow-nosed mollymawk        Thalassarche chlororh… THACHL        1
+##  2 Audubon's shearwater                   Puffinus lherminieri   PUFLHE        1
+##  3 Barau's petrel                         Pterodroma baraui      PTEBAR        1
+##  4 Black / Westland petrel                Procellaria parkinson… PROPAR…       1
+##  5 Bulwer's petrel                        Bulweria bulwerii      BULBUL        1
+##  6 Caspian tern                           Hydroprogne caspia     HYDCAS        1
+##  7 Crested penguin (unidentified)         Eudyptes / Magadyptes… EUDMEG        1
+##  8 Flesh-footed / Wedge-tailed shearwater Puffinus carneipes / … PUFCAR…       1
+##  9 Frigatebird (unidentified)             Fregata sp             FRESP         1
+## 10 Herald petrel                          Pterodroma heraldica   PTEHER        1
+## # … with 11 more rows, and abbreviated variable names ¹​abbreviation,
+## #   ²​max_group_number
 ```
 
-There were 148 types of bird that were only ever seen alone.
+There were 21 types of bird that were only ever seen alone.
 
 <br>
 
@@ -255,3 +257,12 @@ seabirds_data %>%
 ```
 
 There were 158 penguins seen during 70 sightings.
+
+------
+Update 2023-04-14
+
+  - Data Cleaning:
+    - corrected REGEX escape character from "//" to "\\\\"
+  - Data Analysis:
+    - corrected Q4 as misunderstood question
+
