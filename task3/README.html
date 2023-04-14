@@ -397,6 +397,16 @@ date codes” sheet of the XLS file. As a result, more generic patterns
 are used for <code>age</code>, <code>wanplum</code> and
 <code>plphase</code>.</p></li>
 </ul>
+<pre><code>species_split &lt;- function(df, col_name) {
+  case_when(
+    !is.na(df$age) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
+    !is.na(df$wanplum) ~ str_remove(col_name, &quot; PL[// [:alnum:]]*&quot;),
+    !is.na(df$plphase) ~ str_remove(col_name, &quot; [A-Z]{2}[// [:alnum:]]*&quot;),
+    !is.na(df$sex) ~ str_remove(col_name, &quot; [MF]$&quot;),
+    TRUE ~ col_name
+  )
+}</code></pre>
+<p><br></p>
 <p><strong>2. Import and clean data set, then export as CSV</strong></p>
 <ul>
 <li>Import both sheets from the XLS file;</li>
@@ -410,6 +420,47 @@ and duplication of the dedicated <code>age</code>, <code>wanplum</code>,
 <li>Remove variables not required for data analysis;</li>
 <li>Export data to CSV file.</li>
 </ul>
+<pre><code># import dirty data
+
+bird_dirty_data &lt;- readxl::read_xls(here::here(&quot;raw_data/seabirds.xls&quot;),
+                            sheet = &quot;Bird data by record ID&quot;,
+                            col_types = &quot;text&quot;)
+
+ship_dirty_data &lt;- readxl::read_xls(here::here(&quot;raw_data/seabirds.xls&quot;),
+                            sheet = &quot;Ship data by record ID&quot;,
+                            col_types = &quot;text&quot;)</code></pre>
+<pre><code># join data sets, clean column names and remove empty observations/records
+
+seabirds_joined_data &lt;- bird_dirty_data %&gt;% 
+  left_join(ship_dirty_data, by = &quot;RECORD ID&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  rename(com_name = species_common_name_taxon_age_sex_plumage_phase,
+         sci_name = species_scientific_name_taxon_age_sex_plumage_phase,
+         abr_name = species_abbreviation) %&gt;% 
+  filter(com_name != &quot;[NO BIRDS RECORDED]&quot;)</code></pre>
+<pre><code># clean species names to remove age, wanplum, plphase and sex
+
+seabirds_clean_data &lt;- seabirds_joined_data %&gt;% 
+  mutate(across(.cols = c(com_name, sci_name, abr_name),
+                .fns = ~ species_split(seabirds_joined_data, .x),
+                .names = &quot;{.col}_1&quot;
+                ),
+         .after = abr_name
+         )</code></pre>
+<pre><code># select required variables and export clean data
+
+seabirds_clean_data %&gt;%
+  select(
+    record = record_x,
+    record_id,
+    common_name = com_name_1,
+    scientific_name = sci_name_1,
+    abbreviation = abr_name_1,
+    count,
+    latitude = lat,
+    longitude = long
+    ) %&gt;%
+  write_csv(here::here(&quot;clean_data/seabirds_clean.csv&quot;))</code></pre>
 <hr />
 </div>
 <div id="data-analysis" class="section level2">

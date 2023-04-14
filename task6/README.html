@@ -398,6 +398,9 @@ in assumptions above;</li>
 <li>General clean-up of email entries;</li>
 <li>Remove duplicate entries.</li>
 </ul>
+<pre><code>dog_owners_survey_data &lt;- read_csv(here::here(&quot;raw_data/dog_survey.csv&quot;),
+                                   show_col_types = FALSE)</code></pre>
+<p><br></p>
 <p><strong>2. Clean the food cost column</strong></p>
 <ul>
 <li>Locate any rows with multiple entries for dog details and mark NA as
@@ -407,6 +410,24 @@ no indication of food cost split per dog given;</li>
 <li>Replace any value less than £10 with NA as specified in assumptions
 above.</li>
 </ul>
+<pre><code>dos_cost_clean &lt;- dos_personal_info_clean %&gt;%
+
+  # set cost to NA if multiple dogs in row
+  mutate(cost = case_when(str_detect(dog_age, &quot;,&quot;) ~ NA,
+                          str_detect(dog_age, &quot;and&quot;) ~ NA,
+                          TRUE ~ amount_spent_on_dog_food),
+         .after = amount_spent_on_dog_food) %&gt;%
+         
+  # extract cost without units and set other rows to NA
+  mutate(cost = case_when(str_detect(cost, &quot; and &quot;) ~ NA,
+                          str_detect(cost, &quot;-&quot;) ~ NA,
+                          str_detect(cost, &quot;/&quot;) ~ NA,
+                          TRUE ~ str_extract(cost, &quot;[//.[:digit:]]+&quot;)),
+                          
+         # check cost is between 10 and 100 or set NA for typos
+         cost = if_else(as.numeric(cost) &lt; 10 | as.numeric(cost) &gt; 100,
+                        NA, cost))</code></pre>
+<p><br></p>
 <p><strong>3. Clean all columns related to dog details</strong></p>
 <ul>
 <li>Split any rows with multiple entries for dog details;</li>
@@ -415,8 +436,50 @@ above.</li>
 <li>Replace any string that does not give a single age (e.g. 12+) with
 NA.</li>
 </ul>
+<pre><code>dog_owners_final &lt;- dos_cost_clean %&gt;%
+
+  # split multiple entries within same row 
+  mutate(across(.cols = dog_size:dog_age,
+                .fns = ~ str_replace(.x, &quot; and &quot;, &quot;,&quot;)),
+         across(.cols = dog_size:dog_age,
+                .fns = ~ str_split(.x, &quot;,&quot;))) %&gt;% 
+  unnest_longer(col = c(dog_size, dog_gender, dog_age)) %&gt;%
+  
+  # convert words for size (e.g. large) to abbreviation (e.g. S, M, L)
+  mutate(dog_size_2 = case_when(str_detect(dog_size, &quot;^(?i)s&quot;) ~ &quot;S&quot;,
+                                str_detect(dog_size, &quot;^(?i)m&quot;) ~ &quot;M&quot;,
+                                str_detect(dog_size, &quot;^(?i)l&quot;) ~ &quot;L&quot;,
+                                TRUE ~ dog_size),
+                                
+         # update size to be XS, S, M, L, XL or NA
+         dog_size_2 = if_else(str_detect(dog_size_2, &quot;[X]*[SML]&quot;), 
+                              dog_size_2,
+                              NA),
+         .after = dog_size) %&gt;%
+         
+  # convert words for gender (e.g. female) to abbreviation (e.g. M, F)
+  mutate(dog_gender_2 = str_remove_all(dog_gender, &quot;[ [:digit:]]*&quot;),
+         dog_gender_2 = case_when(str_detect(dog_gender_2, &quot;^(?i)m&quot;) ~ &quot;M&quot;,
+                                  str_detect(dog_gender_2, &quot;^(?i)f&quot;) ~ &quot;F&quot;,
+                                  TRUE ~ NA),
+         .after = dog_gender) %&gt;%
+         
+  # set anything other than a number only to NA
+  mutate(dog_age_2 = if_else(str_detect(dog_age, &quot;^[:digit:]+$&quot;), 
+                             dog_age,
+                             NA),
+         .after = dog_age)</code></pre>
+<p><br></p>
 <p><strong>4. Select required columns for data analysis and export to
 CSV</strong></p>
+<pre><code>dog_owners_final %&gt;% 
+  select(id, title, first_name, last_name,
+         email = email_2,
+         amount_spent_on_dog_food = cost,
+         dog_size = dog_size_2,
+         dog_gender = dog_gender_2,
+         dog_age = dog_age_2) %&gt;% 
+  write_csv(here::here(&quot;clean_data/dog_owners_survey_clean.csv&quot;))</code></pre>
 <hr />
 </div>
 <div id="data-analysis" class="section level2">
