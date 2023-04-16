@@ -1,0 +1,151 @@
+---
+title: "Task 5 - Right Wing Authoritarianism"
+author: "Mandip"
+date: "2023-04-16"
+output: html_document
+---
+
+# Import libraries and data sets
+
+### Import libraries
+
+```{r}
+library(assertr)
+library(tidyverse)
+```
+
+### Import data with verification
+
+- Check all fields required for analysis are present
+- `person_id` not required
+
+- Check `test_time`, `age`, `familysize` and `rwa` are numeric
+
+```{r}
+rwa_data <- read_csv(here::here("clean_data/rwa_clean.csv"),
+                     show_col_types = FALSE)
+
+rwa_data %>% 
+  verify(has_all_names("test_time", "education", "childhood", "gender",
+                       "age", "hand", "familysize", "rwa")) %>% 
+  verify(is.numeric(c(test_time, age, familysize, rwa))) %>%
+  summary()
+```
+
+```{r}
+rwa_data %>% 
+  head()
+
+rwa_data %>% 
+  summarise(across(.cols = everything(),
+                   .fns = ~ sum(is.na(.x))))
+
+rwa_data %>% 
+  group_by(education) %>% 
+  count()
+
+rwa_data %>% 
+  group_by(childhood) %>% 
+  count()
+
+rwa_data %>% 
+  group_by(gender) %>% 
+  count()
+
+rwa_data %>% 
+  group_by(hand) %>% 
+  count()
+```
+
+
+# Analysis questions
+
+### Q1
+What’s the average RWA score for each gender?
+
+```{r}
+rwa_data %>% 
+  filter(!is.na(gender)) %>% 
+  summarise(average_RWA_score = mean(rwa, na.rm = TRUE),
+            .by = gender)
+```
+
+### Q2
+What’s the average RWA score for left handed people vs. right handed people?
+
+```{r}
+rwa_data %>%
+  filter(!is.na(hand)) %>% 
+  summarise(average_RWA_score = mean(rwa, na.rm = TRUE),
+            .by = hand)
+```
+
+### Q3
+What’s the average family size for each type of childhood?
+
+```{r}
+rwa_data %>% 
+  filter(!is.na(childhood)) %>% 
+  summarise(average_family_size = mean(familysize, na.rm = TRUE),
+            .by = childhood)
+```
+
+### Q4
+What’s the average time to take the test for each education level?
+
+```{r}
+rwa_data %>% 
+  filter(!is.na(education)) %>% 
+  summarise(average_time_in_seconds_to_take_test = mean(test_time, na.rm = TRUE),
+            .by = education)
+```
+
+### Q5
+Create a plot of results of question 4.
+
+```{r}
+rwa_data %>% 
+  filter(!is.na(education)) %>% 
+  summarise(average_time_in_seconds_to_take_test = mean(test_time, na.rm = TRUE),
+            .by = education) %>% 
+  ggplot(aes(x=factor(education,
+                      levels = c("Less than high school",
+                                 "High school",
+                                 "University degree",
+                                 "Graduate degree")),
+             y=average_time_in_seconds_to_take_test,
+             fill=education)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label=round(average_time_in_seconds_to_take_test, 2)),
+            vjust=2, color="black", show.legend = FALSE) +
+  ggtitle("Average time to take test \n by Education level") +
+  xlab("Education level") +
+  ylab("Time (seconds)") +
+  ylim(0, 250) +
+  theme(plot.title = element_text(hjust=0.5, color="black", 
+                                  size=14, face="bold.italic"),
+        panel.grid.minor=element_blank())
+```
+
+
+
+### Q4
+What’s the average RWA score for people aged:
+
+- Under 18
+- 18 to 25
+- 26 to 40
+- 41 to 60
+- Over 60
+
+```{r}
+rwa_data %>% 
+  filter(!is.na(age)) %>% 
+  mutate(age_bracket = case_when(age < 18 ~ "Under 18",
+                                 age <= 25 ~ "18 to 25",
+                                 age <= 40 ~ "26 to 40",
+                                 age <= 60 ~ "41 to 60",
+                                 TRUE ~ "Over 60")) %>% 
+  summarise(average_RWA_score = mean(rwa, na.rm = TRUE),
+            .by = age_bracket)
+```
