@@ -24,7 +24,7 @@ As part of Task 4 v2, the candy rating analysis was completely re-written. There
 
 The data cleaning script is located in the `data_cleaning_scripts` folder. 
 
-There are also four other scripts within this folder:
+There are also four other scripts within sub-folder `R scripts`:
 
 - An import function (`functions.R`);
 - Recognised candy names (`lookup_candy_approved_names.R`);

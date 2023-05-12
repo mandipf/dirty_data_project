@@ -2,10 +2,10 @@
 library(tidyverse)
 
 # source R scripts
-source(here::here("data_cleaning_scripts/functions.R"))
-source(here::here("data_cleaning_scripts/lookup_candy_alt_names.R"))
-source(here::here("data_cleaning_scripts/lookup_candy_approved_names.R"))
-source(here::here("data_cleaning_scripts/lookup_countries_alt_names.R"))
+source(here::here("data_cleaning_scripts/R scripts/functions.R"))
+source(here::here("data_cleaning_scripts/R scripts/lookup_candy_alt_names.R"))
+source(here::here("data_cleaning_scripts/R scripts/lookup_candy_approved_names.R"))
+source(here::here("data_cleaning_scripts/R scripts/lookup_countries_alt_names.R"))
 
 
 
