@@ -1,7 +1,7 @@
 ---
-title: "Task 4 - Halloween Candy Data"
+title: "Task 4 - Halloween Candy Data (All Data)"
 author: "Mandip"
-date: "2023-04-14"
+date: "2023-04-15"
 output: html_document
 ---
 
@@ -18,8 +18,6 @@ options(dplyr.summarise.inform = FALSE)
 ```
 
 ### Import data
-
-This data has the additional free text field from the questionnaires.
 
 - Check all fields required for analysis are present
 - Check `age` is numeric
