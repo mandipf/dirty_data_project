@@ -1,6 +1,6 @@
 
 # **Task 4 - Halloween Candy Data**
-By Mandip Farmahan (2023-04-12)
+By Mandip Farmahan (2023-04-15)
 
 ------------------------------------------------------------------------
 
@@ -10,25 +10,26 @@ This project cleans some Halloween Candy data and performs some analysis on that
 
 Assumptions made about the data:
 
--   There are no duplicates (raters) across the three year data set;
--   Age range of people surveyed were 4 to 100. Anything outside this range was marked N/A;
--   Candy names within the free text columns were separated using full stops, commas or semi-colons;
-- Any candy which had less than 10 entries is removed from the data set to remove any pattern errors when searching free text columns.
+- There are no duplicates (raters) across the three year data set;
+- Age range of people surveyed were 4 to 100. Anything outside this range was marked N/A;
+- Candy names within the others rated as joy/despair columns were separated using commas or semi-colons;
+- Any candy within the others rated as joy/despair columns which had less than 10 entries is removed from the data set to remove any pattern errors when searching free text columns.
+- "any full sized candy bar" removed from data set as too generic
+
+Task 4 was updated and the candy rating analysis was completely re-written. There were minor updates to the country and age cleaning sections.
 
 ------------------------------------------------------------------------
 
 ## Data cleaning
 
-The data cleaning scripts are located in the `data_cleaning_scripts` folder. There are two scripts within this folder:
+The data cleaning script is located in the `data_cleaning_scripts` folder. 
 
--   The first uses the distinct column headers only for candy name (`candy_data_cleaning_without_text_field.R`);
--   The other also extracts candy data from the free text field for other candies described as joy, meh or despair (`candy_data_cleaning.R`).
+There are also four other scripts within sub-folder `R scripts`:
 
-There are also three scripts within the sub folder `lists`. These contain lists of:
-
--   Recognised candy names (`candy_names.R`);
--   Alternative entries for certain candy used within the questionnaires (`alt_entry_names_for_candy.R`);
--   Alternative entries for certain countries used within the questionnaires (`alt_entry_names_for_countries.R`).
+- An import function (`functions.R`);
+- Recognised candy names (`lookup_candy_approved_names.R`);
+- Alternative entries for certain candy used within the questionnaires (`lookup_candy_alt_names.R`);
+- Alternative entries for certain countries used within the questionnaires (`lookup_countries_alt_names.R`).
 
 The libraries required to run the data cleaning script are:
 
@@ -39,277 +40,58 @@ library(readxl)
 library(tidyverse)
 ```
 
-<br>
+Data was collected using dedicated questions for certain candy types. There were also free text fields to collect names of other candy which brought joy/despair. If the data cleaning script is fully executed, all data will be exported for analysis. 
 
-The following data cleaning tasks are carried out in four stages:
-
-**1. Function definitions**
-
-- Function 1
-  - Import the xlsx file;
-  - Add columns for `year` and `rater_id`, which is made up of the row number and questionnaire year;
-  - Clean the column names.
-  
-```
-# function to import dirty data and perform general clean of column names
-
-import_xlsx_and_clean_names <- function(file_name) {
-  df <- readxl::read_xlsx(here::here(str_c("raw_data/", file_name)),
-                          col_types = "text")
-  
-  df_clean <- df %>% 
-    mutate(year = str_extract(file_name, "20[:digit:]{2}"),
-           tibble::rowid_to_column(df, "rater_id"),
-           rater_id = str_c(year, "_", rater_id),
-           .before = everything()
-    ) %>% 
-    janitor::clean_names()
-}
-```
-
-- Function 2 (`candy_data_cleaning.R` only)
-  - Convert the data to long format (headers `candy` and `rating`);
-  - Search through the free text columns for additional candy ratings;
-  - Remove any empty (N/A) ratings.
-
-```
-# function to convert other candy bar column to usable candy and rating data
-
-others_to_candy <- function(df, start_column, end_column) {
-  df %>% 
-    pivot_longer(cols = all_of(start_column):all_of(end_column),
-                 names_to = "rating",
-                 values_to = "candy"
-    ) %>%
-    separate_longer_delim(cols = candy,
-                          delim = regex("[\\.\\,\\;]")
-    ) %>% 
-    filter(!is.na(candy) & candy != "")
-}
-```
+To remove the additional data from the free text fields, Section 3 should be removed or commented out. No other changes are required. 
 
 <br>
 
-**2. Import and clean each data set to standardise them, then combine them**
+The data cleaning tasks are carried out in seven stages:
 
-- For each data set:
-  - Import file using Function 1;
-  - Rename columns relating the rater (age, country etc) to be consistent across all three files;
+**1. Import files**
+
+  - Import each file using Import function;
+  - Rename columns relating the rater (`age`, `country` etc) to be consistent across all three files;
+  - Remove any surplus columns in rater details section (`Timestamp` and `Internal ID`).
+
+**2. Standardise main questionnaire with named columns**  
+  
+  - Select the required columns from each imported data set;
   - Convert the data from the candy named columns into long format (`candy` and `rating`) and remove any empty (N/A) ratings;
-  - Use Function 2 to extract ratings for free text candy  (`candy_data_cleaning.R` only);
-  - Combine the data from the named columns and the extracted columns for a complete data set for that year (`candy_data_cleaning.R` only).
+  - Combine the data from the named columns;
+  - Remove wrapper characters from the rating column to leave candy names.
+  
+**3. Standardise main questionnaire with any other joy/despair data** 
 
-- Combine all three files for further processing.
+  - Select the required columns from each imported data set;
+  - Combine the three data sets and convert the data from the candy named columns into long format (`candy` and `rating`);
+  - remove any empty string or NA columns;
+  - remove any candy names with less than 10 entries as stated in assumptions above;
+  - combine this data with the data from section 2.
+  
+**4. Combine similar named candy and check whether entry is an official candy**
 
-```
-# import and extract relevant data from 2015 data file (file specific)
-
-candy_2015_import <- import_xlsx_and_clean_names("boing-boing-candy-2015.xlsx")
-
-candy_2015_col_clean <- candy_2015_import %>%
-  rename(age = how_old_are_you,
-         going_trick_or_treating = are_you_going_actually_going_trick_or_treating_yourself,
-         joy = please_list_any_items_not_included_above_that_give_you_joy,
-         despair = please_list_any_items_not_included_above_that_give_you_despair
-  ) %>% 
-  select(year:despair, necco_wafers)
-
-candy_2015_main_list <- candy_2015_col_clean %>%
-  select(-joy, -despair) %>% 
-  pivot_longer(cols = butterfinger:last_col(),
-               names_to = "candy",
-               values_to = "rating"
-  ) %>% 
-  mutate(candy = str_replace_all(candy, "_", " ")) %>% 
-  filter(!is.na(rating))
-
-candy_2015_other_items <- candy_2015_col_clean %>% 
-  select(year, rater_id, age,
-         going_trick_or_treating,
-         joy, despair
-  ) %>%
-  others_to_candy("joy", "despair")
-
-candy_2015_data <- bind_rows(candy_2015_main_list,
-                             candy_2015_other_items)
-```
-```
-# import and extract relevant data from 2016 data file (file specific)
-
-candy_2016_import <- import_xlsx_and_clean_names("boing-boing-candy-2016.xlsx")
-
-candy_2016_col_clean <- candy_2016_import %>%
-  rename(age = how_old_are_you,
-         going_trick_or_treating = are_you_going_actually_going_trick_or_treating_yourself,
-         gender = your_gender,
-         country = which_country_do_you_live_in,
-         joy = please_list_any_items_not_included_above_that_give_you_joy,
-         despair = please_list_any_items_not_included_above_that_give_you_despair
-  ) %>% 
-  select(year:despair)
-
-candy_2016_main_list <- candy_2016_col_clean %>%
-  select(-joy, -despair) %>%
-  pivot_longer(cols = x100_grand_bar:last_col(),
-               names_to = "candy",
-               values_to = "rating"
-  ) %>% 
-  mutate(candy = str_replace_all(candy, "_", " ")) %>% 
-  filter(!is.na(rating))
-
-candy_2016_other_items <- candy_2016_col_clean %>% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %>% 
-  others_to_candy("joy", "despair")
-
-candy_2016_data <- bind_rows(candy_2016_main_list,
-                             candy_2016_other_items)
-```
-```
-# import and extract relevant data from 2017 data file (file specific)
-
-candy_2017_import <- import_xlsx_and_clean_names("boing-boing-candy-2017.xlsx")
-
-candy_2017_col_clean <- candy_2017_import %>%
-  rename_with(~str_remove(., "^q[1-6]_")) %>% 
-  rename(going_trick_or_treating = going_out,
-         joy = q7_joy_other,
-         despair = q8_despair_other) %>% 
-  select(year:despair)
-
-candy_2017_main_list <- candy_2017_col_clean %>%
-  select(-joy, -despair) %>% 
-  pivot_longer(cols = `100_grand_bar`:last_col(),
-               names_to = "candy",
-               values_to = "rating"
-  ) %>% 
-  mutate(candy = str_replace_all(candy, "_", " ")) %>% 
-  filter(!is.na(rating))
-
-candy_2017_other_items <- candy_2017_col_clean %>% 
-  select(year, rater_id, age, gender,
-         going_trick_or_treating,
-         country,
-         joy, despair) %>%
-  others_to_candy("joy", "despair")
-
-candy_2017_data <- bind_rows(candy_2017_main_list,
-                             candy_2017_other_items)
-```
-```
-# combine all 3 data sets and remove redundant columns
-
-all_candy_data_combined <- bind_rows(candy_2015_data,
-                                     candy_2016_data,
-                                     candy_2017_data)
-
-
-all_candy_data_combined <- all_candy_data_combined %>% 
-  select(year, rater_id, age, gender, country, 
-         going_trick_or_treating, candy, rating)
-```
-
-<br>
-
-**3. Deep clean of full data set**
-
-  - Create a table of accepted alternative candy entries (spelling errors etc) using `alt_entry_names_for_candy.R`;
+  - Create a table of accepted alternative candy entries (spelling errors etc) using `lookup_candy_alt_names.R`;
   - Join this table to the combined data set;
-  - Create a table of recognised candy names using `candy_names.R`;
-  - Filter the combined data set against this candy name table;
-  - Remove any candies with less than 10 entries for pattern detection errors;
+  - Filter the combined data set against the list of official candy names in `lookup_candy_approved_names.R`.
+  
+**5. Split countries into Canada, UK, USA, ROW and NA** 
+
   - Decode country entries using REGEX patterns;
-  - Create a table of accepted alternative country entries (spelling errors etc) using `alt_entry_names_for_countries.R`;
-  - Join this table to the combined data set;
-  - Convert age column to numeric and set all entries below 1 or above 100 to N/A.
+  - Compare the remaining entires against a list of accepted alternative country entries (spelling errors etc) using `lookup_countries_alt_names.R`;
+  - Rename any country other than Canada, UK or USA as ROW.
 
-```
-# combine similar sounding candy names and only keep joy/meh/despair entries
+**6. Update age list to be 4-100 years old and set others as NA**   
 
-source(here::here("data_cleaning_scripts/lists/alt_entry_names_for_candy.R"))
+  - Convert age column to numeric and set all entries below 4 or above 100 to N/A.
 
-alternative_candy_names <- enframe(candy_list) %>%
-  unnest_longer(col = value, values_to = "replace_this")
-
-alt_candy_combined <- all_candy_data_combined %>%
-  mutate(rating = str_to_lower(str_trim(rating)),
-         candy = str_to_lower(str_trim(candy))
-  ) %>%
-  filter(rating %in% c("joy", "despair", "meh")) %>%
-  left_join(alternative_candy_names, by = join_by(candy == replace_this)) %>%
-  mutate(candy = if_else(!is.na(name), name, candy)) %>% 
-  select(-name)
-```
-```
-# check candy names exists and remove those with less than 10 entries
-
-source(here::here("data_cleaning_scripts/lists/candy_names.R"))
-
-fixed_candy_data <- alt_candy_combined %>% 
-  mutate(is_candy = (candy %in% candy_names)) %>%
-  filter(is_candy) %>%
-  group_by(candy) %>%
-  filter(n() > 9) %>%
-  ungroup() %>% 
-  select(-is_candy)
-```
-```
-# filter countries into Canada, UK, USA, others and NA
-
-source(here::here("data_cleaning_scripts/lists/alt_entry_names_for_countries.R"))
-
-alternative_country_names <- enframe(country_list) %>%
-  unnest_longer(col = value, values_to = "replace_this")
-
-candy_and_country_data <- fixed_candy_data %>% 
-  left_join(alternative_country_names, by = join_by(country == replace_this)) %>% 
-  mutate(name_2 = case_when(str_detect(country, "^(?i)canada") ~ "Canada",
-                            str_detect(country, "^(?i)unite[sd] st") ~ "United States of America",
-                            str_detect(country, "^(?i)U[\\ \\.]*S") ~ "United States of America",
-                            str_detect(country, "mer") ~ "United States of America",
-                            str_detect(country, "^(?i)U[\\ ]*K$") ~ "United Kingdom",
-                            str_detect(country, "^United Ki[:alpha:]*om$") ~ "United Kingdom",
-                            TRUE ~ NA),
-         .after = name
-  ) %>%
-  mutate(country = case_when(is.na(country) ~ NA,
-                             is.numeric(country) ~ NA,
-                             !is.na(name_2) ~ name_2,
-                             !is.na(name) ~ name,
-                             TRUE ~ "Other")
-  ) %>% 
-  select(-name, -name_2)
-```
-```
-# update age list to be 1-100 years old, rest are NA
-
-age_candy_country_data <- candy_and_country_data %>% 
-  mutate(age_floor = floor(as.numeric(age)),
-         age = if_else(age_floor > 0 & age_floor <= 100,
-                       age_floor,
-                       NA)) %>% 
-  select(-age_floor)
-```
-
-<br>
-
-**4. Select required columns for data analysis and export to CSV**
-```
-age_candy_country_data %>%
-  select(year, rater_id, age, gender, country, 
-         going_trick_or_treating, candy, rating) %>% 
-  write_csv(here::here("clean_data/candy_clean.csv"))
-```
+**7. Select required columns for data analysis and export to CSV**
 
 ------------------------------------------------------------------------
 
 ## Data analysis
 
-The data analysis scripts are located in the `analysis_and_documentation` folder. There are two scripts within this folder, which correspond to `candy_data_cleaning.R`and `candy_data_cleaning_without_text_field.R`. The only difference between these data analysis scripts is the location of the CSV file produced by the respective cleaning script.
-
-The libraries required to run the data analysis script are:
+The data analysis script is located in the `analysis_and_documentation` folder. The libraries required to run the data analysis script are:
 
 ```         
 library(assertr)
@@ -323,8 +105,7 @@ The presence of all required variables within the imported file are verified bef
 
 ### Analysis questions
 
-With the exception of Q1, the answers provided by both data analysis scripts matched although the numbers were slightly higher in the complete data set. The example outputs are provided only for the complete data set, i.e. the data set also containing the free text fields.
-
+With the exception of Q1, the answers provided with and without Section 3 of the data cleaning script match, however some of the counts are higher with Section 3. The outputs below are provided only for the complete data set, i.e. including Section 3 of the data cleaning script.
 
 <br>
 
@@ -338,16 +119,16 @@ candy_data  %>%
 
 ##   number_of_ratings
 ##               <int>
-## 1            623468
+## 1            631057
 ```
 
-This code chunk showed that there were 623468 candy ratings within the complete data set. 
+This code chunk showed that there were 631057 candy ratings within the complete data set. 
 
-- Split by year, this was 383995 in 2015, 97336 in 2016, and 142137 in 2017.
+- Split by year, this was 388828 in 2015, 98474 in 2016, and 143755 in 2017.
 
-When using the reduced data set (no free text field), this was reduced to 620373 candy ratings.
+When using the reduced data set (no free text field), this was reduced to 628478 candy ratings.
 
-- Split by year, this was 381871 in 2015, 96959 in 2016, and 141543 in 2017.
+- Split by year, this was 387023 in 2015, 98164 in 2016, and 143291 in 2017.
 
 
 <br>
@@ -403,15 +184,15 @@ candy_data %>%
   
 ##   rating  candy              number_of_ratings
 ##   <chr>   <chr>                          <int>
-## 1 despair peanut butter bars              6006
-## 2 joy     toblerone bar                   6176
+## 1 despair reggie jackson bar              4506
+## 2 joy     kit kat bar                     7252
 ## 3 meh     100 grand bar                   1307
 ```
 
 For candy bars:
 
--   the highest rating for joy was Toblerone bar
--   the highest rating for despair was Peanut Butter bars
+-   the highest rating for joy was Kit Kat bar
+-   the highest rating for despair was Reggie Jackson bar
 -   the highest rating for meh was 100 Grand bar
 
 For all candy:
@@ -453,21 +234,21 @@ candy_data_with_rating_numbers %>%
   slice_max(rating_value)
   
 ##   gender             candy         rating_value
-##   <chr>              <chr>                <dbl>
-## 1 Female             toblerone bar          716
-## 2 I'd rather not say dove bars               53
-## 3 Male               toblerone bar         1238
-## 4 Other              toblerone bar           23
-## 5 <NA>               toblerone bar         2807
+##   <chr>              <chr>              <dbl>
+## 1 Female             kit kat bar          766
+## 2 I'd rather not say kit kat bar           62
+## 3 Male               kit kat bar         1439
+## 4 Other              twix bar              32
+## 5 <NA>               kit kat bar         4358
 ```
 
 For candy bars:
 
--   the highest rating for female was Toblerone bar
--   the highest rating for male was Toblerone bar
--   the highest rating for other was Toblerone bar
--   the highest rating for "I'd rather not say" was Dove bar
--   the highest rating for unanswered (N/A) was Toblerone bar
+-   the highest rating for female was Kit Kat bar
+-   the highest rating for male was Kit Kat bar
+-   the highest rating for other was Twix bar
+-   the highest rating for "I'd rather not say" was Kit Kat bar
+-   the highest rating for unanswered (N/A) was Kit Kat bar
 
 For all candy, the highest rated by everyone was m&ms.
 
@@ -486,13 +267,13 @@ candy_data_with_rating_numbers %>%
   slice_max(rating_value)
   
 ##    year candy         rating_value
-##   <dbl> <chr>                <dbl>
-## 1  2015 toblerone bar         2797
-## 2  2016 toblerone bar          802
-## 3  2017 toblerone bar         1236
+##   <dbl> <chr>              <dbl>
+## 1  2015 kit kat bar         4340
+## 2  2016 kit kat bar          920
+## 3  2017 kit kat bar         1395
 ```
 
-The highest rated candy bar every year was Toblerone bar.
+The highest rated candy bar every year was Kit Kat bar.
 
 For all candy types, it was m&ms every year.
 
@@ -510,26 +291,15 @@ candy_data_with_rating_numbers %>%
   summarise(rating_value = sum(rating_number, na.rm = TRUE)) %>% 
   slice_max(rating_value)
   
-##   country                  candy         rating_value
-##   <chr>                    <chr>                <dbl>
-## 1 Canada                   toblerone bar          220
-## 2 Other                    toblerone bar           70
-## 3 United Kingdom           toblerone bar           33
-## 4 United States of America toblerone bar         1688
-## 5 <NA>                     toblerone bar         2824
+##   country candy         rating_value
+##   <chr>   <chr>                <dbl>
+## 1 Canada  kit kat bar            229
+## 2 ROW     kit kat bar             71
+## 3 UK      toblerone bar           33
+## 4 USA     kit kat bar           1951
+## 5 <NA>    kit kat bar           4377
 ```
 
-The highest rated candy bar every region was Toblerone bar.
+The highest rated candy bar every region except Uk was Kit Kat bar. In the UK, it was Toblerone bar.
 
 For all candy types, it was m&ms for every region.
-
------
-
-Update 2023-04-14
-
-  - Data Cleaning:
-    - corrected REGEX escape character from “//” to “\\\\”
-    - countries were filtered into Canada, UK, USA, others and NA, i.e. others and unknown was split into others and NA
-  - Data Analysis:
-    - Number of ratings increased marginally for the free text ratings as a result of the REGEX change in Function 2
-    - Q8 was updated due to the addition of NA

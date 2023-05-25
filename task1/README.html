@@ -386,26 +386,6 @@ from the row names;</li>
 <li>Export data to CSV file.</li>
 </ul>
 <p><br></p>
-<pre><code># import dirty data
-
-decathlon_dirty_data &lt;- read_rds(here::here(&quot;raw_data/decathlon.rds&quot;))</code></pre>
-<pre><code># convert to long format data and create clean column names
-
-decathlon_clean_data &lt;- decathlon_dirty_data %&gt;% 
-  tibble::rownames_to_column(&quot;competitor&quot;) %&gt;% 
-  janitor::clean_names() %&gt;% 
-  pivot_longer(cols = x100m:x1500m,
-               names_to = &quot;event&quot;,
-               values_to = &quot;score&quot;
-               ) %&gt;% 
-  mutate(competitor = str_to_title(competitor),
-         event = str_replace_all(event, &quot;_&quot;, &quot; &quot;),
-         event = str_remove(event, &quot;^x&quot;)
-         )</code></pre>
-<pre><code># export clean data
-
-decathlon_clean_data %&gt;% 
-  write_csv(here::here(&quot;clean_data/decathlon_clean.csv&quot;))</code></pre>
 <hr />
 </div>
 <div id="data-analysis" class="section level2">

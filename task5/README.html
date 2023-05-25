@@ -386,12 +386,6 @@ library(tidyverse)</code></pre>
 <p>The following data cleaning tasks are carried out in four stages:</p>
 <p><strong>1. Import data and add an identification number for each
 person tested</strong></p>
-<pre><code>rwa_import &lt;- read_csv(here::here(&quot;raw_data/rwa.csv&quot;),
-                       show_col_types = FALSE)
-
-rwa_data &lt;- rwa_import %&gt;% 
-  mutate(rowid_to_column(rwa_import, &quot;person_id&quot;))</code></pre>
-<p><br></p>
 <p><strong>2. Calculate the RWA score</strong></p>
 <ul>
 <li>Select the required rows for calculating RWA score (Q3:Q22);</li>
@@ -399,21 +393,6 @@ rwa_data &lt;- rwa_import %&gt;%
 therefore they need to be adjusted (10 - listed score);</li>
 <li>Calculate the RWA score from the mean of questions 3 to 22.</li>
 </ul>
-<pre><code>rwa_score &lt;- rwa_data %&gt;% 
-  select(person_id, Q3:Q22) %&gt;%
-  
-  # Set 0 (no response) to NA
-  # Reverse scores for 4, 6, 8, 9, 11, 13, 15, 18, 20, 21
-  mutate(across(.cols = c(Q4, Q6, Q8, Q9, Q11, Q13, Q15, Q18, Q20, Q21),
-                .fns = ~ if_else(.x &gt; 0,
-                                 10 - .x,
-                                 NA))) %&gt;%
-  
-  # calculate mean of Q3:Q22 for each person_id
-  pivot_longer(Q3:Q22) %&gt;% 
-  summarise(rwa = mean(value, na.rm = TRUE),
-            .by = person_id)</code></pre>
-<p><br></p>
 <p><strong>3. Add and and recode remaining columns to RWA score for data
 analysis</strong></p>
 <ul>
@@ -423,59 +402,8 @@ analysis</strong></p>
 <code>rwa_codebook.txt</code>;</li>
 <li>Recode numerical values using assumptions above.</li>
 </ul>
-<pre><code># add columns required for data analysis and calculated RWA score
-
-rwa_all_columns &lt;- rwa_data  %&gt;% 
-  # gender, hand, family size, childhood, test time, education level, and age
-  select(person_id, test_time = testelapse, education,
-         childhood = urban, gender, age, hand, familysize) %&gt;% 
-  inner_join(rwa_score, by = &quot;person_id&quot;)</code></pre>
-<pre><code># recode personal details from listed numbers to rwa_codebook definitions 
-
-rwa_recode &lt;- rwa_all_columns %&gt;% 
-  mutate(education = case_match(education,
-                                1 ~ &quot;Less than high school&quot;,
-                                2 ~ &quot;High school&quot;,
-                                3 ~ &quot;University degree&quot;,
-                                4 ~ &quot;Graduate degree&quot;,
-                                .default = NA),
-         
-         childhood = case_match(childhood,
-                            1 ~ &quot;Rural (country side)&quot;,
-                            2 ~ &quot;Suburban&quot;,
-                            3 ~ &quot;Urban (town, city)&quot;,
-                            .default = NA),
-         
-         gender = case_match(gender,
-                             1 ~ &quot;Male&quot;,
-                             2 ~ &quot;Female&quot;,
-                             3 ~ &quot;Other&quot;,
-                             .default = NA),
-         
-         hand =  case_match(hand,
-                            1 ~ &quot;Right&quot;,
-                            2 ~ &quot;Left&quot;,
-                            3 ~ &quot;Both&quot;,
-                            .default = NA),
-         
-         # test_time filtered to allow up to 10 minutes, rest are NA
-         test_time = if_else(test_time &lt;= 600,
-                             test_time,
-                             NA),
-         
-         # age filtered to allow 13 (minimum survey age) to 100, rest are NA
-         age = if_else(age &gt;= 13 &amp; age &lt;= 100,
-                       age,
-                       NA),
-         
-         # familysize filtered to allow 1 (person surveyed) to 13, rest are NA
-         familysize = if_else(familysize &gt; 0 &amp; familysize &lt;= 13,
-                              familysize,
-                              NA))</code></pre>
-<p><br></p>
 <p><strong>4. Export to CSV</strong></p>
-<pre><code>rwa_recode %&gt;% 
-  write_csv(here::here(&quot;clean_data/rwa_clean.csv&quot;))</code></pre>
+<p><br></p>
 <hr />
 </div>
 <div id="data-analysis" class="section level2">

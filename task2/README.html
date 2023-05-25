@@ -389,46 +389,6 @@ format (headings: <code>code</code> and <code>quantity</code>);</li>
 <li>Export data to CSV file.</li>
 </ul>
 <p><br></p>
-<pre><code># import dirty data
-
-cake_ingredients_dirty &lt;- read_csv(here::here(&quot;raw_data/cake-ingredients-1961.csv&quot;),
-                                   show_col_types = FALSE)
-
-cake_ingredients_code &lt;- read_csv(here::here(&quot;raw_data/cake_ingredient_code.csv&quot;),
-                                   show_col_types = FALSE)</code></pre>
-<pre><code># find units of measure (exclude NA) in code CSV and create REGEX pattern
-
-units_measure_pattern &lt;- cake_ingredients_code %&gt;% 
-  distinct(measure) %&gt;% 
-  drop_na() %&gt;% 
-  pull() %&gt;% 
-  str_c(collapse=&quot;|&quot;)</code></pre>
-<pre><code># split any concatenated ingredient-measure strings in code CSV
-
-cake_ingredients_code_fixed &lt;- cake_ingredients_code %&gt;% 
-  mutate(ingredient_2 =  if_else(str_detect(ingredient, units_measure_pattern),
-                                 str_remove(ingredient, str_c(&quot; &quot;, units_measure_pattern)),
-                                 ingredient),
-         measure_2 = if_else(str_detect(ingredient, units_measure_pattern),
-                             str_extract(ingredient, units_measure_pattern),
-                             measure)) %&gt;% 
-  select(code,
-         ingredient = ingredient_2,
-         measure = measure_2)</code></pre>
-<pre><code># convert to long format data and convert ingredient abbreviations
-
-cake_ingredients_clean &lt;- cake_ingredients_dirty %&gt;% 
-  pivot_longer(cols = -Cake,
-               names_to = &quot;code&quot;,
-               values_to = &quot;quantity&quot;
-               ) %&gt;%
-  janitor::clean_names() %&gt;% 
-  inner_join(cake_ingredients_code, by = &quot;code&quot;) %&gt;% 
-  select(cake, ingredient, quantity, measure)</code></pre>
-<pre><code># export clean data
-
-cake_ingredients_clean %&gt;% 
-  write_csv(here::here(&quot;clean_data/cake_ingredients_clean.csv&quot;))</code></pre>
 <hr />
 </div>
 <div id="data-analysis" class="section level2">
