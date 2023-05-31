@@ -11,7 +11,7 @@
 
 <meta name="author" content="Mandip Farmahan" />
 
-<meta name="date" content="2023-05-12" />
+<meta name="date" content="2023-05-31" />
 
 <title>candy_data_cleaning.R</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">candy_data_cleaning.R</h1>
 <h4 class="author">Mandip Farmahan</h4>
-<h4 class="date">2023-05-12</h4>
+<h4 class="date">2023-05-31</h4>
 
 </div>
 
@@ -360,15 +360,15 @@ display: none;
 <pre class="r"><code># import libraries
 library(tidyverse)</code></pre>
 <pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-## ✔ dplyr     1.1.0     ✔ readr     2.1.4
+## ✔ dplyr     1.1.2     ✔ readr     2.1.4
 ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
-## ✔ ggplot2   3.4.1     ✔ tibble    3.2.0
+## ✔ ggplot2   3.4.2     ✔ tibble    3.2.1
 ## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
 ## ✔ purrr     1.0.1     
 ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()
-## ℹ Use the ]8;;http://conflicted.r-lib.org/conflicted package]8;; to force all conflicts to become errors</code></pre>
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 <pre class="r"><code># source R scripts
 source(here::here(&quot;data_cleaning_scripts/R scripts/functions.R&quot;))
 source(here::here(&quot;data_cleaning_scripts/R scripts/lookup_candy_alt_names.R&quot;))
@@ -376,9 +376,7 @@ source(here::here(&quot;data_cleaning_scripts/R scripts/lookup_candy_approved_na
 source(here::here(&quot;data_cleaning_scripts/R scripts/lookup_countries_alt_names.R&quot;))
 
 
-
-#####
-# SECTION 1: IMPORT FILES
+# SECTION 1: IMPORT FILES -----
 # Rename personal details to short/tidy names
 # Remove unwanted columns within the personal details columns
 
@@ -402,8 +400,7 @@ candy_2017 &lt;- import_xlsx_and_clean_names(&quot;boing-boing-candy-2017.xlsx&q
   select(-`Internal ID`)</code></pre>
 <pre><code>## New names:
 ## • `` -&gt; `...114`</code></pre>
-<pre class="r"><code>#####
-# SECTION 2: MAIN QUESTIONNAIRE WITH CANDY NAMED COLUMNS STANDARDISED
+<pre class="r"><code># SECTION 2: MAIN QUESTIONNAIRE WITH CANDY NAMED COLUMNS STANDARDISED -----
 # select required columns and convert candy data to long format
 
 candy_2015_main &lt;- candy_2015 %&gt;%
@@ -441,9 +438,7 @@ candy_combined &lt;- bind_rows(candy_2015_main, candy_2016_main,
          candy = str_to_lower(candy))
 
 
-
-##### 
-# SECTION 3: MAIN QUESTIONNAIRE WITH ANY OTHER JOY/DESPAIR STANDARDISED
+# SECTION 3: MAIN QUESTIONNAIRE WITH ANY OTHER JOY/DESPAIR STANDARDISED -----
 # Section 3 can be commented out to remove these additional joy/despair columns
 
 # select required columns
@@ -484,9 +479,7 @@ candy_combined &lt;- bind_rows(candy_combined,
                             candy_extra_combined)
 
 
-
-#####
-# SECTION 4: COMBINE SIMILAR NAMED CANDY AND CHECK VALIDITY
+# SECTION 4: COMBINE SIMILAR NAMED CANDY AND CHECK VALIDITY -----
 
 # create list to combine similar named candy
 candy_alt_names &lt;- enframe(candy_list) %&gt;%
@@ -501,9 +494,7 @@ candy_renamed &lt;- candy_combined %&gt;%
   filter(candy %in% candy_names)
 
 
-
-#####
-# SECTION 5: SPLIT COUNTRIES INTO CANADA, UK, USA, ROW and NA
+# SECTION 5: SPLIT COUNTRIES INTO CANADA, UK, USA, ROW and NA -----
 
 country_candy_data &lt;- candy_renamed %&gt;%   
   mutate(country = case_when(is.na(country) ~ NA,
@@ -523,9 +514,7 @@ country_candy_data &lt;- candy_renamed %&gt;%
                              TRUE ~ &quot;ROW&quot;))
 
 
-
-#####
-# SECTION 6: UPDATE AGE LIST TO BE 4-100 years old; set rest to NA
+# SECTION 6: UPDATE AGE LIST TO BE 4-100 years old; set rest to NA -----
 
 age_country_candy_data &lt;- country_candy_data %&gt;% 
   mutate(age_floor = floor(as.numeric(age)),
@@ -537,8 +526,7 @@ age_country_candy_data &lt;- country_candy_data %&gt;%
 ## ℹ In argument: `age_floor = floor(as.numeric(age))`.
 ## Caused by warning:
 ## ! NAs introduced by coercion</code></pre>
-<pre class="r"><code>#####
-# SECTION 7: EXPORT CLEAN DATA AS CSV
+<pre class="r"><code># SECTION 7: EXPORT CLEAN DATA AS CSV -----
 age_country_candy_data %&gt;%
   select(year, rater_id, age, gender, country, 
          going_trick_or_treating, candy, rating) %&gt;% 

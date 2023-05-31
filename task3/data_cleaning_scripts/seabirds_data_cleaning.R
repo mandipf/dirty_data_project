@@ -1,8 +1,7 @@
 library(tidyverse)
 
 
-#####
-# SECTION 1: FUNCTION DEFINITIONS
+# SECTION 1: FUNCTION DEFINITIONS -----
 
 # function to clean species names to remove age, wanplum, plphase and sex
 species_split <- function(df, col_name) {
@@ -16,8 +15,7 @@ species_split <- function(df, col_name) {
 }
 
 
-#####
-# SECTION 2: IMPORT AND CLEAN DATA SET, THEN EXPORT
+# SECTION 2: IMPORT AND CLEAN DATA SET, THEN EXPORT -----
 
 # import dirty data
 bird_dirty_data <- readxl::read_xls(here::here("raw_data/seabirds.xls"),

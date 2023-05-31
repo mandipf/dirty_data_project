@@ -8,9 +8,7 @@ source(here::here("data_cleaning_scripts/R scripts/lookup_candy_approved_names.R
 source(here::here("data_cleaning_scripts/R scripts/lookup_countries_alt_names.R"))
 
 
-
-#####
-# SECTION 1: IMPORT FILES
+# SECTION 1: IMPORT FILES -----
 # Rename personal details to short/tidy names
 # Remove unwanted columns within the personal details columns
 
@@ -34,9 +32,7 @@ candy_2017 <- import_xlsx_and_clean_names("boing-boing-candy-2017.xlsx") %>%
   select(-`Internal ID`)
 
 
-
-#####
-# SECTION 2: MAIN QUESTIONNAIRE WITH CANDY NAMED COLUMNS STANDARDISED
+# SECTION 2: MAIN QUESTIONNAIRE WITH CANDY NAMED COLUMNS STANDARDISED -----
 # select required columns and convert candy data to long format
 
 candy_2015_main <- candy_2015 %>%
@@ -74,9 +70,7 @@ candy_combined <- bind_rows(candy_2015_main, candy_2016_main,
          candy = str_to_lower(candy))
 
 
-
-##### 
-# SECTION 3: MAIN QUESTIONNAIRE WITH ANY OTHER JOY/DESPAIR STANDARDISED
+# SECTION 3: MAIN QUESTIONNAIRE WITH ANY OTHER JOY/DESPAIR STANDARDISED -----
 # Section 3 can be commented out to remove these additional joy/despair columns
 
 # select required columns
@@ -117,9 +111,7 @@ candy_combined <- bind_rows(candy_combined,
                             candy_extra_combined)
 
 
-
-#####
-# SECTION 4: COMBINE SIMILAR NAMED CANDY AND CHECK VALIDITY
+# SECTION 4: COMBINE SIMILAR NAMED CANDY AND CHECK VALIDITY -----
 
 # create list to combine similar named candy
 candy_alt_names <- enframe(candy_list) %>%
@@ -134,9 +126,7 @@ candy_renamed <- candy_combined %>%
   filter(candy %in% candy_names)
 
 
-
-#####
-# SECTION 5: SPLIT COUNTRIES INTO CANADA, UK, USA, ROW and NA
+# SECTION 5: SPLIT COUNTRIES INTO CANADA, UK, USA, ROW and NA -----
 
 country_candy_data <- candy_renamed %>%   
   mutate(country = case_when(is.na(country) ~ NA,
@@ -156,9 +146,7 @@ country_candy_data <- candy_renamed %>%
                              TRUE ~ "ROW"))
 
 
-
-#####
-# SECTION 6: UPDATE AGE LIST TO BE 4-100 years old; set rest to NA
+# SECTION 6: UPDATE AGE LIST TO BE 4-100 years old; set rest to NA -----
 
 age_country_candy_data <- country_candy_data %>% 
   mutate(age_floor = floor(as.numeric(age)),
@@ -168,9 +156,7 @@ age_country_candy_data <- country_candy_data %>%
   select(-age_floor)
 
 
-
-#####
-# SECTION 7: EXPORT CLEAN DATA AS CSV
+# SECTION 7: EXPORT CLEAN DATA AS CSV -----
 age_country_candy_data %>%
   select(year, rater_id, age, gender, country, 
          going_trick_or_treating, candy, rating) %>% 
