@@ -1,0 +1,157 @@
+cake,ingredient,quantity,measure
+Angel,Almond essence,0.25,teaspoon
+Angel,Cream of tartar,1.25,teaspoon
+Angel,Egg white,10,one
+Angel,Sifted flour,1,cup
+Angel,Granulated sugar,1.5,cup
+Angel,Salt,0.25,teaspoon
+Angel,Vanilla extract,1,teaspoon
+Babas au Rhum,Butter,0.25,cup
+Babas au Rhum,Dried currants,3,tablespoon
+Babas au Rhum,Eggs,1,one
+Babas au Rhum,Egg yolk,2,one
+Babas au Rhum,Sifted flour,1.75,cup
+Babas au Rhum,Lemon rind,0.5,teaspoon
+Babas au Rhum,Milk,0.25,cup
+Babas au Rhum,Rum,2,ounce
+Babas au Rhum,Granulated sugar,0.25,cup
+Babas au Rhum,Water,0.25,cup
+Babas au Rhum,Yeast,0.6,ounce
+Sweet Chocolate,Butter,1,cup
+Sweet Chocolate,Chocolate,4,ounce
+Sweet Chocolate,Eggs,4,one
+Sweet Chocolate,Sifted flour,2.5,cup
+Sweet Chocolate,Milk,1,cup
+Sweet Chocolate,Soda,1,teaspoon
+Sweet Chocolate,Granulated sugar,2,cup
+Sweet Chocolate,Salt,0.5,teaspoon
+Sweet Chocolate,Vanilla extract,1,teaspoon
+Sweet Chocolate,Water,0.5,cup
+Buche de Noel,Eggs,4,one
+Buche de Noel,Sifted flour,1,cup
+Buche de Noel,Granulated sugar,1.3,cup
+Buche de Noel,Salt,0.5,teaspoon
+Buche de Noel,Vanilla extract,1,teaspoon
+Cheesecake,Butter,0.25,cup
+Cheesecake,Cottage Cheese,1.5,pound
+Cheesecake,Eggs,6,one
+Cheesecake,Sifted flour,0.25,cup
+Cheesecake,Lemon juice,1,tablespoon
+Cheesecake,Lemon rind,1,teaspoon
+Cheesecake,Sour cream ,1,cup
+Cheesecake,Granulated sugar,1,cup
+Cheesecake,Salt,0.25,teaspoon
+Cheesecake,Zwiebach,6,ounce
+Rum Cheesecake,Cottage Cheese,1.5,pound
+Rum Cheesecake,Eggs,2,one
+Rum Cheesecake,Gelatin,2,tablespoon
+Rum Cheesecake,Heavy cream,1,cup
+Rum Cheesecake,Lemon juice,1,tablespoon
+Rum Cheesecake,Lemon rind,1,teaspoon
+Rum Cheesecake,Milk,1,cup
+Rum Cheesecake,Rum,1,ounce
+Rum Cheesecake,Granulated sugar,1,cup
+Rum Cheesecake,Salt,0.25,teaspoon
+Blender Cheesecake,Cottage Cheese,0.5,pound
+Blender Cheesecake,Crushed Ice,1,cup
+Blender Cheesecake,Crumbs,0.3,cup
+Blender Cheesecake,Egg yolk,2,one
+Blender Cheesecake,Gelatin,1,tablespoon
+Blender Cheesecake,Lemon juice,1,tablespoon
+Blender Cheesecake,Lemon rind,1,teaspoon
+Blender Cheesecake,Sour cream ,1,cup
+Blender Cheesecake,Water,0.5,cup
+One Bowl Chocolate,Baking powder,2,teaspoon
+One Bowl Chocolate,Cocoa,10,tablespoon
+One Bowl Chocolate,Eggs,2,one
+One Bowl Chocolate,Sifted flour,2,cup
+One Bowl Chocolate,Milk,0.7,cup
+One Bowl Chocolate,Soda,0.5,teaspoon
+One Bowl Chocolate,Shortening,10,tablespoon
+One Bowl Chocolate,Granulated sugar,1.5,cup
+One Bowl Chocolate,Salt,0.25,teaspoon
+One Bowl Chocolate,Vanilla extract,1,teaspoon
+One Bowl Chocolate,Water,0.5,cup
+Red Devil's Food,Cocoa,0.3,tablespoon
+Red Devil's Food,Eggs,2,one
+Red Devil's Food,Sifted flour,1.75,cup
+Red Devil's Food,Milk,1,cup
+Red Devil's Food,Soda,1.25,teaspoon
+Red Devil's Food,Shortening,0.5,tablespoon
+Red Devil's Food,Granulated sugar,1.5,cup
+Red Devil's Food,Salt,1,teaspoon
+Red Devil's Food,Vanilla extract,1,teaspoon
+Sour Cream Fudge,Chocolate,3,ounce
+Sour Cream Fudge,Eggs,2,one
+Sour Cream Fudge,Sifted flour,2,cup
+Sour Cream Fudge,Soda,1,teaspoon
+Sour Cream Fudge,Sour cream ,1,cup
+Sour Cream Fudge,Shortening,0.3,tablespoon
+Sour Cream Fudge,Granulated sugar,1.5,cup
+Sour Cream Fudge,Salt,1,teaspoon
+Sour Cream Fudge,Vanilla extract,1,teaspoon
+Sour Cream Fudge,Water,0.25,cup
+Hungarian Cream,Almond essence,1.5,teaspoon
+Hungarian Cream,Baking powder,3,teaspoon
+Hungarian Cream,Eggs,3,one
+Hungarian Cream,Sifted flour,3,cup
+Hungarian Cream,Heavy cream,2,cup
+Hungarian Cream,Granulated sugar,1.5,cup
+Hungarian Cream,Salt,1,teaspoon
+Hungarian Cream,Vanilla extract,2,teaspoon
+Crumb and Nut,Baking powder,3,teaspoon
+Crumb and Nut,Crumbs,3,cup
+Crumb and Nut,Eggs,4,one
+Crumb and Nut,Milk,1,cup
+Crumb and Nut,Nuts,1,cup
+Crumb and Nut,Shortening,1,tablespoon
+Crumb and Nut,Granulated sugar,1,cup
+Crumb and Nut,Vanilla extract,2,teaspoon
+Spiced Pound,Butter,1,cup
+Spiced Pound,Eggs,5,one
+Spiced Pound,Sifted flour,2,cup
+Spiced Pound,Nutmeg,1.5,teaspoon
+Spiced Pound,Granulated sugar,1.7,cup
+Spiced Pound,Salt,0.5,teaspoon
+Strawberry Roll,Baking powder,0.75,teaspoon
+Strawberry Roll,Cottage Cheese,0.5,pound
+Strawberry Roll,Eggs,4,one
+Strawberry Roll,Sifted flour,0.75,cup
+Strawberry Roll,Granulated sugar,0.75,cup
+Strawberry Roll,Strawberries,1,quart
+Strawberry Roll,Salt,1,teaspoon
+Strawberry Roll,Vanilla extract,1,teaspoon
+Savarin,Butter,0.7,cup
+Savarin,Eggs,3,one
+Savarin,Sifted flour,1.5,cup
+Savarin,Lemon rind,1,teaspoon
+Savarin,Milk,0.25,cup
+Savarin,Granulated sugar,0.6,cup
+Savarin,Salt,0.5,teaspoon
+Savarin,Water,0.25,cup
+Savarin,Yeast,1,ounce
+Banana Shortcake,Baking powder,4,teaspoon
+Banana Shortcake,Butter,0.6,cup
+Banana Shortcake,Bananas,3,one
+Banana Shortcake,Sifted flour,3,cup
+Banana Shortcake,Heavy cream,1,cup
+Banana Shortcake,Milk,1,cup
+Banana Shortcake,Granulated sugar,0.13,cup
+Banana Shortcake,Salt,0.5,teaspoon
+Strawberry Shortcake,Baking powder,3,teaspoon
+Strawberry Shortcake,Butter,0.12,cup
+Strawberry Shortcake,Cottage Cheese,0.2,pound
+Strawberry Shortcake,Eggs,1,one
+Strawberry Shortcake,Sifted flour,2,cup
+Strawberry Shortcake,Milk,0.5,cup
+Strawberry Shortcake,Sour cream ,1,cup
+Strawberry Shortcake,Granulated sugar,0.6,cup
+Strawberry Shortcake,Strawberries,1,quart
+Strawberry Shortcake,Salt,0.75,teaspoon
+Sponge,Almond essence,0.5,teaspoon
+Sponge,Baking powder,1,teaspoon
+Sponge,Eggs,4,one
+Sponge,Sifted flour,0.75,cup
+Sponge,Granulated sugar,0.75,cup
+Sponge,Salt,0.25,teaspoon
+Sponge,Water,2,cup
